@@ -39,7 +39,7 @@
   <div class="panel" style="width:min(900px,100%)">
     <div class="menu-layout">
       <div>
-        <span class="eyebrow">TEST BUILD v0.6 · 3D LIFE SIMULATOR</span>
+        <span class="eyebrow">TEST BUILD v0.7 · 3D LIFE SIMULATOR</span>
         <h1>FROM<br>NOTHING</h1>
         <p>Start with almost nothing. Work, save, build a reputation, and create your legacy.</p>
         <div class="menu-actions">
@@ -62,7 +62,7 @@
   <div class="panel character-panel">
     <span class="eyebrow">CREATE YOUR STORY</span>
     <h2>Choose Your Character</h2>
-    <p>This choice changes your player model and is stored in each save slot. The test build now loads a real skinned GLB character with skeletal Idle / Walk / Run animation.</p>
+    <p>This choice changes your player model and is stored in each save slot. The test build now loads local rigged GLB character assets from this repository with skeletal animation.</p>
     <div class="character-grid">
       <button class="char-card selected" data-gender="boy"><div class="sil"><div class="preview-human boy-preview"><i class="head"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>BOY</strong><small>Streetwear · athletic build</small></button>
       <button class="char-card girl" data-gender="girl"><div class="sil"><div class="preview-human girl-preview"><i class="head"></i><i class="hair"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>GIRL</strong><small>Streetwear · athletic build</small></button>
@@ -175,7 +175,7 @@ for(const x of[-7,-3,1,5])plane(1.1,7,new THREE.MeshBasicMaterial({color:0xe6e2d
 
 function material(color,rough=.72){return new THREE.MeshStandardMaterial({color,roughness:rough})}
 const gltfLoader=new GLTFLoader();
-const RIGGED_MODEL_URL='https://threejs.org/examples/models/gltf/Soldier.glb';
+const RIGGED_MODEL_URLS={boy:'./assets/characters/boy.glb',girl:'./assets/characters/girl.glb'};
 let playerMixer=null,playerActions={},playerAnimName='',riggedReady=false,riggedLoading=false;
 function setRiggedAnim(name,fade=.18){
   if(!playerActions[name]||playerAnimName===name)return;
@@ -186,7 +186,7 @@ function setRiggedAnim(name,fade=.18){
 function loadRiggedPlayer(kind){
   if(riggedLoading)return;riggedLoading=true;riggedReady=false;
   const oldVisual=player.getObjectByName('riggedVisual');if(oldVisual)player.remove(oldVisual);
-  gltfLoader.load(RIGGED_MODEL_URL,gltf=>{
+  gltfLoader.load(RIGGED_MODEL_URLS[kind]||RIGGED_MODEL_URLS.boy,gltf=>{
     const model=gltf.scene;model.name='riggedVisual';
     model.scale.setScalar(.95);model.position.y=0;
     model.rotation.y=Math.PI;
@@ -204,7 +204,12 @@ function loadRiggedPlayer(kind){
     player.children.filter(x=>x!==model).forEach(x=>x.visible=false);
     playerMixer=new THREE.AnimationMixer(model);playerActions={};
     for(const clip of gltf.animations)playerActions[clip.name]=playerMixer.clipAction(clip);
-    playerAnimName='';setRiggedAnim(playerActions.Idle?'Idle':Object.keys(playerActions)[0],0);
+    const names=Object.keys(playerActions);
+    const findAnim=(terms)=>names.find(n=>terms.some(t=>n.toLowerCase().includes(t)));
+    playerActions.Idle ||= playerActions[findAnim(['idle','stand','breath'])] || playerActions[names[0]];
+    playerActions.Walk ||= playerActions[findAnim(['walk'])] || playerActions[names[1]] || playerActions.Idle;
+    playerActions.Run ||= playerActions[findAnim(['run','jog'])] || playerActions[names[2]] || playerActions.Walk;
+    playerAnimName='';setRiggedAnim('Idle',0);
     riggedReady=true;riggedLoading=false;toast('Rigged 3D character loaded');
   },undefined,err=>{riggedLoading=false;riggedReady=false;console.error('Rigged model failed',err);toast('Rigged model failed to load — fallback active')});
 }
