@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080b12" />
+    <title>From Nothing — 3D Life Simulator</title>
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+
+    <div id="hud">
+      <div class="brand">
+        <span class="eyebrow">FROM NOTHING</span>
+        <strong>Day <span id="day">1</span> · <span id="clock">08:00</span></strong>
+      </div>
+
+      <div class="stats">
+        <div><span>Cash</span><b id="cash">$120</b></div>
+        <div><span>Energy</span><b id="energy">100</b></div>
+        <div><span>Hunger</span><b id="hunger">12</b></div>
+        <div><span>Reputation</span><b id="rep">0</b></div>
+      </div>
+
+      <div id="objective">
+        <span>OBJECTIVE</span>
+        <strong id="objectiveText">Find the diner and ask for work.</strong>
+      </div>
+
+      <div id="prompt" class="hidden">Press <kbd>E</kbd> to interact</div>
+      <div id="toast" class="hidden"></div>
+
+      <div class="controls">
+        <span><kbd>WASD</kbd> Move</span>
+        <span><kbd>SHIFT</kbd> Run</span>
+        <span><kbd>E</kbd> Interact</span>
+        <span><kbd>ESC</kbd> Pause</span>
+      </div>
+    </div>
+
+    <div id="modal" class="hidden">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <span id="modalKicker">INTERACTION</span>
+            <h2 id="modalTitle">Title</h2>
+          </div>
+          <button id="closeModal" aria-label="Close">×</button>
+        </div>
+        <p id="modalText"></p>
+        <div id="modalActions"></div>
+      </div>
+    </div>
+
+    <div id="pause" class="hidden">
+      <div class="panel pause-panel">
+        <span class="eyebrow">PAUSED</span>
+        <h2>From Nothing</h2>
+        <button id="resumeBtn">Resume</button>
+        <button id="saveBtn">Save Game</button>
+        <button id="loadBtn">Load Save</button>
+        <button id="resetBtn" class="danger">New Life</button>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
