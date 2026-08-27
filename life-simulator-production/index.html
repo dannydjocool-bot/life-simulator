@@ -39,7 +39,7 @@
   <div class="panel" style="width:min(900px,100%)">
     <div class="menu-layout">
       <div>
-        <span class="eyebrow">TEST BUILD v0.7.1 · 3D LIFE SIMULATOR</span>
+        <span class="eyebrow">TEST BUILD v0.8 · 3D LIFE SIMULATOR</span>
         <h1>FROM<br>NOTHING</h1>
         <p>Start with almost nothing. Work, save, build a reputation, and create your legacy.</p>
         <div class="menu-actions">
@@ -62,10 +62,10 @@
   <div class="panel character-panel">
     <span class="eyebrow">CREATE YOUR STORY</span>
     <h2>Choose Your Character</h2>
-    <p>This choice changes your player model and is stored in each save slot. The test build now loads local rigged GLB character assets from this repository with skeletal animation.</p>
+    <p>This choice changes your player model and is stored in each save slot. The test build now loads local rigged GLB characters with skeletal animation, distinct styling, skin tone, hair, and clothing.</p>
     <div class="character-grid">
-      <button class="char-card selected" data-gender="boy"><div class="sil"><div class="preview-human boy-preview"><i class="head"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>BOY</strong><small>Streetwear · athletic build</small></button>
-      <button class="char-card girl" data-gender="girl"><div class="sil"><div class="preview-human girl-preview"><i class="head"></i><i class="hair"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>GIRL</strong><small>Streetwear · athletic build</small></button>
+      <button class="char-card selected" data-gender="boy"><div class="sil"><div class="preview-human boy-preview"><i class="head"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>BOY</strong><small>Black hoodie · twists · athletic build</small></button>
+      <button class="char-card girl" data-gender="girl"><div class="sil"><div class="preview-human girl-preview"><i class="head"></i><i class="hair"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>GIRL</strong><small>Black top · tied-back hair · athletic build</small></button>
     </div>
     <button id="confirmCharacterBtn" class="menu-btn">Continue</button>
     <button id="characterBackBtn" class="menu-btn secondary">Back</button>
@@ -186,13 +186,53 @@ function setRiggedAnim(name,fade=.18){
   if(prev)prev.fadeOut(fade);
   next.reset().fadeIn(fade).play();playerAnimName=name;
 }
+
+function findBone(root,patterns){
+  let found=null;root.traverse(o=>{if(found||!o.isBone)return;const n=(o.name||'').toLowerCase();if(patterns.some(p=>n.includes(p)))found=o});return found
+}
+function addRiggedStyle(model,kind){
+  const female=kind==='girl';
+  const skin=female?0x8a5036:0x6b3f2a, dark=0x111216, pants=female?0x55575d:0x111418, shoe=0xf1f1ef;
+  model.traverse(o=>{
+    if(o.isMesh&&o.material){
+      const mats=Array.isArray(o.material)?o.material:[o.material];
+      for(const m of mats){m.color?.setHex(skin);m.roughness=.62;m.metalness=0}
+    }
+  });
+  const head=findBone(model,['head']), chest=findBone(model,['spine2','spine1','chest','upperchest','spine']), hips=findBone(model,['hips','pelvis']);
+  const footL=findBone(model,['leftfoot','foot_l','l_foot']),footR=findBone(model,['rightfoot','foot_r','r_foot']);
+  if(head){
+    const hairMat=new THREE.MeshStandardMaterial({color:0x0b0b0d,roughness:.92});
+    const cap=new THREE.Mesh(new THREE.SphereGeometry(female?.115:.13,20,14,0,Math.PI*2,0,Math.PI*.62),hairMat);
+    cap.position.set(0,female?.08:.075,0);cap.scale.set(1.05,.72,1.04);cap.castShadow=true;head.add(cap);
+    if(female){
+      const back=new THREE.Mesh(new THREE.CapsuleGeometry(.085,.26,5,10),hairMat);back.position.set(0,-.08,.075);back.rotation.x=.08;back.castShadow=true;head.add(back);
+      const bun=new THREE.Mesh(new THREE.SphereGeometry(.07,14,10),hairMat);bun.position.set(0,.06,.11);head.add(bun);
+    }else{
+      for(let i=0;i<11;i++){const a=(i/11)*Math.PI*2;const lock=new THREE.Mesh(new THREE.CylinderGeometry(.012,.016,.11,6),hairMat);lock.position.set(Math.cos(a)*.085,.12,Math.sin(a)*.075);lock.rotation.z=Math.cos(a)*.35;lock.rotation.x=Math.sin(a)*.35;lock.castShadow=true;head.add(lock)}
+    }
+  }
+  if(chest){
+    const hoodieMat=new THREE.MeshStandardMaterial({color:dark,roughness:.88});
+    const top=new THREE.Mesh(new THREE.CapsuleGeometry(female?.105:.12,.28,6,12),hoodieMat);top.scale.set(female?1.5:1.65,1.65,.72);top.position.set(0,.01,0);top.castShadow=true;chest.add(top);
+    const hood=new THREE.Mesh(new THREE.TorusGeometry(female?.1:.115,.028,8,18,Math.PI*1.25),hoodieMat);hood.rotation.x=Math.PI/2;hood.position.set(0,.12,.055);chest.add(hood);
+  }
+  if(hips){
+    const pantsMat=new THREE.MeshStandardMaterial({color:pants,roughness:.9});
+    const waist=new THREE.Mesh(new THREE.CapsuleGeometry(.1,.22,5,10),pantsMat);waist.rotation.z=Math.PI/2;waist.scale.set(1.6,1,.8);waist.castShadow=true;hips.add(waist);
+  }
+  for(const foot of [footL,footR]) if(foot){
+    const sm=new THREE.MeshStandardMaterial({color:shoe,roughness:.52});
+    const sneaker=new THREE.Mesh(new THREE.BoxGeometry(.085,.055,.18),sm);sneaker.position.set(0,-.02,.035);sneaker.castShadow=true;foot.add(sneaker)
+  }
+}
 function loadRiggedPlayer(kind){
   if(riggedLoading)return;riggedLoading=true;riggedReady=false;
   const oldVisual=player.getObjectByName('riggedVisual');if(oldVisual)player.remove(oldVisual);
   gltfLoader.load(RIGGED_MODEL_URLS[kind]||RIGGED_MODEL_URLS.boy,gltf=>{
     const model=gltf.scene;model.name='riggedVisual';
     model.scale.setScalar(.95);model.position.y=0;
-    model.rotation.y=Math.PI;
+    model.rotation.y=0;
     model.traverse(o=>{
       if(o.isMesh){o.castShadow=true;o.receiveShadow=true;
         if(o.material){o.material=o.material.clone();o.material.roughness=Math.min(.82,o.material.roughness??.7);
@@ -201,7 +241,8 @@ function loadRiggedPlayer(kind){
         }
       }
     });
-    if(kind==='girl')model.scale.set(.88,.94,.88);
+    if(kind==='girl')model.scale.set(.88,.94,.88);else model.scale.set(.94,.98,.94);
+    addRiggedStyle(model,kind);
     player.add(model);
     // Hide procedural fallback once the GLB is actually ready.
     player.children.filter(x=>x!==model).forEach(x=>x.visible=false);
@@ -295,7 +336,7 @@ let verticalVel=0,onGround=true,slideTimer=0,punchTimer=0,blockHeld=false,combat
 function flashCombat(label){const el=$('#combatState');el.textContent=label;el.classList.add('show');combatFlashTimer=.55}
 function jump(){if(!gameActive||paused||!onGround||slideTimer>0)return;verticalVel=8.2;onGround=false;flashCombat('JUMP')}
 function slide(){if(!gameActive||paused||!onGround||slideTimer>0||Math.hypot(vel.x,vel.z)<4)return;slideTimer=.72;flashCombat('SLIDE')}
-function punch(){if(!gameActive||paused||punchTimer>0||blockHeld)return;punchTimer=.42;flashCombat('PUNCH');const forward=new THREE.Vector3(-Math.sin(player.rotation.y),0,-Math.cos(player.rotation.y));for(const npc of[marcus,dinerNpc,storeNpc]){const to=npc.position.clone().sub(player.position);const dist=to.length();to.y=0;if(dist<2.2&&forward.dot(to.normalize())>.15){npc.userData.hit=.25;toast('Punch connected')}}}
+function punch(){if(!gameActive||paused||punchTimer>0||blockHeld)return;punchTimer=.42;flashCombat('PUNCH');const forward=new THREE.Vector3(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y));for(const npc of[marcus,dinerNpc,storeNpc]){const to=npc.position.clone().sub(player.position);const dist=to.length();to.y=0;if(dist<2.2&&forward.dot(to.normalize())>.15){npc.userData.hit=.25;toast('Punch connected')}}}
 addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'&&gameActive&&modal.classList.contains('hidden')){document.exitPointerLock?.();paused=true;$('#pauseMenu').classList.remove('hidden')}if(e.code==='KeyE'&&gameActive&&!paused&&nearest)interact(nearest.id);if(e.code==='Space'){e.preventDefault();jump()}if((e.code==='ControlLeft'||e.code==='ControlRight'))slide()});
 addEventListener('keyup',e=>keys[e.code]=false);
 canvas.addEventListener('click',()=>{if(gameActive&&!paused)requestLook()});
@@ -322,10 +363,10 @@ function tick(){
    if(input.lengthSq()>0||slideTimer>0){
      if(input.lengthSq()>0)input.normalize();else input.set(0,0,-1);
      const sy=Math.sin(yaw),cy=Math.cos(yaw);let wx=input.x*cy+input.z*sy,wz=-input.x*sy+input.z*cy;
-     if(slideTimer>0){wx=-Math.sin(player.rotation.y);wz=-Math.cos(player.rotation.y)}
+     if(slideTimer>0){wx=Math.sin(player.rotation.y);wz=Math.cos(player.rotation.y)}
      vel.x=THREE.MathUtils.damp(vel.x,wx*maxSpeed,slideTimer>0?5:13,dt);vel.z=THREE.MathUtils.damp(vel.z,wz*maxSpeed,slideTimer>0?5:13,dt);
      const nx=player.position.x+vel.x*dt,nz=player.position.z+vel.z*dt;if(!collision(nx,player.position.z))player.position.x=nx;else vel.x=0;if(!collision(player.position.x,nz))player.position.z=nz;else vel.z=0;
-     if(slideTimer<=0){const targetRot=Math.atan2(vel.x,vel.z);player.rotation.y=THREE.MathUtils.lerp(player.rotation.y,targetRot,1-Math.pow(.0007,dt))}
+     if(slideTimer<=0&&Math.hypot(wx,wz)>.05){const targetRot=Math.atan2(wx,wz);player.rotation.y=THREE.MathUtils.lerp(player.rotation.y,targetRot,1-Math.pow(.00035,dt))}
      if(sprint){state.energy-=dt*.32;state.hunger+=dt*.07}
    }else{vel.x=THREE.MathUtils.damp(vel.x,0,14,dt);vel.z=THREE.MathUtils.damp(vel.z,0,14,dt)}
    if(!onGround){verticalVel-=20.5*dt;player.position.y+=verticalVel*dt;if(player.position.y<=0){player.position.y=0;verticalVel=0;onGround=true}}else player.position.y=0;
