@@ -11,7 +11,8 @@
 #hud{position:fixed;inset:0;pointer-events:none;padding:22px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:14px}.brand{align-self:start;padding:13px 15px;border-radius:16px}.brand b{display:block;font-size:18px;margin-top:3px}.eyebrow{font-size:11px;letter-spacing:.2em;font-weight:900;color:#a8b4c6}.stats{display:flex;gap:8px}.stats>div{min-width:92px;padding:10px 12px;border-radius:14px}.stats span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#96a2b4}.stats b{font-size:17px}#objective{grid-column:1;grid-row:3;max-width:430px;padding:13px 15px;border-radius:14px}#objective strong{display:block;margin-top:4px;font-size:14px}.controls{grid-column:2;grid-row:3;align-self:end;display:flex;gap:12px;padding:10px 12px;border-radius:12px;font-size:11px;color:#bdc6d3}.controls kbd,#prompt kbd{font-weight:900;color:#fff}
 #prompt{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);padding:11px 14px;border-radius:999px;font-size:13px;font-weight:800}#toast{position:fixed;left:50%;top:25px;transform:translateX(-50%);padding:11px 14px;border-radius:12px;font-weight:800;font-size:13px}
 .overlay{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at center,rgba(12,20,30,.72),rgba(2,4,8,.94));backdrop-filter:blur(8px);z-index:20;padding:22px}.panel{width:min(620px,100%);padding:26px;border-radius:22px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(17,24,36,.98),rgba(7,10,16,.99));box-shadow:0 30px 90px rgba(0,0,0,.6)}.panel h1,.panel h2{margin:5px 0 10px}.panel h1{font-size:48px;line-height:.95}.panel h2{font-size:28px}.panel p{color:#b8c1ce;line-height:1.5}.menu-actions{display:grid;gap:10px;margin-top:18px}.menu-btn,.panel button{width:100%;padding:13px 15px;border:0;border-radius:12px;background:#eef3f9;color:#111722;font-weight:900}.menu-btn.secondary,.panel button.secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.1)}.menu-btn.danger{background:#3b171c;color:#ffd8dc}.row{display:flex;gap:10px;align-items:center;justify-content:space-between}.setting{padding:14px 0;border-top:1px solid rgba(255,255,255,.08)}.setting input[type=range]{width:100%}.setting small{color:#9ba8ba}.slot-grid{display:grid;gap:10px;margin-top:16px}.slot{padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.04)}.slot strong{display:block}.slot small{color:#a9b4c4}.slot-actions{display:flex;gap:8px;margin-top:10px}.slot-actions button{width:auto;flex:1}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.close-btn{width:40px!important;height:40px;padding:0!important;border-radius:50%!important;background:rgba(255,255,255,.08)!important;color:#fff!important}
-#crosshair{position:fixed;left:50%;top:50%;width:8px;height:8px;margin:-4px;z-index:5;pointer-events:none}#crosshair:before,#crosshair:after{content:"";position:absolute;background:rgba(255,255,255,.85)}#crosshair:before{width:8px;height:1px;top:3px}#crosshair:after{height:8px;width:1px;left:3px}
+#crosshair{position:fixed;left:50%;top:50%;width:8px;height:8px;margin:-4px;z-index:5;pointer-events:none}
+.menu-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;align-items:end}.road{padding:18px;border-radius:16px;background:rgba(255,183,67,.06);border:1px solid rgba(255,199,107,.22)}.road h3{margin:0 0 12px;color:#ffc86a;letter-spacing:.08em}.road div{padding:9px 0;border-top:1px solid rgba(255,255,255,.06);font-size:14px}.road div:first-of-type{border-top:0}.character-panel{width:min(980px,100%)}.character-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}.char-card{position:relative;min-height:330px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(30,43,58,.96),rgba(10,14,20,.98));overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;transition:.18s}.char-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.3)}.char-card.selected{outline:2px solid #f5c568;box-shadow:0 0 0 4px rgba(245,197,104,.12)}.char-card.girl{background:linear-gradient(180deg,rgba(63,33,56,.96),rgba(17,10,18,.98))}.char-card .sil{position:absolute;inset:20px 20px 70px;display:grid;place-items:center;font-size:140px;filter:drop-shadow(0 18px 20px rgba(0,0,0,.35))}.char-card strong{font-size:26px}.char-card small{color:#a9b4c4}.mini{position:fixed;left:24px;bottom:78px;width:150px;height:150px;border-radius:50%;z-index:4;overflow:hidden;border:4px solid rgba(0,0,0,.4);background:#20252d;box-shadow:0 12px 28px rgba(0,0,0,.35)}.mini:before,.mini:after{content:"";position:absolute;background:#59616c}.mini:before{left:68px;top:0;width:14px;height:100%}.mini:after{top:68px;left:0;height:14px;width:100%}.mini-dot{position:absolute;left:50%;top:50%;width:13px;height:13px;border-radius:50%;background:#ffe15c;transform:translate(-50%,-50%);z-index:2;box-shadow:0 0 0 3px rgba(255,225,92,.2)}.mini-arrow{position:absolute;left:50%;top:36%;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:13px solid #70f58c;transform-origin:50% 22px;z-index:2}.credits{line-height:1.7;color:#b8c1ce}#crosshair:before,#crosshair:after{content:"";position:absolute;background:rgba(255,255,255,.85)}#crosshair:before{width:8px;height:1px;top:3px}#crosshair:after{height:8px;width:1px;left:3px}
 @media(max-width:760px){#hud{padding:12px;grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto}.stats{grid-row:2;display:grid;grid-template-columns:repeat(4,1fr)}.stats>div{min-width:0}.controls{display:none}#objective{grid-row:4}.panel h1{font-size:38px}}
 </style>
 </head>
@@ -31,19 +32,46 @@
   <div id="toast" class="glass hidden"></div>
   <div class="controls glass"><span><kbd>WASD</kbd> Move</span><span><kbd>SHIFT</kbd> Run</span><span><kbd>MOUSE</kbd> Look</span><span><kbd>E</kbd> Interact</span><span><kbd>ESC</kbd> Pause</span></div>
 </div>
+<div id="minimap" class="mini hidden"><div id="miniArrow" class="mini-arrow"></div><div class="mini-dot"></div></div>
 
 <div id="mainMenu" class="overlay">
-  <div class="panel">
-    <span class="eyebrow">3D LIFE SIMULATOR</span>
-    <h1>FROM<br>NOTHING</h1>
-    <p>Start with almost nothing. Work, save, build a reputation, and grow your life.</p>
-    <div class="menu-actions">
-      <button id="newGameBtn" class="menu-btn">Start New Game</button>
-      <button id="loadGameBtn" class="menu-btn secondary">Load Save</button>
-      <button id="settingsBtn" class="menu-btn secondary">Settings</button>
+  <div class="panel" style="width:min(900px,100%)">
+    <div class="menu-layout">
+      <div>
+        <span class="eyebrow">TEST BUILD · 3D LIFE SIMULATOR</span>
+        <h1>FROM<br>NOTHING</h1>
+        <p>Start with almost nothing. Work, save, build a reputation, and create your legacy.</p>
+        <div class="menu-actions">
+          <button id="newGameBtn" class="menu-btn">Start New Game</button>
+          <button id="loadGameBtn" class="menu-btn secondary">Load Game</button>
+          <button id="settingsBtn" class="menu-btn secondary">Settings</button>
+          <button id="creditsBtn" class="menu-btn secondary">Credits</button>
+          <button id="quitBtn" class="menu-btn secondary">Quit Game</button>
+        </div>
+      </div>
+      <div class="road">
+        <h3>ROAD TO SUCCESS</h3>
+        <div>◉ Find a job</div><div>◉ Make some money</div><div>◉ Build your reputation</div><div>◉ Create your legacy</div>
+      </div>
     </div>
   </div>
 </div>
+
+<div id="characterMenu" class="overlay hidden">
+  <div class="panel character-panel">
+    <span class="eyebrow">CREATE YOUR STORY</span>
+    <h2>Choose Your Character</h2>
+    <p>This choice changes your player model and is stored in each save slot.</p>
+    <div class="character-grid">
+      <button class="char-card selected" data-gender="boy"><div class="sil">🧑🏽</div><strong>BOY</strong><small>Streetwear · athletic build</small></button>
+      <button class="char-card girl" data-gender="girl"><div class="sil">👩🏽</div><strong>GIRL</strong><small>Streetwear · athletic build</small></button>
+    </div>
+    <button id="confirmCharacterBtn" class="menu-btn">Continue</button>
+    <button id="characterBackBtn" class="menu-btn secondary">Back</button>
+  </div>
+</div>
+
+<div id="creditsMenu" class="overlay hidden"><div class="panel"><div class="panel-head"><div><span class="eyebrow">CREDITS</span><h2>From Nothing</h2></div><button class="close-btn" data-close="creditsMenu">×</button></div><p class="credits">Game concept & direction: Daniel<br>Prototype development: ChatGPT<br>Engine: Three.js<br><br>Built as a browser-first 3D life simulator test project.</p><button class="menu-btn secondary" data-close="creditsMenu">Back</button></div></div>
 
 <div id="settingsMenu" class="overlay hidden">
   <div class="panel">
@@ -91,13 +119,37 @@ building(-27,-28,20,17,14,0x6b4c42,'YOUR APARTMENT','#d9f1ff');building(28,-28,2
 function tree(x,z){box(.65,3.1,.65,0x5c3b25,x,1.55,z);const c=new THREE.Mesh(new THREE.SphereGeometry(2.1,10,8),new THREE.MeshStandardMaterial({color:0x315f3a,roughness:1}));c.position.set(x,4.2,z);c.castShadow=true;scene.add(c)}[[-19,22],[-20,39],[-44,18],[-46,42],[18,20],[43,18],[46,44],[-18,-45],[18,-46],[45,-48]].forEach(p=>tree(...p));
 plane(26,21,new THREE.MeshStandardMaterial({color:0x3e7546,roughness:1}),-25,55,.028);box(8,.45,1.4,0x6a4a32,-25,.5,54);
 
-function person(shirt=0x394d6b,skin=0xc78f6a){const g=new THREE.Group();const torso=new THREE.Mesh(new THREE.BoxGeometry(1.05,1.45,.62),new THREE.MeshStandardMaterial({color:shirt}));torso.position.y=2.1;torso.castShadow=true;g.add(torso);const head=new THREE.Mesh(new THREE.SphereGeometry(.42,16,12),new THREE.MeshStandardMaterial({color:skin}));head.position.y=3.2;head.castShadow=true;g.add(head);for(const sx of[-.32,.32]){const leg=new THREE.Mesh(new THREE.BoxGeometry(.33,1.35,.38),new THREE.MeshStandardMaterial({color:0x1e2530}));leg.position.set(sx,.72,0);leg.castShadow=true;g.add(leg)}return g}
-const player=person(0x202733,0xa96f4e);player.position.set(-16,0,-5);scene.add(player);const marcus=person(0x6d3e68,0x9b694f);marcus.position.set(-25,0,55);scene.add(marcus);const dinerNpc=person(0x7a2727,0xd09a76);dinerNpc.position.set(28,0,-17);scene.add(dinerNpc);const storeNpc=person(0x365c49,0xb87957);storeNpc.position.set(29,0,18);scene.add(storeNpc);
+function material(color,rough=.72){return new THREE.MeshStandardMaterial({color,roughness:rough})}
+function limb(w,h,d,color){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material(color));m.castShadow=true;return m}
+function person(kind='boy',shirt=0x1f2631,skin=0xb87852){
+  const g=new THREE.Group();g.userData.parts={};
+  const female=kind==='girl';
+  const hip=new THREE.Group();hip.position.y=1.55;g.add(hip);g.userData.parts.hip=hip;
+  const torso=new THREE.Mesh(new THREE.CapsuleGeometry(female?.48:.54,1.05,6,10),material(shirt,.62));torso.position.y=.95;torso.castShadow=true;hip.add(torso);
+  const neck=limb(.24,.22,.24,skin);neck.position.y=1.62;hip.add(neck);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.43,20,16),material(skin,.7));head.scale.set(.94,1.08,.92);head.position.y=1.98;head.castShadow=true;hip.add(head);
+  const hair=new THREE.Mesh(new THREE.SphereGeometry(.45,18,12,0,Math.PI*2,0,Math.PI*.62),material(female?0x171314:0x161616,.95));hair.position.set(0,2.12,-.015);hair.scale.set(1.02,.72,1.02);hip.add(hair);
+  if(female){const backHair=limb(.72,.86,.22,0x171314);backHair.position.set(0,1.82,.23);hip.add(backHair)}
+  const armL=new THREE.Group(),armR=new THREE.Group();armL.position.set(-.66,1.37,0);armR.position.set(.66,1.37,0);hip.add(armL,armR);g.userData.parts.armL=armL;g.userData.parts.armR=armR;
+  const uaL=limb(.26,.88,.3,shirt),uaR=limb(.26,.88,.3,shirt);uaL.position.y=-.42;uaR.position.y=-.42;armL.add(uaL);armR.add(uaR);
+  const handL=new THREE.Mesh(new THREE.SphereGeometry(.17,12,10),material(skin));handL.position.y=-.92;armL.add(handL);const handR=handL.clone();armR.add(handR);
+  const legL=new THREE.Group(),legR=new THREE.Group();legL.position.set(-.27,.1,0);legR.position.set(.27,.1,0);hip.add(legL,legR);g.userData.parts.legL=legL;g.userData.parts.legR=legR;
+  const pants=female?0x31343b:0x161a20;const l1=limb(.34,1.2,.4,pants),l2=limb(.34,1.2,.4,pants);l1.position.y=-.57;l2.position.y=-.57;legL.add(l1);legR.add(l2);
+  const shoeL=limb(.38,.22,.72,0xe8e8e8);shoeL.position.set(0,-1.22,-.12);legL.add(shoeL);const shoeR=shoeL.clone();legR.add(shoeR);
+  if(female){torso.scale.x=.92;hip.scale.x=.96}
+  return g
+}
+let selectedGender='boy';
+let player=person('boy',0x1d232c,0xaa704f);player.position.set(-16,0,-5);scene.add(player);
+function rebuildPlayer(kind){const pos=player.position.clone(),rot=player.rotation.y;scene.remove(player);player=person(kind,kind==='girl'?0x15161a:0x1d232c,kind==='girl'?0xb97859:0xaa704f);player.position.copy(pos);player.rotation.y=rot;scene.add(player)}
+const marcus=person('boy',0x5a374f,0x956446);marcus.position.set(-25,0,55);scene.add(marcus);
+const dinerNpc=person('boy',0x742c2c,0xc98f6d);dinerNpc.position.set(28,0,-17);scene.add(dinerNpc);
+const storeNpc=person('girl',0x315949,0xb87957);storeNpc.position.set(29,0,18);scene.add(storeNpc);
 
 const interactions=[{id:'home',name:'Apartment',pos:new THREE.Vector3(-27,0,-18.3),r:4.4},{id:'diner',name:'Diner Manager',pos:new THREE.Vector3(28,0,-17.4),r:4.4},{id:'store',name:'Quick Mart',pos:new THREE.Vector3(29,0,18.6),r:4.4},{id:'npc',name:'Talk to Marcus',pos:new THREE.Vector3(-25,0,55),r:4.2}];
 for(const i of interactions){const ring=new THREE.Mesh(new THREE.RingGeometry(1.3,1.55,28),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.3,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.copy(i.pos);ring.position.y=.06;scene.add(ring);i.ring=ring}
 
-const baseState=()=>({cash:120,energy:100,hunger:12,rep:0,day:1,minutes:480,employed:false,interviewDone:false,talkedMarcus:false,objective:'Find the diner and ask for work.'});
+const baseState=()=>({cash:120,energy:100,hunger:12,rep:0,day:1,minutes:480,employed:false,interviewDone:false,talkedMarcus:false,gender:'boy',objective:'Find the diner and ask for work.'});
 let state=baseState();
 let gameActive=false,paused=true,nearest=null;
 let yaw=0,pitch=-0.18;
@@ -114,17 +166,20 @@ let toastTimer;function toast(msg){clearTimeout(toastTimer);els.toast.textConten
 function slotKey(n){return 'from-nothing-slot-'+n}
 function slotData(n){try{return JSON.parse(localStorage.getItem(slotKey(n))||'null')}catch{return null}}
 function saveSlot(n){const data={version:2,state:{...state},pos:{x:player.position.x,z:player.position.z},camera:{yaw,pitch},savedAt:Date.now()};localStorage.setItem(slotKey(n),JSON.stringify(data));renderSlots();toast('Saved to Slot '+n)}
-function loadSlot(n){const data=slotData(n);if(!data)return;state={...baseState(),...data.state};if(data.pos)player.position.set(data.pos.x,0,data.pos.z);if(data.camera){yaw=data.camera.yaw||0;pitch=data.camera.pitch??-.18}startGameplay();closeAllOverlays();toast('Loaded Slot '+n)}
+function loadSlot(n){const data=slotData(n);if(!data)return;state={...baseState(),...data.state};selectedGender=state.gender||'boy';rebuildPlayer(selectedGender);if(data.pos)player.position.set(data.pos.x,0,data.pos.z);if(data.camera){yaw=data.camera.yaw||0;pitch=data.camera.pitch??-.18}startGameplay();closeAllOverlays();toast('Loaded Slot '+n)}
 function renderSlots(){for(const mode of['load','save']){const wrap=$('#'+mode+'Slots');wrap.innerHTML='';for(let n=1;n<=3;n++){const d=slotData(n);const div=document.createElement('div');div.className='slot';const date=d?new Date(d.savedAt).toLocaleString():'';div.innerHTML='<strong>Slot '+n+'</strong><small>'+(d?'Day '+d.state.day+' · $'+Math.floor(d.state.cash)+' · '+date:'Empty slot')+'</small><div class="slot-actions"></div>';const a=div.querySelector('.slot-actions');if(mode==='load'){const b=document.createElement('button');b.textContent=d?'Load':'Empty';b.disabled=!d;b.className=d?'':'secondary';b.onclick=()=>loadSlot(n);a.append(b)}else{const b=document.createElement('button');b.textContent=d?'Overwrite':'Save';b.onclick=()=>saveSlot(n);a.append(b)}if(d){const del=document.createElement('button');del.textContent='Delete';del.className='secondary';del.onclick=()=>{if(confirm('Delete Slot '+n+'?')){localStorage.removeItem(slotKey(n));renderSlots()}};a.append(del)}wrap.append(div)}}}
 renderSlots();
 
 function closeAllOverlays(){['mainMenu','settingsMenu','loadMenu','saveMenu','pauseMenu'].forEach(id=>$('#'+id).classList.add('hidden'));$('#modal').classList.add('hidden')}
 function requestLook(){if(gameActive&&!paused&&document.pointerLockElement!==canvas)canvas.requestPointerLock?.()}
-function startGameplay(){gameActive=true;paused=false;$('#hud').classList.remove('hidden');$('#crosshair').classList.remove('hidden');closeAllOverlays();hud();setTimeout(requestLook,100)}
-function newGame(){state=baseState();player.position.set(-16,0,-5);yaw=0;pitch=-.18;startGameplay()}
+function startGameplay(){gameActive=true;paused=false;$('#hud').classList.remove('hidden');$('#crosshair').classList.remove('hidden');$('#minimap').classList.remove('hidden');closeAllOverlays();hud();setTimeout(requestLook,100)}
+function newGame(){state=baseState();state.gender=selectedGender;rebuildPlayer(selectedGender);player.position.set(-16,0,-5);yaw=0;pitch=-.18;startGameplay()}
 function openOverlay(id){document.exitPointerLock?.();paused=true;$('#'+id).classList.remove('hidden')}
-$('#newGameBtn').onclick=newGame;$('#loadGameBtn').onclick=()=>{renderSlots();$('#loadMenu').classList.remove('hidden')};$('#settingsBtn').onclick=()=>$('#settingsMenu').classList.remove('hidden');
-$('#resumeBtn').onclick=()=>{paused=false;$('#pauseMenu').classList.add('hidden');requestLook()};$('#saveMenuBtn').onclick=()=>{renderSlots();$('#saveMenu').classList.remove('hidden')};$('#loadFromPauseBtn').onclick=()=>{renderSlots();$('#loadMenu').classList.remove('hidden')};$('#settingsFromPauseBtn').onclick=()=>$('#settingsMenu').classList.remove('hidden');$('#mainMenuBtn').onclick=()=>{gameActive=false;paused=true;document.exitPointerLock?.();$('#hud').classList.add('hidden');$('#crosshair').classList.add('hidden');closeAllOverlays();$('#mainMenu').classList.remove('hidden')};
+$('#newGameBtn').onclick=()=>{selectedGender='boy';document.querySelectorAll('.char-card').forEach((x,i)=>x.classList.toggle('selected',i===0));$('#characterMenu').classList.remove('hidden')};
+document.querySelectorAll('.char-card').forEach(card=>card.onclick=()=>{selectedGender=card.dataset.gender;document.querySelectorAll('.char-card').forEach(x=>x.classList.toggle('selected',x===card))});
+$('#confirmCharacterBtn').onclick=newGame;$('#characterBackBtn').onclick=()=>$('#characterMenu').classList.add('hidden');
+$('#loadGameBtn').onclick=()=>{renderSlots();$('#loadMenu').classList.remove('hidden')};$('#settingsBtn').onclick=()=>$('#settingsMenu').classList.remove('hidden');$('#creditsBtn').onclick=()=>$('#creditsMenu').classList.remove('hidden');$('#quitBtn').onclick=()=>alert('Browser games cannot close your browser tab. Use your browser close button to quit.');
+$('#resumeBtn').onclick=()=>{paused=false;$('#pauseMenu').classList.add('hidden');requestLook()};$('#saveMenuBtn').onclick=()=>{renderSlots();$('#saveMenu').classList.remove('hidden')};$('#loadFromPauseBtn').onclick=()=>{renderSlots();$('#loadMenu').classList.remove('hidden')};$('#settingsFromPauseBtn').onclick=()=>$('#settingsMenu').classList.remove('hidden');$('#mainMenuBtn').onclick=()=>{gameActive=false;paused=true;document.exitPointerLock?.();$('#hud').classList.add('hidden');$('#crosshair').classList.add('hidden');$('#minimap').classList.add('hidden');closeAllOverlays();$('#mainMenu').classList.remove('hidden')};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$('#'+b.dataset.close).classList.add('hidden'));
 
 const modal=$('#modal'),actions=$('#modalActions');
@@ -143,12 +198,19 @@ addEventListener('mousemove',e=>{if(document.pointerLockElement!==canvas||!gameA
 
 function collision(x,z){if(Math.abs(x)>84||Math.abs(z)>84)return true;return colliders.some(c=>Math.abs(x-c.x)<c.hx&&Math.abs(z-c.z)<c.hz)}
 const clock=new THREE.Clock(),vel=new THREE.Vector3(),input=new THREE.Vector3();let elapsed=0;
+function animateCharacter(model,speed,sprinting){
+  const p=model.userData.parts;if(!p)return;
+  const moving=speed>.15;const rate=sprinting?11:7.5;const amp=moving?(sprinting?.82:.55):.05;const s=Math.sin(elapsed*rate)*amp;
+  p.legL.rotation.x=s;p.legR.rotation.x=-s;p.armL.rotation.x=-s*.72;p.armR.rotation.x=s*.72;
+  p.hip.position.y=1.55+(moving?Math.abs(Math.sin(elapsed*rate*2))*.035:Math.sin(elapsed*2)*.012);
+}
 function tick(){
  requestAnimationFrame(tick);const dt=Math.min(clock.getDelta(),.04);elapsed+=dt;
  if(gameActive&&!paused){
    input.set((keys.KeyD?1:0)-(keys.KeyA?1:0),0,(keys.KeyS?1:0)-(keys.KeyW?1:0));
    const sprint=!!(keys.ShiftLeft||keys.ShiftRight),maxSpeed=sprint?10.8:6.4;
    if(input.lengthSq()>0){input.normalize();const sy=Math.sin(yaw),cy=Math.cos(yaw);const wx=input.x*cy+input.z*sy,wz=-input.x*sy+input.z*cy;vel.x=THREE.MathUtils.damp(vel.x,wx*maxSpeed,12,dt);vel.z=THREE.MathUtils.damp(vel.z,wz*maxSpeed,12,dt);const nx=player.position.x+vel.x*dt,nz=player.position.z+vel.z*dt;if(!collision(nx,player.position.z))player.position.x=nx;else vel.x=0;if(!collision(player.position.x,nz))player.position.z=nz;else vel.z=0;const targetRot=Math.atan2(vel.x,vel.z);player.rotation.y=THREE.MathUtils.lerp(player.rotation.y,targetRot,1-Math.pow(.0008,dt));player.position.y=Math.sin(elapsed*(sprint?13:9))*.035;if(sprint){state.energy-=dt*.35;state.hunger+=dt*.08}}else{vel.x=THREE.MathUtils.damp(vel.x,0,14,dt);vel.z=THREE.MathUtils.damp(vel.z,0,14,dt);player.position.y=THREE.MathUtils.damp(player.position.y,0,10,dt)}
+   animateCharacter(player,Math.hypot(vel.x,vel.z),sprint);$('#miniArrow').style.transform='translateX(-50%) rotate('+(-yaw)+'rad)'
    state.minutes+=dt*.38;if(state.minutes>=1440){state.minutes-=1440;state.day++}
    const hour=state.minutes/60,daylight=Math.max(.08,Math.sin(((hour-5.5)/24)*Math.PI*2)*.5+.5);sun.intensity=.45+daylight*3.2;hemi.intensity=.45+daylight*1.9;const night=new THREE.Color(0x070b18),day=new THREE.Color(0x86a7c4);scene.background.copy(night).lerp(day,daylight);scene.fog.color.copy(scene.background);hud()
  }
