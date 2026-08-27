@@ -6,20 +6,19 @@
 <meta name="theme-color" content="#080b12"/>
 <title>From Nothing — 3D Test Build</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070a10;color:#f4f7fb;font-family:Inter,system-ui,sans-serif}button{font:inherit}#game{position:fixed;inset:0;width:100%;height:100%;display:block}
-#hud{position:fixed;inset:0;pointer-events:none;padding:22px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:14px}.glass{border:1px solid rgba(255,255,255,.12);background:rgba(7,10,16,.74);backdrop-filter:blur(14px);box-shadow:0 18px 50px rgba(0,0,0,.25)}
-.brand{align-self:start;padding:13px 15px;border-radius:16px}.brand b{display:block;font-size:18px;margin-top:3px}.eyebrow{font-size:11px;letter-spacing:.2em;font-weight:900;color:#a8b4c6}.stats{display:flex;gap:8px}.stats>div{min-width:92px;padding:10px 12px;border-radius:14px}.stats span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#96a2b4}.stats b{font-size:17px}
-#objective{grid-column:1;grid-row:3;max-width:430px;padding:13px 15px;border-radius:14px}#objective strong{display:block;margin-top:4px;font-size:14px}.controls{grid-column:2;grid-row:3;align-self:end;display:flex;gap:12px;padding:10px 12px;border-radius:12px;font-size:11px;color:#bdc6d3}.controls kbd,#prompt kbd{font-weight:900;color:#fff}
-#prompt{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);padding:11px 14px;border-radius:999px;font-size:13px;font-weight:800}.hidden{display:none!important}
-#toast{position:fixed;left:50%;top:25px;transform:translateX(-50%);padding:11px 14px;border-radius:12px;font-weight:800;font-size:13px}
-#modal,#pause{position:fixed;inset:0;display:grid;place-items:center;background:rgba(2,4,8,.64);backdrop-filter:blur(6px);z-index:10;padding:24px}.panel{pointer-events:auto;width:min(520px,100%);padding:22px;border-radius:20px;border:1px solid rgba(255,255,255,.13);background:linear-gradient(180deg,rgba(19,25,36,.98),rgba(10,14,21,.98));box-shadow:0 30px 90px rgba(0,0,0,.55)}
-.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.panel h2{margin:4px 0 0;font-size:28px}.panel p{color:#b8c1ce;line-height:1.55}.panel button{pointer-events:auto;width:100%;margin-top:8px;padding:12px 14px;border:0;border-radius:12px;background:#f1f5fa;color:#111722;font-weight:900;cursor:pointer}.panel button.secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.1)}#closeModal{width:40px;height:40px;margin:0;padding:0;border-radius:50%;background:rgba(255,255,255,.08);color:#fff;font-size:24px}
-@media(max-width:760px){#hud{padding:12px;grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto}.stats{grid-row:2;display:grid;grid-template-columns:repeat(4,1fr)}.stats>div{min-width:0}.controls{display:none}#objective{grid-row:4}}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070a10;color:#f4f7fb;font-family:Inter,system-ui,sans-serif}button,input{font:inherit}button{cursor:pointer}#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+.hidden{display:none!important}.glass{border:1px solid rgba(255,255,255,.12);background:rgba(7,10,16,.76);backdrop-filter:blur(16px);box-shadow:0 18px 50px rgba(0,0,0,.25)}
+#hud{position:fixed;inset:0;pointer-events:none;padding:22px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:14px}.brand{align-self:start;padding:13px 15px;border-radius:16px}.brand b{display:block;font-size:18px;margin-top:3px}.eyebrow{font-size:11px;letter-spacing:.2em;font-weight:900;color:#a8b4c6}.stats{display:flex;gap:8px}.stats>div{min-width:92px;padding:10px 12px;border-radius:14px}.stats span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#96a2b4}.stats b{font-size:17px}#objective{grid-column:1;grid-row:3;max-width:430px;padding:13px 15px;border-radius:14px}#objective strong{display:block;margin-top:4px;font-size:14px}.controls{grid-column:2;grid-row:3;align-self:end;display:flex;gap:12px;padding:10px 12px;border-radius:12px;font-size:11px;color:#bdc6d3}.controls kbd,#prompt kbd{font-weight:900;color:#fff}
+#prompt{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);padding:11px 14px;border-radius:999px;font-size:13px;font-weight:800}#toast{position:fixed;left:50%;top:25px;transform:translateX(-50%);padding:11px 14px;border-radius:12px;font-weight:800;font-size:13px}
+.overlay{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at center,rgba(12,20,30,.72),rgba(2,4,8,.94));backdrop-filter:blur(8px);z-index:20;padding:22px}.panel{width:min(620px,100%);padding:26px;border-radius:22px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(17,24,36,.98),rgba(7,10,16,.99));box-shadow:0 30px 90px rgba(0,0,0,.6)}.panel h1,.panel h2{margin:5px 0 10px}.panel h1{font-size:48px;line-height:.95}.panel h2{font-size:28px}.panel p{color:#b8c1ce;line-height:1.5}.menu-actions{display:grid;gap:10px;margin-top:18px}.menu-btn,.panel button{width:100%;padding:13px 15px;border:0;border-radius:12px;background:#eef3f9;color:#111722;font-weight:900}.menu-btn.secondary,.panel button.secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.1)}.menu-btn.danger{background:#3b171c;color:#ffd8dc}.row{display:flex;gap:10px;align-items:center;justify-content:space-between}.setting{padding:14px 0;border-top:1px solid rgba(255,255,255,.08)}.setting input[type=range]{width:100%}.setting small{color:#9ba8ba}.slot-grid{display:grid;gap:10px;margin-top:16px}.slot{padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.04)}.slot strong{display:block}.slot small{color:#a9b4c4}.slot-actions{display:flex;gap:8px;margin-top:10px}.slot-actions button{width:auto;flex:1}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.close-btn{width:40px!important;height:40px;padding:0!important;border-radius:50%!important;background:rgba(255,255,255,.08)!important;color:#fff!important}
+#crosshair{position:fixed;left:50%;top:50%;width:8px;height:8px;margin:-4px;z-index:5;pointer-events:none}#crosshair:before,#crosshair:after{content:"";position:absolute;background:rgba(255,255,255,.85)}#crosshair:before{width:8px;height:1px;top:3px}#crosshair:after{height:8px;width:1px;left:3px}
+@media(max-width:760px){#hud{padding:12px;grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto}.stats{grid-row:2;display:grid;grid-template-columns:repeat(4,1fr)}.stats>div{min-width:0}.controls{display:none}#objective{grid-row:4}.panel h1{font-size:38px}}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
-<div id="hud">
+<div id="crosshair" class="hidden"></div>
+<div id="hud" class="hidden">
   <div class="brand glass"><span class="eyebrow">FROM NOTHING · TEST BUILD</span><b>Day <span id="day">1</span> · <span id="clock">08:00</span></b></div>
   <div class="stats">
     <div class="glass"><span>Cash</span><b id="cash">$120</b></div>
@@ -30,14 +29,49 @@
   <div id="objective" class="glass"><span class="eyebrow">OBJECTIVE</span><strong id="objectiveText">Find the diner and ask for work.</strong></div>
   <div id="prompt" class="glass hidden">Press <kbd>E</kbd> to interact</div>
   <div id="toast" class="glass hidden"></div>
-  <div class="controls glass"><span><kbd>WASD</kbd> Move</span><span><kbd>SHIFT</kbd> Run</span><span><kbd>E</kbd> Interact</span><span><kbd>ESC</kbd> Pause</span></div>
+  <div class="controls glass"><span><kbd>WASD</kbd> Move</span><span><kbd>SHIFT</kbd> Run</span><span><kbd>MOUSE</kbd> Look</span><span><kbd>E</kbd> Interact</span><span><kbd>ESC</kbd> Pause</span></div>
 </div>
-<div id="modal" class="hidden"><div class="panel"><div class="panel-head"><div><span id="modalKicker" class="eyebrow">INTERACTION</span><h2 id="modalTitle">Title</h2></div><button id="closeModal">×</button></div><p id="modalText"></p><div id="modalActions"></div></div></div>
-<div id="pause" class="hidden"><div class="panel"><span class="eyebrow">PAUSED</span><h2>From Nothing</h2><button id="resumeBtn">Resume</button><button id="saveBtn">Save Game</button><button id="loadBtn">Load Save</button></div></div>
+
+<div id="mainMenu" class="overlay">
+  <div class="panel">
+    <span class="eyebrow">3D LIFE SIMULATOR</span>
+    <h1>FROM<br>NOTHING</h1>
+    <p>Start with almost nothing. Work, save, build a reputation, and grow your life.</p>
+    <div class="menu-actions">
+      <button id="newGameBtn" class="menu-btn">Start New Game</button>
+      <button id="loadGameBtn" class="menu-btn secondary">Load Save</button>
+      <button id="settingsBtn" class="menu-btn secondary">Settings</button>
+    </div>
+  </div>
+</div>
+
+<div id="settingsMenu" class="overlay hidden">
+  <div class="panel">
+    <div class="panel-head"><div><span class="eyebrow">OPTIONS</span><h2>Settings</h2></div><button class="close-btn" data-close="settingsMenu">×</button></div>
+    <div class="setting">
+      <div class="row"><strong>Mouse Sensitivity</strong><b id="sensValue">1.00</b></div>
+      <input id="sensSlider" type="range" min="0.2" max="3" step="0.05" value="1">
+      <small>Controls how quickly the camera turns with the mouse.</small>
+    </div>
+    <div class="setting">
+      <div class="row"><strong>Invert Y</strong><input id="invertY" type="checkbox"></div>
+    </div>
+    <button class="menu-btn secondary" data-close="settingsMenu">Back</button>
+  </div>
+</div>
+
+<div id="loadMenu" class="overlay hidden"><div class="panel"><div class="panel-head"><div><span class="eyebrow">SAVES</span><h2>Load Game</h2></div><button class="close-btn" data-close="loadMenu">×</button></div><div id="loadSlots" class="slot-grid"></div><button class="menu-btn secondary" data-close="loadMenu">Back</button></div></div>
+<div id="saveMenu" class="overlay hidden"><div class="panel"><div class="panel-head"><div><span class="eyebrow">SAVES</span><h2>Save Game</h2></div><button class="close-btn" data-close="saveMenu">×</button></div><div id="saveSlots" class="slot-grid"></div><button class="menu-btn secondary" data-close="saveMenu">Back</button></div></div>
+
+<div id="pauseMenu" class="overlay hidden"><div class="panel"><span class="eyebrow">PAUSED</span><h2>From Nothing</h2><div class="menu-actions"><button id="resumeBtn">Resume</button><button id="saveMenuBtn" class="secondary">Save Game</button><button id="loadFromPauseBtn" class="secondary">Load Game</button><button id="settingsFromPauseBtn" class="secondary">Settings</button><button id="mainMenuBtn" class="secondary">Main Menu</button></div></div></div>
+
+<div id="modal" class="overlay hidden"><div class="panel"><div class="panel-head"><div><span id="modalKicker" class="eyebrow">INTERACTION</span><h2 id="modalTitle">Title</h2></div><button id="closeModal" class="close-btn">×</button></div><p id="modalText"></p><div id="modalActions"></div></div></div>
+
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js';
 
-const canvas=document.querySelector('#game');
+const $=s=>document.querySelector(s);
+const canvas=$('#game');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x86a7c4);scene.fog=new THREE.Fog(0x86a7c4,55,150);
@@ -51,7 +85,6 @@ function box(w,h,d,color,x,y,z,cast=true){const m=new THREE.Mesh(new THREE.BoxGe
 function plane(w,d,mat,x,z,y=.015){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),mat);m.rotation.x=-Math.PI/2;m.position.set(x,y,z);m.receiveShadow=true;scene.add(m);return m}
 function label(text,color='#fff'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(4,7,11,.84)';x.fillRect(0,0,512,128);x.fillStyle=color;x.font='800 42px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(text,256,64);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true}));s.scale.set(8,2,1);scene.add(s);return s}
 plane(18,180,roadMat,0,0,.02);plane(180,18,roadMat,0,0,.021);for(let i=-80;i<=80;i+=10){plane(.35,5,new THREE.MeshBasicMaterial({color:0xd8c45d}),0,i,.03);plane(5,.35,new THREE.MeshBasicMaterial({color:0xd8c45d}),i,0,.031)}plane(4.5,180,sidewalkMat,-11.5,0,.025);plane(4.5,180,sidewalkMat,11.5,0,.025);plane(180,4.5,sidewalkMat,0,-11.5,.026);plane(180,4.5,sidewalkMat,0,11.5,.026);
-
 const colliders=[];
 function building(x,z,w,d,h,color,name,sign='#fff'){box(w,h,d,color,x,h/2,z);colliders.push({x,z,hx:w/2+.65,hz:d/2+.65});box(w+.35,.35,d+.35,0x262c35,x,h+.17,z,false);const s=label(name,sign);s.position.set(x,h*.68,z+d/2+.12)}
 building(-27,-28,20,17,14,0x6b4c42,'YOUR APARTMENT','#d9f1ff');building(28,-28,22,17,10,0x78352f,'NIGHT OWL DINER','#ffd7a8');building(29,29,20,18,9,0x35665a,'QUICK MART','#d7ffe9');building(-31,29,27,18,12,0x4f5668,'CITY SERVICES','#dfe7ff');building(-54,-31,19,26,18,0x675c50,'APARTMENTS');building(55,-29,25,22,16,0x4b5562,'OFFICES');building(55,30,24,19,13,0x625b46,'WAREHOUSE');
@@ -63,33 +96,64 @@ const player=person(0x202733,0xa96f4e);player.position.set(-16,0,-5);scene.add(p
 
 const interactions=[{id:'home',name:'Apartment',pos:new THREE.Vector3(-27,0,-18.3),r:4.4},{id:'diner',name:'Diner Manager',pos:new THREE.Vector3(28,0,-17.4),r:4.4},{id:'store',name:'Quick Mart',pos:new THREE.Vector3(29,0,18.6),r:4.4},{id:'npc',name:'Talk to Marcus',pos:new THREE.Vector3(-25,0,55),r:4.2}];
 for(const i of interactions){const ring=new THREE.Mesh(new THREE.RingGeometry(1.3,1.55,28),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.3,side:THREE.DoubleSide}));ring.rotation.x=-Math.PI/2;ring.position.copy(i.pos);ring.position.y=.06;scene.add(ring);i.ring=ring}
-const state={cash:120,energy:100,hunger:12,rep:0,day:1,minutes:480,employed:false,interviewDone:false,talkedMarcus:false,objective:'Find the diner and ask for work.'};
-const $=s=>document.querySelector(s),els={cash:$('#cash'),energy:$('#energy'),hunger:$('#hunger'),rep:$('#rep'),day:$('#day'),clock:$('#clock'),objective:$('#objectiveText'),prompt:$('#prompt'),toast:$('#toast')};
+
+const baseState=()=>({cash:120,energy:100,hunger:12,rep:0,day:1,minutes:480,employed:false,interviewDone:false,talkedMarcus:false,objective:'Find the diner and ask for work.'});
+let state=baseState();
+let gameActive=false,paused=true,nearest=null;
+let yaw=0,pitch=-0.18;
+let sensitivity=parseFloat(localStorage.getItem('fn3d-sensitivity')||'1');
+let invertY=localStorage.getItem('fn3d-invertY')==='1';
+const sensSlider=$('#sensSlider'),sensValue=$('#sensValue'),invertCheck=$('#invertY');sensSlider.value=sensitivity;sensValue.textContent=sensitivity.toFixed(2);invertCheck.checked=invertY;
+sensSlider.oninput=()=>{sensitivity=parseFloat(sensSlider.value);sensValue.textContent=sensitivity.toFixed(2);localStorage.setItem('fn3d-sensitivity',String(sensitivity))};
+invertCheck.onchange=()=>{invertY=invertCheck.checked;localStorage.setItem('fn3d-invertY',invertY?'1':'0')};
+
+const els={cash:$('#cash'),energy:$('#energy'),hunger:$('#hunger'),rep:$('#rep'),day:$('#day'),clock:$('#clock'),objective:$('#objectiveText'),prompt:$('#prompt'),toast:$('#toast')};
 function hud(){state.energy=Math.max(0,Math.min(100,state.energy));state.hunger=Math.max(0,Math.min(100,state.hunger));els.cash.textContent='$'+Math.floor(state.cash);els.energy.textContent=Math.floor(state.energy);els.hunger.textContent=Math.floor(state.hunger);els.rep.textContent=Math.floor(state.rep);els.day.textContent=state.day;els.clock.textContent=String(Math.floor(state.minutes/60)%24).padStart(2,'0')+':'+String(Math.floor(state.minutes%60)).padStart(2,'0');els.objective.textContent=state.objective}
 function advance(m){state.minutes+=m;while(state.minutes>=1440){state.minutes-=1440;state.day++}hud()}
 let toastTimer;function toast(msg){clearTimeout(toastTimer);els.toast.textContent=msg;els.toast.classList.remove('hidden');toastTimer=setTimeout(()=>els.toast.classList.add('hidden'),2200)}
-let paused=false;const modal=$('#modal'),actions=$('#modalActions');
-function closeModal(){modal.classList.add('hidden');paused=false}$('#closeModal').onclick=closeModal;
-function openModal(title,text,buttons,k='INTERACTION'){paused=true;$('#modalTitle').textContent=title;$('#modalText').textContent=text;$('#modalKicker').textContent=k;actions.innerHTML='';for(const b of buttons){const x=document.createElement('button');x.textContent=b.label;if(b.secondary)x.className='secondary';x.onclick=()=>{b.action?.();if(b.close!==false)closeModal()};actions.append(x)}modal.classList.remove('hidden')}
+function slotKey(n){return 'from-nothing-slot-'+n}
+function slotData(n){try{return JSON.parse(localStorage.getItem(slotKey(n))||'null')}catch{return null}}
+function saveSlot(n){const data={version:2,state:{...state},pos:{x:player.position.x,z:player.position.z},camera:{yaw,pitch},savedAt:Date.now()};localStorage.setItem(slotKey(n),JSON.stringify(data));renderSlots();toast('Saved to Slot '+n)}
+function loadSlot(n){const data=slotData(n);if(!data)return;state={...baseState(),...data.state};if(data.pos)player.position.set(data.pos.x,0,data.pos.z);if(data.camera){yaw=data.camera.yaw||0;pitch=data.camera.pitch??-.18}startGameplay();closeAllOverlays();toast('Loaded Slot '+n)}
+function renderSlots(){for(const mode of['load','save']){const wrap=$('#'+mode+'Slots');wrap.innerHTML='';for(let n=1;n<=3;n++){const d=slotData(n);const div=document.createElement('div');div.className='slot';const date=d?new Date(d.savedAt).toLocaleString():'';div.innerHTML='<strong>Slot '+n+'</strong><small>'+(d?'Day '+d.state.day+' · $'+Math.floor(d.state.cash)+' · '+date:'Empty slot')+'</small><div class="slot-actions"></div>';const a=div.querySelector('.slot-actions');if(mode==='load'){const b=document.createElement('button');b.textContent=d?'Load':'Empty';b.disabled=!d;b.className=d?'':'secondary';b.onclick=()=>loadSlot(n);a.append(b)}else{const b=document.createElement('button');b.textContent=d?'Overwrite':'Save';b.onclick=()=>saveSlot(n);a.append(b)}if(d){const del=document.createElement('button');del.textContent='Delete';del.className='secondary';del.onclick=()=>{if(confirm('Delete Slot '+n+'?')){localStorage.removeItem(slotKey(n));renderSlots()}};a.append(del)}wrap.append(div)}}}
+renderSlots();
+
+function closeAllOverlays(){['mainMenu','settingsMenu','loadMenu','saveMenu','pauseMenu'].forEach(id=>$('#'+id).classList.add('hidden'));$('#modal').classList.add('hidden')}
+function requestLook(){if(gameActive&&!paused&&document.pointerLockElement!==canvas)canvas.requestPointerLock?.()}
+function startGameplay(){gameActive=true;paused=false;$('#hud').classList.remove('hidden');$('#crosshair').classList.remove('hidden');closeAllOverlays();hud();setTimeout(requestLook,100)}
+function newGame(){state=baseState();player.position.set(-16,0,-5);yaw=0;pitch=-.18;startGameplay()}
+function openOverlay(id){document.exitPointerLock?.();paused=true;$('#'+id).classList.remove('hidden')}
+$('#newGameBtn').onclick=newGame;$('#loadGameBtn').onclick=()=>{renderSlots();$('#loadMenu').classList.remove('hidden')};$('#settingsBtn').onclick=()=>$('#settingsMenu').classList.remove('hidden');
+$('#resumeBtn').onclick=()=>{paused=false;$('#pauseMenu').classList.add('hidden');requestLook()};$('#saveMenuBtn').onclick=()=>{renderSlots();$('#saveMenu').classList.remove('hidden')};$('#loadFromPauseBtn').onclick=()=>{renderSlots();$('#loadMenu').classList.remove('hidden')};$('#settingsFromPauseBtn').onclick=()=>$('#settingsMenu').classList.remove('hidden');$('#mainMenuBtn').onclick=()=>{gameActive=false;paused=true;document.exitPointerLock?.();$('#hud').classList.add('hidden');$('#crosshair').classList.add('hidden');closeAllOverlays();$('#mainMenu').classList.remove('hidden')};
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$('#'+b.dataset.close).classList.add('hidden'));
+
+const modal=$('#modal'),actions=$('#modalActions');
+function closeModal(){modal.classList.add('hidden');paused=false;requestLook()}$('#closeModal').onclick=closeModal;
+function openModal(title,text,buttons,k='INTERACTION'){document.exitPointerLock?.();paused=true;$('#modalTitle').textContent=title;$('#modalText').textContent=text;$('#modalKicker').textContent=k;actions.innerHTML='';for(const b of buttons){const x=document.createElement('button');x.textContent=b.label;if(b.secondary)x.className='secondary';x.onclick=()=>{b.action?.();if(b.close!==false)closeModal()};actions.append(x)}modal.classList.remove('hidden')}
 function interact(id){
  if(id==='diner'){if(!state.interviewDone)openModal('Night Owl Diner','The manager looks you over. “You show up on time and work hard?”',[{label:'Ask for a job',action:()=>{state.interviewDone=true;state.employed=true;state.rep+=2;state.objective='Work your first shift at the diner.';advance(30);toast('Hired! $18/hour')}},{label:'Maybe later',secondary:true}],'JOB INTERVIEW');else openModal('Clock In','Work a 4-hour shift. It costs energy and increases hunger.',[{label:'Work 4 hours · Earn $72',action:()=>{if(state.energy<20){toast('Too exhausted. Rest at home.');return}state.cash+=72;state.energy-=28;state.hunger+=24;state.rep++;advance(240);state.objective='Build your life: work, eat, rest, meet people.';toast('Shift complete · +$72')}},{label:'Not now',secondary:true}],'WORK')}
- if(id==='home')openModal('Your Apartment','Tiny, cheap, and yours. Resting restores energy.',[{label:'Sleep 8 hours',action:()=>{state.energy=100;state.hunger+=18;advance(480);toast('Rested up')}},{label:'Save game',action:saveGame},{label:'Leave',secondary:true}],'HOME');
+ if(id==='home')openModal('Your Apartment','Tiny, cheap, and yours. Resting restores energy.',[{label:'Sleep 8 hours',action:()=>{state.energy=100;state.hunger+=18;advance(480);toast('Rested up')}},{label:'Save Game',action:()=>{renderSlots();$('#saveMenu').classList.remove('hidden');},close:false},{label:'Leave',secondary:true}],'HOME');
  if(id==='store')openModal('Quick Mart','Grab something cheap to keep going.',[{label:'Meal · $14',action:()=>{if(state.cash<14)return toast('Not enough cash');state.cash-=14;state.hunger-=38;advance(15);toast('You ate a meal')}},{label:'Energy drink · $6',action:()=>{if(state.cash<6)return toast('Not enough cash');state.cash-=6;state.energy+=18;advance(5);toast('Energy +18')}},{label:'Leave',secondary:true}],'STORE');
  if(id==='npc')openModal('Marcus',state.talkedMarcus?'“Still standing. That counts for something.”':'“Everybody starts somewhere. Keep your word and people remember.”',[{label:state.talkedMarcus?'Later':'Introduce yourself',action:()=>{if(!state.talkedMarcus){state.talkedMarcus=true;state.rep+=3;toast('Reputation +3')}}}],'CONVERSATION');hud()
 }
-function saveGame(){localStorage.setItem('from-nothing-test-save',JSON.stringify({...state,pos:{x:player.position.x,z:player.position.z}}));toast('Game saved')}
-function loadGame(){const r=localStorage.getItem('from-nothing-test-save');if(!r)return toast('No save found');const s=JSON.parse(r);Object.assign(state,s);if(s.pos)player.position.set(s.pos.x,0,s.pos.z);hud();toast('Save loaded')}
-$('#saveBtn').onclick=saveGame;$('#loadBtn').onclick=loadGame;$('#resumeBtn').onclick=()=>{$('#pause').classList.add('hidden');paused=false};
-const keys={};let nearest=null;
-addEventListener('keydown',e=>{if(e.code==='Escape'&&modal.classList.contains('hidden')){paused=!paused;$('#pause').classList.toggle('hidden',!paused);return}keys[e.code]=true;if(e.code==='KeyE'&&!paused&&nearest)interact(nearest.id)});addEventListener('keyup',e=>keys[e.code]=false);
+
+const keys={};addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'&&gameActive&&modal.classList.contains('hidden')){document.exitPointerLock?.();paused=true;$('#pauseMenu').classList.remove('hidden')}if(e.code==='KeyE'&&gameActive&&!paused&&nearest)interact(nearest.id)});addEventListener('keyup',e=>keys[e.code]=false);
+canvas.addEventListener('click',()=>{if(gameActive&&!paused)requestLook()});
+addEventListener('mousemove',e=>{if(document.pointerLockElement!==canvas||!gameActive||paused)return;const scale=.0022*sensitivity;yaw-=e.movementX*scale;pitch+=(invertY?1:-1)*e.movementY*scale;pitch=Math.max(-1.15,Math.min(.55,pitch))});
+
 function collision(x,z){if(Math.abs(x)>84||Math.abs(z)>84)return true;return colliders.some(c=>Math.abs(x-c.x)<c.hx&&Math.abs(z-c.z)<c.hz)}
-const clock=new THREE.Clock(),velocity=new THREE.Vector3(),move=new THREE.Vector3();let elapsed=0;
+const clock=new THREE.Clock(),vel=new THREE.Vector3(),input=new THREE.Vector3();let elapsed=0;
 function tick(){
  requestAnimationFrame(tick);const dt=Math.min(clock.getDelta(),.04);elapsed+=dt;
- if(!paused){move.set(0,0,0);if(keys.KeyW)move.z--;if(keys.KeyS)move.z++;if(keys.KeyA)move.x--;if(keys.KeyD)move.x++;if(move.lengthSq()){move.normalize();const speed=(keys.ShiftLeft||keys.ShiftRight)?10.5:6.2;velocity.x=THREE.MathUtils.damp(velocity.x,move.x*speed,10,dt);velocity.z=THREE.MathUtils.damp(velocity.z,move.z*speed,10,dt);const nx=player.position.x+velocity.x*dt,nz=player.position.z+velocity.z*dt;if(!collision(nx,player.position.z))player.position.x=nx;if(!collision(player.position.x,nz))player.position.z=nz;player.rotation.y=Math.atan2(velocity.x,velocity.z);player.position.y=Math.sin(elapsed*10)*.045;if(speed>7){state.energy-=dt*.45;state.hunger+=dt*.11}}else{velocity.multiplyScalar(.82);player.position.y*=.8}
- state.minutes+=dt*.38;if(state.minutes>=1440){state.minutes-=1440;state.day++}const hour=state.minutes/60,daylight=Math.max(.08,Math.sin(((hour-5.5)/24)*Math.PI*2)*.5+.5);sun.intensity=.45+daylight*3.2;hemi.intensity=.45+daylight*1.9;const night=new THREE.Color(0x070b18),day=new THREE.Color(0x86a7c4);scene.background.copy(night).lerp(day,daylight);scene.fog.color.copy(scene.background);hud()}
- const forward=new THREE.Vector3(0,0,1).applyQuaternion(player.quaternion);const desired=player.position.clone().add(new THREE.Vector3(0,7.3,0)).add(forward.multiplyScalar(-9.8));camera.position.lerp(desired,1-Math.pow(.002,dt));camera.lookAt(player.position.clone().add(new THREE.Vector3(0,2.1,0)));
- nearest=null;let best=999;for(const i of interactions){const d=player.position.distanceTo(i.pos);i.ring.material.opacity=.18+Math.sin(elapsed*3)*.08;if(d<i.r&&d<best){best=d;nearest=i}}els.prompt.classList.toggle('hidden',!nearest||paused);if(nearest)els.prompt.innerHTML='Press <kbd>E</kbd> · '+nearest.name;
+ if(gameActive&&!paused){
+   input.set((keys.KeyD?1:0)-(keys.KeyA?1:0),0,(keys.KeyS?1:0)-(keys.KeyW?1:0));
+   const sprint=!!(keys.ShiftLeft||keys.ShiftRight),maxSpeed=sprint?10.8:6.4;
+   if(input.lengthSq()>0){input.normalize();const sy=Math.sin(yaw),cy=Math.cos(yaw);const wx=input.x*cy+input.z*sy,wz=-input.x*sy+input.z*cy;vel.x=THREE.MathUtils.damp(vel.x,wx*maxSpeed,12,dt);vel.z=THREE.MathUtils.damp(vel.z,wz*maxSpeed,12,dt);const nx=player.position.x+vel.x*dt,nz=player.position.z+vel.z*dt;if(!collision(nx,player.position.z))player.position.x=nx;else vel.x=0;if(!collision(player.position.x,nz))player.position.z=nz;else vel.z=0;const targetRot=Math.atan2(vel.x,vel.z);player.rotation.y=THREE.MathUtils.lerp(player.rotation.y,targetRot,1-Math.pow(.0008,dt));player.position.y=Math.sin(elapsed*(sprint?13:9))*.035;if(sprint){state.energy-=dt*.35;state.hunger+=dt*.08}}else{vel.x=THREE.MathUtils.damp(vel.x,0,14,dt);vel.z=THREE.MathUtils.damp(vel.z,0,14,dt);player.position.y=THREE.MathUtils.damp(player.position.y,0,10,dt)}
+   state.minutes+=dt*.38;if(state.minutes>=1440){state.minutes-=1440;state.day++}
+   const hour=state.minutes/60,daylight=Math.max(.08,Math.sin(((hour-5.5)/24)*Math.PI*2)*.5+.5);sun.intensity=.45+daylight*3.2;hemi.intensity=.45+daylight*1.9;const night=new THREE.Color(0x070b18),day=new THREE.Color(0x86a7c4);scene.background.copy(night).lerp(day,daylight);scene.fog.color.copy(scene.background);hud()
+ }
+ const camDist=7.8,camHeight=3.2;const cp=Math.cos(pitch),sp=Math.sin(pitch),sy=Math.sin(yaw),cy=Math.cos(yaw);const target=player.position.clone().add(new THREE.Vector3(0,2.15,0));const desired=target.clone().add(new THREE.Vector3(sy*cp*camDist,-sp*camDist+camHeight,cy*cp*camDist));camera.position.lerp(desired,1-Math.pow(.00005,dt));camera.lookAt(target);
+ nearest=null;let best=999;if(gameActive){for(const i of interactions){const d=player.position.distanceTo(i.pos);i.ring.material.opacity=.18+Math.sin(elapsed*3)*.08;if(d<i.r&&d<best){best=d;nearest=i}}els.prompt.classList.toggle('hidden',!nearest||paused);if(nearest)els.prompt.innerHTML='Press <kbd>E</kbd> · '+nearest.name}
  renderer.render(scene,camera)
 }
 camera.position.set(-16,7,-14);hud();tick();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
