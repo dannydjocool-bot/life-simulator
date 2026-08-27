@@ -12,7 +12,8 @@
 #prompt{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);padding:11px 14px;border-radius:999px;font-size:13px;font-weight:800}#toast{position:fixed;left:50%;top:25px;transform:translateX(-50%);padding:11px 14px;border-radius:12px;font-weight:800;font-size:13px}
 .overlay{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at center,rgba(12,20,30,.72),rgba(2,4,8,.94));backdrop-filter:blur(8px);z-index:20;padding:22px}.panel{width:min(620px,100%);padding:26px;border-radius:22px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(17,24,36,.98),rgba(7,10,16,.99));box-shadow:0 30px 90px rgba(0,0,0,.6)}.panel h1,.panel h2{margin:5px 0 10px}.panel h1{font-size:48px;line-height:.95}.panel h2{font-size:28px}.panel p{color:#b8c1ce;line-height:1.5}.menu-actions{display:grid;gap:10px;margin-top:18px}.menu-btn,.panel button{width:100%;padding:13px 15px;border:0;border-radius:12px;background:#eef3f9;color:#111722;font-weight:900}.menu-btn.secondary,.panel button.secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.1)}.menu-btn.danger{background:#3b171c;color:#ffd8dc}.row{display:flex;gap:10px;align-items:center;justify-content:space-between}.setting{padding:14px 0;border-top:1px solid rgba(255,255,255,.08)}.setting input[type=range]{width:100%}.setting small{color:#9ba8ba}.slot-grid{display:grid;gap:10px;margin-top:16px}.slot{padding:14px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.04)}.slot strong{display:block}.slot small{color:#a9b4c4}.slot-actions{display:flex;gap:8px;margin-top:10px}.slot-actions button{width:auto;flex:1}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.close-btn{width:40px!important;height:40px;padding:0!important;border-radius:50%!important;background:rgba(255,255,255,.08)!important;color:#fff!important}
 #crosshair{position:fixed;left:50%;top:50%;width:8px;height:8px;margin:-4px;z-index:5;pointer-events:none}
-.menu-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;align-items:end}.road{padding:18px;border-radius:16px;background:rgba(255,183,67,.06);border:1px solid rgba(255,199,107,.22)}.road h3{margin:0 0 12px;color:#ffc86a;letter-spacing:.08em}.road div{padding:9px 0;border-top:1px solid rgba(255,255,255,.06);font-size:14px}.road div:first-of-type{border-top:0}.character-panel{width:min(980px,100%)}.character-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}.char-card{position:relative;min-height:330px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(30,43,58,.96),rgba(10,14,20,.98));overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;transition:.18s}.char-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.3)}.char-card.selected{outline:2px solid #f5c568;box-shadow:0 0 0 4px rgba(245,197,104,.12)}.char-card.girl{background:linear-gradient(180deg,rgba(63,33,56,.96),rgba(17,10,18,.98))}.char-card .sil{position:absolute;inset:20px 20px 70px;display:grid;place-items:center;font-size:140px;filter:drop-shadow(0 18px 20px rgba(0,0,0,.35))}.char-card strong{font-size:26px}.char-card small{color:#a9b4c4}.mini{position:fixed;left:24px;bottom:78px;width:150px;height:150px;border-radius:50%;z-index:4;overflow:hidden;border:4px solid rgba(0,0,0,.4);background:#20252d;box-shadow:0 12px 28px rgba(0,0,0,.35)}.mini:before,.mini:after{content:"";position:absolute;background:#59616c}.mini:before{left:68px;top:0;width:14px;height:100%}.mini:after{top:68px;left:0;height:14px;width:100%}.mini-dot{position:absolute;left:50%;top:50%;width:13px;height:13px;border-radius:50%;background:#ffe15c;transform:translate(-50%,-50%);z-index:2;box-shadow:0 0 0 3px rgba(255,225,92,.2)}.mini-arrow{position:absolute;left:50%;top:36%;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:13px solid #70f58c;transform-origin:50% 22px;z-index:2}.credits{line-height:1.7;color:#b8c1ce}#crosshair:before,#crosshair:after{content:"";position:absolute;background:rgba(255,255,255,.85)}#crosshair:before{width:8px;height:1px;top:3px}#crosshair:after{height:8px;width:1px;left:3px}
+.menu-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px;align-items:end}.road{padding:18px;border-radius:16px;background:rgba(255,183,67,.06);border:1px solid rgba(255,199,107,.22)}.road h3{margin:0 0 12px;color:#ffc86a;letter-spacing:.08em}.road div{padding:9px 0;border-top:1px solid rgba(255,255,255,.06);font-size:14px}.road div:first-of-type{border-top:0}.character-panel{width:min(980px,100%)}.character-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0}.char-card{position:relative;min-height:330px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg,rgba(30,43,58,.96),rgba(10,14,20,.98));overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;transition:.18s}.char-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.3)}.char-card.selected{outline:2px solid #f5c568;box-shadow:0 0 0 4px rgba(245,197,104,.12)}.char-card.girl{background:linear-gradient(180deg,rgba(63,33,56,.96),rgba(17,10,18,.98))}.char-card .sil{position:absolute;inset:20px 20px 70px;display:grid;place-items:center;filter:drop-shadow(0 18px 20px rgba(0,0,0,.35))}
+.preview-human{position:relative;width:120px;height:220px}.preview-human i{position:absolute;display:block}.preview-human .head{width:52px;height:62px;border-radius:45% 45% 48% 48%;left:34px;top:8px;background:linear-gradient(145deg,#d79970,#9a5c3f);z-index:3}.preview-human .body{width:78px;height:92px;left:21px;top:62px;border-radius:22px 22px 14px 14px;background:linear-gradient(#20242a,#111318)}.preview-human .arm{width:20px;height:90px;top:70px;border-radius:12px;background:#1a1e24}.preview-human .a1{left:8px;transform:rotate(5deg)}.preview-human .a2{right:8px;transform:rotate(-5deg)}.preview-human .leg{width:26px;height:86px;top:142px;border-radius:9px;background:#171b20}.preview-human .l1{left:28px}.preview-human .l2{right:28px}.preview-human.girl-preview .body{width:72px;left:24px;background:linear-gradient(#17181c,#101114)}.preview-human.girl-preview .hair{width:62px;height:82px;left:29px;top:3px;border-radius:46% 46% 35% 35%;background:#1a1416;z-index:2}.preview-human.girl-preview .head{z-index:4}.char-card.selected .preview-human{transform:scale(1.04)}.char-card strong{font-size:26px}.char-card small{color:#a9b4c4}.mini{position:fixed;left:24px;bottom:78px;width:150px;height:150px;border-radius:50%;z-index:4;overflow:hidden;border:4px solid rgba(0,0,0,.4);background:#20252d;box-shadow:0 12px 28px rgba(0,0,0,.35)}.mini:before,.mini:after{content:"";position:absolute;background:#59616c}.mini:before{left:68px;top:0;width:14px;height:100%}.mini:after{top:68px;left:0;height:14px;width:100%}.mini-dot{position:absolute;left:50%;top:50%;width:13px;height:13px;border-radius:50%;background:#ffe15c;transform:translate(-50%,-50%);z-index:2;box-shadow:0 0 0 3px rgba(255,225,92,.2)}.mini-arrow{position:absolute;left:50%;top:36%;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:13px solid #70f58c;transform-origin:50% 22px;z-index:2}.credits{line-height:1.7;color:#b8c1ce}#crosshair:before,#crosshair:after{content:"";position:absolute;background:rgba(255,255,255,.85)}#crosshair:before{width:8px;height:1px;top:3px}#crosshair:after{height:8px;width:1px;left:3px}
 @media(max-width:760px){#hud{padding:12px;grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto}.stats{grid-row:2;display:grid;grid-template-columns:repeat(4,1fr)}.stats>div{min-width:0}.controls{display:none}#objective{grid-row:4}.panel h1{font-size:38px}}
 </style>
 </head>
@@ -38,7 +39,7 @@
   <div class="panel" style="width:min(900px,100%)">
     <div class="menu-layout">
       <div>
-        <span class="eyebrow">TEST BUILD · 3D LIFE SIMULATOR</span>
+        <span class="eyebrow">TEST BUILD v0.4 · 3D LIFE SIMULATOR</span>
         <h1>FROM<br>NOTHING</h1>
         <p>Start with almost nothing. Work, save, build a reputation, and create your legacy.</p>
         <div class="menu-actions">
@@ -63,8 +64,8 @@
     <h2>Choose Your Character</h2>
     <p>This choice changes your player model and is stored in each save slot.</p>
     <div class="character-grid">
-      <button class="char-card selected" data-gender="boy"><div class="sil">🧑🏽</div><strong>BOY</strong><small>Streetwear · athletic build</small></button>
-      <button class="char-card girl" data-gender="girl"><div class="sil">👩🏽</div><strong>GIRL</strong><small>Streetwear · athletic build</small></button>
+      <button class="char-card selected" data-gender="boy"><div class="sil"><div class="preview-human boy-preview"><i class="head"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>BOY</strong><small>Streetwear · athletic build</small></button>
+      <button class="char-card girl" data-gender="girl"><div class="sil"><div class="preview-human girl-preview"><i class="head"></i><i class="hair"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>GIRL</strong><small>Streetwear · athletic build</small></button>
     </div>
     <button id="confirmCharacterBtn" class="menu-btn">Continue</button>
     <button id="characterBackBtn" class="menu-btn secondary">Back</button>
@@ -101,8 +102,8 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.m
 const $=s=>document.querySelector(s);
 const canvas=$('#game');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x86a7c4);scene.fog=new THREE.Fog(0x86a7c4,55,150);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.18;renderer.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x91acc1);scene.fog=new THREE.Fog(0x91acc1,70,175);
 const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,300);
 const hemi=new THREE.HemisphereLight(0xd9efff,0x323128,2.25);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff0d0,3.4);sun.position.set(-35,60,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-70;sun.shadow.camera.right=70;sun.shadow.camera.top=70;sun.shadow.camera.bottom=-70;scene.add(sun);
@@ -114,10 +115,50 @@ function plane(w,d,mat,x,z,y=.015){const m=new THREE.Mesh(new THREE.PlaneGeometr
 function label(text,color='#fff'){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(4,7,11,.84)';x.fillRect(0,0,512,128);x.fillStyle=color;x.font='800 42px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(text,256,64);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true}));s.scale.set(8,2,1);scene.add(s);return s}
 plane(18,180,roadMat,0,0,.02);plane(180,18,roadMat,0,0,.021);for(let i=-80;i<=80;i+=10){plane(.35,5,new THREE.MeshBasicMaterial({color:0xd8c45d}),0,i,.03);plane(5,.35,new THREE.MeshBasicMaterial({color:0xd8c45d}),i,0,.031)}plane(4.5,180,sidewalkMat,-11.5,0,.025);plane(4.5,180,sidewalkMat,11.5,0,.025);plane(180,4.5,sidewalkMat,0,-11.5,.026);plane(180,4.5,sidewalkMat,0,11.5,.026);
 const colliders=[];
-function building(x,z,w,d,h,color,name,sign='#fff'){box(w,h,d,color,x,h/2,z);colliders.push({x,z,hx:w/2+.65,hz:d/2+.65});box(w+.35,.35,d+.35,0x262c35,x,h+.17,z,false);const s=label(name,sign);s.position.set(x,h*.68,z+d/2+.12)}
-building(-27,-28,20,17,14,0x6b4c42,'YOUR APARTMENT','#d9f1ff');building(28,-28,22,17,10,0x78352f,'NIGHT OWL DINER','#ffd7a8');building(29,29,20,18,9,0x35665a,'QUICK MART','#d7ffe9');building(-31,29,27,18,12,0x4f5668,'CITY SERVICES','#dfe7ff');building(-54,-31,19,26,18,0x675c50,'APARTMENTS');building(55,-29,25,22,16,0x4b5562,'OFFICES');building(55,30,24,19,13,0x625b46,'WAREHOUSE');
+function building(x,z,w,d,h,color,name,sign='#fff',style='normal'){
+  box(w,h,d,color,x,h/2,z);colliders.push({x,z,hx:w/2+.65,hz:d/2+.65});
+  box(w+.4,.35,d+.4,0x1b2028,x,h+.17,z,false);
+  box(w+.18,.22,d+.18,0x30353c,x,.11,z,false);
+  const frontZ=z+d/2+.022;
+  const rows=Math.max(1,Math.floor((h-3)/2.4)),cols=Math.max(2,Math.floor((w-3)/3));
+  const glassMat=new THREE.MeshStandardMaterial({color:style==='diner'?0xffbc71:0x6d8fa6,emissive:style==='diner'?0x4c1d08:0x101b25,emissiveIntensity:style==='diner'?1.4:.2,metalness:.05,roughness:.2});
+  for(let r=0;r<rows;r++)for(let col=0;col<cols;col++){
+    if(style==='diner'&&r===0)continue;
+    const wx=x-w/2+2+(col*(w-4)/Math.max(1,cols-1)),wy=2.2+r*2.3;
+    const win=new THREE.Mesh(new THREE.BoxGeometry(1.45,1.25,.08),glassMat);win.position.set(wx,wy,frontZ);scene.add(win);
+  }
+  const door=new THREE.Mesh(new THREE.BoxGeometry(1.7,2.6,.12),new THREE.MeshStandardMaterial({color:0x252c34,metalness:.15,roughness:.35}));door.position.set(x,1.3,frontZ+.03);scene.add(door);
+  if(style==='diner'){
+    for(const dx of[-7,-4.5,-2,2,4.5,7]){const win=new THREE.Mesh(new THREE.BoxGeometry(1.9,2.4,.1),glassMat);win.position.set(x+dx,1.65,frontZ+.035);scene.add(win)}
+    const awning=box(w*.82,.22,1.7,0x2a1714,x,3.4,frontZ+.65,false);awning.rotation.x=-.08;
+  }
+  const s=label(name,sign);s.position.set(x,style==='diner'?5.2:h*.68,frontZ+.22)
+}
+building(-27,-28,20,17,14,0x635048,'YOUR APARTMENT','#d9f1ff');
+building(28,-28,22,17,10,0x704239,'NIGHT OWL DINER','#ffca8d','diner');
+building(29,29,20,18,9,0x3e6359,'QUICK MART','#d7ffe9');
+building(-31,29,27,18,12,0x555d6e,'CITY SERVICES','#dfe7ff');
+building(-54,-31,19,26,18,0x6a6255,'APARTMENTS');
+building(55,-29,25,22,16,0x515b68,'OFFICES');
+building(55,30,24,19,13,0x665f4c,'WAREHOUSE');
 function tree(x,z){box(.65,3.1,.65,0x5c3b25,x,1.55,z);const c=new THREE.Mesh(new THREE.SphereGeometry(2.1,10,8),new THREE.MeshStandardMaterial({color:0x315f3a,roughness:1}));c.position.set(x,4.2,z);c.castShadow=true;scene.add(c)}[[-19,22],[-20,39],[-44,18],[-46,42],[18,20],[43,18],[46,44],[-18,-45],[18,-46],[45,-48]].forEach(p=>tree(...p));
 plane(26,21,new THREE.MeshStandardMaterial({color:0x3e7546,roughness:1}),-25,55,.028);box(8,.45,1.4,0x6a4a32,-25,.5,54);
+function streetLight(x,z){
+  box(.18,5.7,.18,0x343a42,x,2.85,z);
+  const arm=box(1.4,.12,.12,0x343a42,x+.58,5.55,z,false);
+  const lamp=new THREE.PointLight(0xffd99a,1.1,13,2);lamp.position.set(x+1.05,5.25,z);lamp.castShadow=false;scene.add(lamp);
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(.16,10,8),new THREE.MeshBasicMaterial({color:0xffe6ad}));bulb.position.copy(lamp.position);scene.add(bulb)
+}
+[[-13,-42],[13,-42],[-13,-16],[13,-16],[-13,16],[13,16],[-13,43],[13,43],[-43,-13],[-17,-13],[17,13],[43,13]].forEach(p=>streetLight(...p));
+function parkedCar(x,z,rot=0,color=0x2f4d6a){
+ const g=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry(4.2,.85,1.85),new THREE.MeshStandardMaterial({color,metalness:.35,roughness:.38}));body.position.y=.75;body.castShadow=true;g.add(body);
+ const cab=new THREE.Mesh(new THREE.BoxGeometry(2.3,.75,1.62),new THREE.MeshStandardMaterial({color:0x1d2934,metalness:.5,roughness:.22}));cab.position.set(-.2,1.45,0);cab.castShadow=true;g.add(cab);
+ for(const sx of[-1.35,1.35])for(const sz of[-.98,.98]){const wh=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,.28,14),new THREE.MeshStandardMaterial({color:0x111317,roughness:1}));wh.rotation.x=Math.PI/2;wh.position.set(sx,.43,sz);g.add(wh)}
+ g.position.set(x,0,z);g.rotation.y=rot;scene.add(g)
+}
+parkedCar(-5,-33,Math.PI/2,0x233c5d);parkedCar(5,30,Math.PI/2,0x7a2e2e);parkedCar(34,5,0,0x9a813f);parkedCar(-37,-5,0,0x335c46);
+for(const x of[-7,-3,1,5])plane(1.1,7,new THREE.MeshBasicMaterial({color:0xe6e2d8}),x,-10.3,.035);
+for(const x of[-7,-3,1,5])plane(1.1,7,new THREE.MeshBasicMaterial({color:0xe6e2d8}),x,10.3,.035);
 
 function material(color,rough=.72){return new THREE.MeshStandardMaterial({color,roughness:rough})}
 function limb(w,h,d,color){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material(color));m.castShadow=true;return m}
@@ -170,14 +211,14 @@ function loadSlot(n){const data=slotData(n);if(!data)return;state={...baseState(
 function renderSlots(){for(const mode of['load','save']){const wrap=$('#'+mode+'Slots');wrap.innerHTML='';for(let n=1;n<=3;n++){const d=slotData(n);const div=document.createElement('div');div.className='slot';const date=d?new Date(d.savedAt).toLocaleString():'';div.innerHTML='<strong>Slot '+n+'</strong><small>'+(d?'Day '+d.state.day+' · $'+Math.floor(d.state.cash)+' · '+date:'Empty slot')+'</small><div class="slot-actions"></div>';const a=div.querySelector('.slot-actions');if(mode==='load'){const b=document.createElement('button');b.textContent=d?'Load':'Empty';b.disabled=!d;b.className=d?'':'secondary';b.onclick=()=>loadSlot(n);a.append(b)}else{const b=document.createElement('button');b.textContent=d?'Overwrite':'Save';b.onclick=()=>saveSlot(n);a.append(b)}if(d){const del=document.createElement('button');del.textContent='Delete';del.className='secondary';del.onclick=()=>{if(confirm('Delete Slot '+n+'?')){localStorage.removeItem(slotKey(n));renderSlots()}};a.append(del)}wrap.append(div)}}}
 renderSlots();
 
-function closeAllOverlays(){['mainMenu','settingsMenu','loadMenu','saveMenu','pauseMenu'].forEach(id=>$('#'+id).classList.add('hidden'));$('#modal').classList.add('hidden')}
+function closeAllOverlays(){['mainMenu','characterMenu','settingsMenu','loadMenu','saveMenu','pauseMenu','creditsMenu'].forEach(id=>$('#'+id).classList.add('hidden'));$('#modal').classList.add('hidden')}
 function requestLook(){if(gameActive&&!paused&&document.pointerLockElement!==canvas)canvas.requestPointerLock?.()}
 function startGameplay(){gameActive=true;paused=false;$('#hud').classList.remove('hidden');$('#crosshair').classList.remove('hidden');$('#minimap').classList.remove('hidden');closeAllOverlays();hud();setTimeout(requestLook,100)}
 function newGame(){state=baseState();state.gender=selectedGender;rebuildPlayer(selectedGender);player.position.set(-16,0,-5);yaw=0;pitch=-.18;startGameplay()}
 function openOverlay(id){document.exitPointerLock?.();paused=true;$('#'+id).classList.remove('hidden')}
 $('#newGameBtn').onclick=()=>{selectedGender='boy';document.querySelectorAll('.char-card').forEach((x,i)=>x.classList.toggle('selected',i===0));$('#characterMenu').classList.remove('hidden')};
 document.querySelectorAll('.char-card').forEach(card=>card.onclick=()=>{selectedGender=card.dataset.gender;document.querySelectorAll('.char-card').forEach(x=>x.classList.toggle('selected',x===card))});
-$('#confirmCharacterBtn').onclick=newGame;$('#characterBackBtn').onclick=()=>$('#characterMenu').classList.add('hidden');
+$('#confirmCharacterBtn').onclick=()=>{$('#characterMenu').classList.add('hidden');newGame()};$('#characterBackBtn').onclick=()=>$('#characterMenu').classList.add('hidden');
 $('#loadGameBtn').onclick=()=>{renderSlots();$('#loadMenu').classList.remove('hidden')};$('#settingsBtn').onclick=()=>$('#settingsMenu').classList.remove('hidden');$('#creditsBtn').onclick=()=>$('#creditsMenu').classList.remove('hidden');$('#quitBtn').onclick=()=>alert('Browser games cannot close your browser tab. Use your browser close button to quit.');
 $('#resumeBtn').onclick=()=>{paused=false;$('#pauseMenu').classList.add('hidden');requestLook()};$('#saveMenuBtn').onclick=()=>{renderSlots();$('#saveMenu').classList.remove('hidden')};$('#loadFromPauseBtn').onclick=()=>{renderSlots();$('#loadMenu').classList.remove('hidden')};$('#settingsFromPauseBtn').onclick=()=>$('#settingsMenu').classList.remove('hidden');$('#mainMenuBtn').onclick=()=>{gameActive=false;paused=true;document.exitPointerLock?.();$('#hud').classList.add('hidden');$('#crosshair').classList.add('hidden');$('#minimap').classList.add('hidden');closeAllOverlays();$('#mainMenu').classList.remove('hidden')};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>$('#'+b.dataset.close).classList.add('hidden'));
