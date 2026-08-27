@@ -39,7 +39,7 @@
   <div class="panel" style="width:min(900px,100%)">
     <div class="menu-layout">
       <div>
-        <span class="eyebrow">TEST BUILD v0.5 · 3D LIFE SIMULATOR</span>
+        <span class="eyebrow">TEST BUILD v0.6 · 3D LIFE SIMULATOR</span>
         <h1>FROM<br>NOTHING</h1>
         <p>Start with almost nothing. Work, save, build a reputation, and create your legacy.</p>
         <div class="menu-actions">
@@ -62,7 +62,7 @@
   <div class="panel character-panel">
     <span class="eyebrow">CREATE YOUR STORY</span>
     <h2>Choose Your Character</h2>
-    <p>This choice changes your player model and is stored in each save slot.</p>
+    <p>This choice changes your player model and is stored in each save slot. The test build now loads a real skinned GLB character with skeletal Idle / Walk / Run animation.</p>
     <div class="character-grid">
       <button class="char-card selected" data-gender="boy"><div class="sil"><div class="preview-human boy-preview"><i class="head"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>BOY</strong><small>Streetwear · athletic build</small></button>
       <button class="char-card girl" data-gender="girl"><div class="sil"><div class="preview-human girl-preview"><i class="head"></i><i class="hair"></i><i class="body"></i><i class="arm a1"></i><i class="arm a2"></i><i class="leg l1"></i><i class="leg l2"></i></div></div><strong>GIRL</strong><small>Streetwear · athletic build</small></button>
@@ -98,6 +98,7 @@
 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js';
+import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/loaders/GLTFLoader.js';
 
 const $=s=>document.querySelector(s);
 const canvas=$('#game');
@@ -173,6 +174,41 @@ for(const x of[-7,-3,1,5])plane(1.1,7,new THREE.MeshBasicMaterial({color:0xe6e2d
 for(const x of[-7,-3,1,5])plane(1.1,7,new THREE.MeshBasicMaterial({color:0xe6e2d8}),x,10.3,.035);
 
 function material(color,rough=.72){return new THREE.MeshStandardMaterial({color,roughness:rough})}
+const gltfLoader=new GLTFLoader();
+const RIGGED_MODEL_URL='https://threejs.org/examples/models/gltf/Soldier.glb';
+let playerMixer=null,playerActions={},playerAnimName='',riggedReady=false,riggedLoading=false;
+function setRiggedAnim(name,fade=.18){
+  if(!playerActions[name]||playerAnimName===name)return;
+  const prev=playerActions[playerAnimName],next=playerActions[name];
+  if(prev)prev.fadeOut(fade);
+  next.reset().fadeIn(fade).play();playerAnimName=name;
+}
+function loadRiggedPlayer(kind){
+  if(riggedLoading)return;riggedLoading=true;riggedReady=false;
+  const oldVisual=player.getObjectByName('riggedVisual');if(oldVisual)player.remove(oldVisual);
+  gltfLoader.load(RIGGED_MODEL_URL,gltf=>{
+    const model=gltf.scene;model.name='riggedVisual';
+    model.scale.setScalar(.95);model.position.y=0;
+    model.rotation.y=Math.PI;
+    model.traverse(o=>{
+      if(o.isMesh){o.castShadow=true;o.receiveShadow=true;
+        if(o.material){o.material=o.material.clone();o.material.roughness=Math.min(.82,o.material.roughness??.7);
+          if(kind==='girl'&&o.material.color)o.material.color.lerp(new THREE.Color(0x8d6079),.18);
+          if(kind==='boy'&&o.material.color)o.material.color.lerp(new THREE.Color(0x26384e),.12);
+        }
+      }
+    });
+    if(kind==='girl')model.scale.set(.88,.94,.88);
+    player.add(model);
+    // Hide procedural fallback once the GLB is actually ready.
+    player.children.filter(x=>x!==model).forEach(x=>x.visible=false);
+    playerMixer=new THREE.AnimationMixer(model);playerActions={};
+    for(const clip of gltf.animations)playerActions[clip.name]=playerMixer.clipAction(clip);
+    playerAnimName='';setRiggedAnim(playerActions.Idle?'Idle':Object.keys(playerActions)[0],0);
+    riggedReady=true;riggedLoading=false;toast('Rigged 3D character loaded');
+  },undefined,err=>{riggedLoading=false;riggedReady=false;console.error('Rigged model failed',err);toast('Rigged model failed to load — fallback active')});
+}
+
 function limb(w,h,d,color){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material(color));m.castShadow=true;return m}
 function person(kind='boy',shirt=0x1f2631,skin=0xb87852){
   const g=new THREE.Group();g.userData.parts={};const female=kind==='girl';
@@ -194,8 +230,8 @@ function person(kind='boy',shirt=0x1f2631,skin=0xb87852){
   g.userData.baseHipY=1.42;g.userData.parts.torso=torso;return g
 }
 let selectedGender='boy';
-let player=person('boy',0x1d232c,0xaa704f);player.position.set(-16,0,-5);scene.add(player);
-function rebuildPlayer(kind){const pos=player.position.clone(),rot=player.rotation.y;scene.remove(player);player=person(kind,kind==='girl'?0x15161a:0x1d232c,kind==='girl'?0xb97859:0xaa704f);player.position.copy(pos);player.rotation.y=rot;scene.add(player)}
+let player=person('boy',0x1d232c,0xaa704f);player.position.set(-16,0,-5);scene.add(player);loadRiggedPlayer('boy');
+function rebuildPlayer(kind){const pos=player.position.clone(),rot=player.rotation.y;scene.remove(player);playerMixer=null;playerActions={};playerAnimName='';riggedReady=false;riggedLoading=false;player=person(kind,kind==='girl'?0x15161a:0x1d232c,kind==='girl'?0xb97859:0xaa704f);player.position.copy(pos);player.rotation.y=rot;scene.add(player);loadRiggedPlayer(kind)}
 const marcus=person('boy',0x5a374f,0x956446);marcus.position.set(-25,0,55);scene.add(marcus);
 const dinerNpc=person('boy',0x742c2c,0xc98f6d);dinerNpc.position.set(28,0,-17);scene.add(dinerNpc);
 const storeNpc=person('girl',0x315949,0xb87957);storeNpc.position.set(29,0,18);scene.add(storeNpc);
@@ -285,7 +321,15 @@ function tick(){
      if(sprint){state.energy-=dt*.32;state.hunger+=dt*.07}
    }else{vel.x=THREE.MathUtils.damp(vel.x,0,14,dt);vel.z=THREE.MathUtils.damp(vel.z,0,14,dt)}
    if(!onGround){verticalVel-=20.5*dt;player.position.y+=verticalVel*dt;if(player.position.y<=0){player.position.y=0;verticalVel=0;onGround=true}}else player.position.y=0;
-   animateCharacter(player,Math.hypot(vel.x,vel.z),sprint,dt);$('#miniArrow').style.transform='translateX(-50%) rotate('+(-yaw)+'rad)';
+   if(playerMixer)playerMixer.update(dt);
+   if(riggedReady){
+     const speed=Math.hypot(vel.x,vel.z);
+     if(slideTimer>0||punchTimer>0||blockHeld||!onGround)setRiggedAnim('Idle');
+     else if(sprint&&speed>.35)setRiggedAnim('Run');
+     else if(speed>.25)setRiggedAnim('Walk');
+     else setRiggedAnim('Idle');
+   }else animateCharacter(player,Math.hypot(vel.x,vel.z),sprint,dt);
+   $('#miniArrow').style.transform='translateX(-50%) rotate('+(-yaw)+'rad)';
    for(const npc of[marcus,dinerNpc,storeNpc]){if(npc.userData.hit>0){npc.userData.hit-=dt;npc.rotation.z=Math.sin(npc.userData.hit*25)*.08}else npc.rotation.z=THREE.MathUtils.damp(npc.rotation.z,0,12,dt)}
    state.minutes+=dt*.38;if(state.minutes>=1440){state.minutes-=1440;state.day++}
    const hour=state.minutes/60,daylight=Math.max(.08,Math.sin(((hour-5.5)/24)*Math.PI*2)*.5+.5);sun.intensity=.55+daylight*3.55;hemi.intensity=.55+daylight*1.75;
