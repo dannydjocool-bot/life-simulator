@@ -39,7 +39,7 @@
   <div class="panel" style="width:min(900px,100%)">
     <div class="menu-layout">
       <div>
-        <span class="eyebrow">TEST BUILD v0.7 · 3D LIFE SIMULATOR</span>
+        <span class="eyebrow">TEST BUILD v0.7.1 · 3D LIFE SIMULATOR</span>
         <h1>FROM<br>NOTHING</h1>
         <p>Start with almost nothing. Work, save, build a reputation, and create your legacy.</p>
         <div class="menu-actions">
@@ -96,8 +96,11 @@
 
 <div id="modal" class="overlay hidden"><div class="panel"><div class="panel-head"><div><span id="modalKicker" class="eyebrow">INTERACTION</span><h2 id="modalTitle">Title</h2></div><button id="closeModal" class="close-btn">×</button></div><p id="modalText"></p><div id="modalActions"></div></div></div>
 
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js"}}
+</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.module.js';
+import * as THREE from 'three';
 import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.179.1/examples/jsm/loaders/GLTFLoader.js';
 
 const $=s=>document.querySelector(s);
