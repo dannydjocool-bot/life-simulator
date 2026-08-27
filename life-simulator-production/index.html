@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Life Simulator: Complete Edition</title>
+<style>
+:root{
+  --bg:#080c12;--panel:#111824;--panel2:#172131;--panel3:#0d141f;
+  --text:#f0f5ff;--muted:#91a1b9;--border:#26344a;
+  --good:#72f59b;--warn:#ffd166;--bad:#ff6676;--accent:#6ee7ff;--purple:#b78cff;
+}
+*{box-sizing:border-box} body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+background:radial-gradient(circle at 8% 3%,rgba(110,231,255,.1),transparent 28%),radial-gradient(circle at 90% 10%,rgba(183,140,255,.08),transparent 25%),linear-gradient(180deg,#070b10,#0c121b 55%,#080c12)}
+button,input,select{font:inherit}.app{max-width:1500px;margin:auto;padding:18px}.topbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:15px;flex-wrap:wrap}
+.brand h1{margin:0;font-size:clamp(28px,4.5vw,52px);letter-spacing:-2px}.brand p{margin:5px 0 0;color:var(--muted)}
+.pill{border:1px solid var(--border);background:rgba(17,24,36,.86);border-radius:999px;padding:10px 14px;color:#c8d5e8}
+.grid{display:grid;grid-template-columns:290px minmax(0,1fr) 330px;gap:14px}.card{background:linear-gradient(180deg,rgba(23,33,49,.97),rgba(17,24,36,.99));border:1px solid var(--border);border-radius:20px;box-shadow:0 18px 45px rgba(0,0,0,.32)}
+.side,.center{padding:17px}.center{min-height:760px}.section-title{margin:0 0 12px;font-size:12px;color:#bac7db;letter-spacing:.14em;text-transform:uppercase}
+.identity{display:flex;align-items:center;gap:12px;margin-bottom:17px}.avatar{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;font-size:30px;background:linear-gradient(135deg,#293954,#172132);border:1px solid #3a4b67}.identity h2{margin:0;font-size:20px}.identity small{color:var(--muted)}
+.stat{margin-bottom:11px}.stat-head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}.bar{height:8px;background:#091019;border-radius:999px;overflow:hidden;border:1px solid #202d40}.fill{height:100%;border-radius:inherit;transition:width .3s}.health{background:linear-gradient(90deg,#32d66f,#75f59b)}.happy{background:linear-gradient(90deg,#f2b93b,#ffe28a)}.smarts{background:linear-gradient(90deg,#5da7ff,#91c4ff)}.looks{background:linear-gradient(90deg,#ad6fff,#e6b4ff)}.energy{background:linear-gradient(90deg,#3fe3d0,#90fff2)}.stress{background:linear-gradient(90deg,#ff796c,#ffb36e)}
+.moneybox{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}.mini,.info-card{background:var(--panel3);border:1px solid var(--border);border-radius:14px;padding:11px}.mini span,.label{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}.mini strong{font-size:15px}
+.age-card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px;border-radius:18px;background:linear-gradient(135deg,#0d151f,#151f30);border:1px solid var(--border);margin-bottom:15px}.age-num{font-size:42px;font-weight:900;line-height:1}.age-meta{color:var(--muted);font-size:12px}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:7px;margin-bottom:12px}.tab{white-space:nowrap;border:1px solid #33435b;background:#101722;color:#c8d5e8;padding:9px 12px;border-radius:999px;cursor:pointer}.tab.active{background:linear-gradient(135deg,#24435c,#253651);border-color:#5680a4;color:white}
+.actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:12px 0 17px}.action{min-height:76px;padding:11px 7px;border-radius:14px;border:1px solid #2c3b53;color:var(--text);background:#111a27;cursor:pointer;transition:.16s}.action:hover{transform:translateY(-2px);border-color:#5c78a0;background:#172337}.action:disabled{opacity:.4;cursor:not-allowed;transform:none}.action .emoji{font-size:21px;display:block;margin-bottom:4px}.action small{display:block;color:var(--muted);margin-top:3px;font-size:10px}
+.timeline{height:390px;overflow:auto;padding-right:4px}.entry{border-left:3px solid #31425d;padding:1px 0 11px 11px;margin:0 0 10px}.entry.good{border-color:var(--good)}.entry.bad{border-color:var(--bad)}.entry.warn{border-color:var(--warn)}.entry.purple{border-color:var(--purple)}.entry strong{font-size:12px}.entry p{margin:4px 0 0;color:#cbd6e8;line-height:1.42;font-size:13px}
+.right-block{margin-bottom:15px}.info-card{margin-bottom:8px}.value{font-weight:750;margin-top:2px}.stack{display:grid;gap:8px}.btn{width:100%;border:0;border-radius:14px;padding:13px 15px;font-weight:850;cursor:pointer;color:#061013;background:linear-gradient(135deg,#75f59b,#6ee7ff)}.btn.secondary{color:var(--text);background:#192334;border:1px solid #34455f}.btn.danger{color:white;background:#3c1920;border:1px solid #7d303d}.btn.gold{color:#211704;background:linear-gradient(135deg,#ffe08a,#ffbf4a)}
+.badges{display:flex;gap:6px;flex-wrap:wrap}.badge{font-size:10px;padding:5px 7px;border-radius:999px;border:1px solid #34455f;background:#101722;color:#c7d4e8}.badge.good{border-color:#2f7950;color:#9cfab7}.badge.warn{border-color:#806b2f;color:#ffe28a}.badge.bad{border-color:#813a45;color:#ff9aa5}
+.modal{position:fixed;inset:0;background:rgba(2,5,8,.8);display:none;place-items:center;padding:18px;z-index:40;backdrop-filter:blur(8px)}.modal.show{display:grid}.modal-box{width:min(620px,100%);max-height:90vh;overflow:auto;background:#111925;border:1px solid #354862;border-radius:24px;padding:21px;box-shadow:0 30px 90px rgba(0,0,0,.65)}.modal h2{margin-top:0}.choices{display:grid;gap:9px;margin-top:15px}.choice{display:flex;justify-content:space-between;gap:12px;align-items:center;text-align:left;padding:13px;border-radius:14px;border:1px solid #34445e;background:#172131;color:var(--text);cursor:pointer}.choice:hover{border-color:#6687b4;background:#1c2a40}.choice small{color:var(--muted)}
+.setup{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0}.setup label{font-size:11px;color:var(--muted)}.setup input,.setup select{width:100%;margin-top:5px;background:#0c131d;color:white;border:1px solid #33445e;padding:11px;border-radius:11px;outline:none}
+.death{font-size:62px;text-align:center}.footer-note{color:var(--muted);font-size:11px;text-align:center;margin-top:10px}.toast{position:fixed;right:18px;bottom:18px;background:#141e2c;border:1px solid #3c5273;padding:12px 15px;border-radius:14px;color:#eaf2ff;opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s;z-index:80}.toast.show{opacity:1;transform:none}
+@media(max-width:1050px){.grid{grid-template-columns:1fr 1fr}.center{grid-column:1/-1;grid-row:1}.actions{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.app{padding:10px}.grid{grid-template-columns:1fr}.center{grid-column:auto;grid-row:auto;min-height:unset}.actions{grid-template-columns:repeat(2,1fr)}.timeline{height:330px}.setup{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand"><h1>LIFE SIMULATOR</h1><p>Complete Edition — one life, hundreds of possible outcomes.</p></div>
+    <div class="pill" id="statusPill">Year 0 • New Life</div>
+  </div>
+
+  <div class="grid">
+    <aside class="card side">
+      <div class="section-title">Character</div>
+      <div class="identity">
+        <div class="avatar" id="avatar">👶</div>
+        <div><h2 id="nameView">Alex Carter</h2><small id="bioView">Age 0 • United States</small></div>
+      </div>
+      <div id="stats"></div>
+      <div class="moneybox">
+        <div class="mini"><span>Cash</span><strong id="cash">$0</strong></div>
+        <div class="mini"><span>Bank</span><strong id="bank">$0</strong></div>
+        <div class="mini"><span>Income</span><strong id="income">$0</strong></div>
+        <div class="mini"><span>Net Worth</span><strong id="networth">$0</strong></div>
+        <div class="mini"><span>Debt</span><strong id="debt">$0</strong></div>
+        <div class="mini"><span>Fame</span><strong id="fame">0%</strong></div>
+      </div>
+    </aside>
+
+    <main class="card center">
+      <div class="age-card">
+        <div><div class="age-num" id="age">0</div><div class="age-meta">YEARS OLD</div></div>
+        <div style="text-align:right"><div id="stage" style="font-weight:850">Baby</div><div class="age-meta" id="yearText">Born this year</div></div>
+      </div>
+
+      <div class="tabs" id="tabs"></div>
+      <div class="section-title" id="actionTitle">Life Actions</div>
+      <div class="actions" id="actions"></div>
+
+      <div class="section-title">Life Timeline</div>
+      <div class="timeline" id="timeline"></div>
+    </main>
+
+    <aside class="card side">
+      <div class="right-block">
+        <div class="section-title">Career & Education</div>
+        <div class="info-card"><div class="label">Education</div><div class="value" id="education">None</div></div>
+        <div class="info-card"><div class="label">Occupation</div><div class="value" id="job">Unemployed</div></div>
+        <div class="info-card"><div class="label">Sports Career</div><div class="value" id="sportsCareer">None</div></div>
+        <div class="info-card"><div class="label">Business</div><div class="value" id="business">None</div></div>
+      </div>
+
+      <div class="right-block">
+        <div class="section-title">Life</div>
+        <div class="info-card"><div class="label">Relationships</div><div class="value" id="relationships">Single</div></div>
+        <div class="info-card"><div class="label">Property</div><div class="value" id="property">No home</div></div>
+        <div class="info-card"><div class="label">Vehicle</div><div class="value" id="vehicle">No vehicle</div></div>
+        <div class="info-card"><div class="label">Legal Status</div><div class="value" id="legal">Clean record</div></div>
+      </div>
+
+      <div class="right-block">
+        <div class="section-title">Achievements</div>
+        <div class="badges" id="achievements"></div>
+      </div>
+
+      <div class="stack">
+        <button class="btn" id="ageBtn">AGE UP +1 YEAR</button>
+        <button class="btn secondary" id="halfAgeBtn">SIM +0.5 YEAR</button>
+        <button class="btn gold" id="specialBtn">LIFE SUMMARY</button>
+        <button class="btn secondary" id="saveBtn">SAVE GAME</button>
+        <button class="btn secondary" id="loadBtn">LOAD SAVE</button>
+        <button class="btn danger" id="restartBtn">NEW LIFE</button>
+      </div>
+      <div class="footer-note">Each tab has its own 5 AP. Spending AP in one tab never reduces another tab.</div>
+    </aside>
+  </div>
+</div>
+
+<div class="modal show" id="startModal">
+  <div class="modal-box">
+    <h2>Start a New Life</h2>
+    <p style="color:var(--muted)">Build your character and see how far you can take them.</p>
+    <div class="setup">
+      <label>First Name<input id="firstName" value="Alex"></label>
+      <label>Last Name<input id="lastName" value="Carter"></label>
+      <label>Country<select id="country"><option>United States</option><option>Canada</option><option>United Kingdom</option><option>Mexico</option><option>Brazil</option><option>Japan</option></select></label>
+      <label>Life Goal<select id="goalSelect"><option>Live a long, happy life</option><option>Become wealthy</option><option>Build a great career</option><option>Find true love</option><option>Become famous</option><option>Become highly educated</option></select></label>
+    </div>
+    <button class="btn" id="startBtn">BEGIN LIFE</button>
+  </div>
+</div>
+
+<div class="modal" id="eventModal"><div class="modal-box"><h2 id="eventTitle">Life Event</h2><p id="eventText" style="color:#cbd6e8;line-height:1.55"></p><div class="choices" id="eventChoices"></div></div></div>
+<div class="modal" id="deathModal"><div class="modal-box"><div class="death">🪦</div><h2 style="text-align:center">Your Life Has Ended</h2><p id="deathSummary" style="color:#cbd6e8;line-height:1.6;text-align:center"></p><button class="btn" id="deathRestart">LIVE ANOTHER LIFE</button></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const clamp=(n,min=0,max=100)=>Math.max(min,Math.min(max,n));
+const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Math.round(n||0));
+const rand=(min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const chance=p=>Math.random()<p;
+let state={}, activeTab="life";
+
+const educationNames=["None","Elementary School","High School","Associate Degree","Bachelor's Degree","Graduate Degree"];
+const jobs=[
+{name:"Fast Food Worker",age:16,smart:0,edu:0,pay:24000},{name:"Retail Associate",age:16,smart:0,edu:0,pay:29000},
+{name:"Construction Worker",age:18,smart:20,edu:1,pay:48000},{name:"Mechanic",age:18,smart:35,edu:1,pay:55000},
+{name:"Police Officer",age:21,smart:40,edu:1,pay:65000},{name:"Firefighter",age:21,smart:38,edu:1,pay:63000},
+{name:"Web Developer",age:18,smart:62,edu:2,pay:88000},{name:"Accountant",age:21,smart:67,edu:3,pay:80000},
+{name:"Registered Nurse",age:22,smart:68,edu:3,pay:87000},{name:"Engineer",age:22,smart:74,edu:3,pay:108000},
+{name:"Teacher",age:22,smart:64,edu:3,pay:61000},{name:"Pilot",age:23,smart:72,edu:3,pay:125000},
+{name:"Lawyer",age:25,smart:82,edu:4,pay:150000},{name:"Doctor",age:29,smart:88,edu:5,pay:225000},
+{name:"Actor",age:18,smart:35,edu:1,pay:60000,fame:true},{name:"Musician",age:18,smart:30,edu:1,pay:55000,fame:true}
+];
+const homes=[
+{name:"Small Apartment",cost:65000,annual:4500,happy:3},{name:"Townhouse",cost:180000,annual:8500,happy:5},
+{name:"Family Home",cost:350000,annual:13000,happy:8},{name:"Luxury Home",cost:850000,annual:28000,happy:12},{name:"Mansion",cost:2500000,annual:65000,happy:18}
+];
+const cars=[
+{name:"Used Compact",cost:8000,annual:1200,happy:2},{name:"Sedan",cost:28000,annual:2600,happy:4},
+{name:"Sports Car",cost:95000,annual:7000,happy:8},{name:"Luxury SUV",cost:140000,annual:9000,happy:9},{name:"Supercar",cost:450000,annual:22000,happy:14}
+];
+const businesses=[
+{name:"Online Store",cost:10000,profit:12000,risk:.12},{name:"Food Truck",cost:35000,profit:26000,risk:.14},
+{name:"Auto Shop",cost:90000,profit:55000,risk:.13},{name:"Restaurant",cost:175000,profit:80000,risk:.2},
+{name:"Tech Startup",cost:300000,profit:180000,risk:.32},{name:"Real Estate Company",cost:500000,profit:250000,risk:.18}
+];
+const sports=[
+ {name:"Basketball",emoji:"🏀",league:"NBA",positions:["Point Guard","Shooting Guard","Small Forward","Power Forward","Center"],teams:["New York Empire","Los Angeles Stars","Miami Waves","Chicago Storm","Boston Royals","Dallas Outlaws","Phoenix Heat","Atlanta Flight"]},
+ {name:"Football",emoji:"🏈",league:"NFL",positions:["Quarterback","Running Back","Wide Receiver","Linebacker","Cornerback","Safety"],teams:["New York Knights","Dallas Bulls","Miami Sharks","Chicago Grizzlies","Los Angeles Gold","Boston Rebels","Atlanta Fire","Seattle Wolves"]},
+ {name:"Baseball",emoji:"⚾",league:"MLB",positions:["Pitcher","Catcher","First Base","Shortstop","Center Field"],teams:["New York Kings","Los Angeles Suns","Chicago Legends","Boston Harbor","Miami Palms","Texas Riders","Atlanta Hawks","Seattle Orcas"]},
+ {name:"Soccer",emoji:"⚽",league:"MLS",positions:["Goalkeeper","Defender","Midfielder","Winger","Striker"],teams:["New York City FCX","LA United","Miami Athletic","Chicago City","Dallas SC","Boston FC","Atlanta United X","Seattle Green"]},
+ {name:"Hockey",emoji:"🏒",league:"NHL",positions:["Center","Left Wing","Right Wing","Defenseman","Goalie"],teams:["New York Ice","Boston Blizzard","Chicago Frost","Detroit Steel","Toronto North","Los Angeles Freeze","Dallas Stars X","Seattle Storm"]},
+ {name:"Boxing",emoji:"🥊",league:"World Boxing",positions:["Lightweight","Welterweight","Middleweight","Light Heavyweight","Heavyweight"],teams:["Independent"]},
+ {name:"Tennis",emoji:"🎾",league:"Pro Tennis Tour",positions:["Singles Player","Doubles Specialist"],teams:["Independent"]}
+];
+
+const achievements=[
+{id:"adult",name:"Adulting",test:s=>s.age>=18},{id:"graduate",name:"Graduate",test:s=>s.educationLevel>=4},
+{id:"million",name:"Millionaire",test:s=>netWorth(s)>=1000000},{id:"love",name:"True Love",test:s=>s.married},
+{id:"parent",name:"Parent",test:s=>s.children>=1},{id:"boss",name:"Boss",test:s=>!!s.business},
+{id:"famous",name:"Famous",test:s=>s.fame>=60},{id:"clean100",name:"Century",test:s=>s.age>=100},
+{id:"home",name:"Homeowner",test:s=>!!s.home},{id:"criminal",name:"Outlaw",test:s=>s.criminalRecord>0},
+{id:"athlete",name:"Student Athlete",test:s=>["Middle School Team","High School Varsity","College Athlete","Professional"].includes(s.sportLevel)},
+{id:"drafted",name:"Drafted",test:s=>s.proAthlete},{id:"champ",name:"Champion",test:s=>s.championships>0},
+{id:"mvp",name:"MVP",test:s=>s.mvpAwards>0}
+];
+
+function freshState(){
+ return {name:"Alex Carter",country:"United States",goal:"Live a long, happy life",age:0,alive:true,
+ health:rand(78,100),happiness:rand(65,100),smarts:rand(35,82),looks:rand(35,88),energy:100,stress:0,
+ cash:0,bank:0,debt:0,investments:0,salary:0,job:"Unemployed",jobYears:0,educationLevel:0,
+ partner:null,married:false,relationshipYears:0,children:0,friends:0,parents:2,
+ home:null,vehicle:null,business:null,businessValue:0,fame:0,criminalRecord:0,prisonYears:0,
+ skills:{fitness:0,social:0,creativity:0,business:0},
+ tabActionsUsed:{life:0,sports:0,career:0,money:0,love:0,assets:0,crime:0,fun:0},
+ tabBonusAP:{life:0,sports:0,career:0,money:0,love:0,assets:0,crime:0,fun:0},
+ history:[],travelCount:0,
+ gamblingWins:0,inheritance:0,achievements:[],generation:1,
+ sport:null,sportSkill:0,sportFitness:0,sportIQ:0,sportFame:0,sportTrainingUsed:0,
+ sportLevel:"None",sportTeam:null,sportPosition:null,sportSeasonStats:{games:0,wins:0,points:0},
+ sportAwards:[],proAthlete:false,proLeague:null,proTeam:null,proSalary:0,proYears:0,
+ championships:0,mvpAwards:0,allStarSelections:0,draftStatus:"Undrafted",retiredFromSports:false,
+ lastBirthdayAge:0};
+}
+function netWorth(s=state){return s.cash+s.bank+s.investments+(s.home?.cost||0)+(s.vehicle?.cost||0)+(s.businessValue||0)-s.debt}
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),1600)}
+function addLog(title,text,type=""){state.history.unshift({age:state.age,title,text,type});renderTimeline()}
+function getStage(){if(state.age<2)return"Baby";if(state.age<6)return"Toddler";if(state.age<13)return"Child";if(state.age<18)return"Teenager";if(state.age<25)return"Young Adult";if(state.age<40)return"Adult";if(state.age<60)return"Middle Age";if(state.age<75)return"Senior";return"Elder"}
+function avatar(){if(!state.alive)return"🪦";if(state.prisonYears>0)return"⛓️";if(state.age<3)return"👶";if(state.age<13)return"🧒";if(state.age<20)return"🧑";if(state.age<60)return state.fame>60?"😎":"🙂";return"👴"}
+
+function renderStats(){
+ const data=[["Health","health",state.health],["Happiness","happy",state.happiness],["Smarts","smarts",state.smarts],["Looks","looks",state.looks],["Energy","energy",state.energy],["Stress","stress",state.stress]];
+ document.getElementById("stats").innerHTML=data.map(([l,c,v])=>`<div class="stat"><div class="stat-head"><span>${l}</span><strong>${Math.round(v)}%</strong></div><div class="bar"><div class="fill ${c}" style="width:${clamp(v)}%"></div></div></div>`).join("");
+}
+function renderTimeline(){document.getElementById("timeline").innerHTML=state.history.map(x=>`<div class="entry ${x.type}"><strong>Age ${x.age} • ${x.title}</strong><p>${x.text}</p></div>`).join("")||`<div style="color:var(--muted)">Your story begins here.</div>`}
+function renderAchievements(){
+ const got=achievements.filter(a=>a.test(state)).map(a=>a.id); state.achievements=[...new Set([...state.achievements,...got])];
+ document.getElementById("achievements").innerHTML=achievements.map(a=>`<span class="badge ${state.achievements.includes(a.id)?"good":""}">${state.achievements.includes(a.id)?"✓ ":""}${a.name}</span>`).join("");
+}
+function legalText(){return state.prisonYears>0?`In prison — ${state.prisonYears} year${state.prisonYears===1?"":"s"} left`:state.criminalRecord?`${state.criminalRecord} conviction${state.criminalRecord===1?"":"s"}`:"Clean record"}
+function relationText(){if(state.married)return`Married to ${state.partner} • ${state.children} child${state.children===1?"":"ren"}`;if(state.partner)return`Dating ${state.partner}`;return`Single • ${state.friends} friend${state.friends===1?"":"s"}`}
+function render(){
+ ensureTabAP();
+ document.getElementById("nameView").textContent=state.name;document.getElementById("bioView").textContent=`Age ${state.age} • ${state.country}`;
+ document.getElementById("avatar").textContent=avatar();document.getElementById("age").textContent=state.age;document.getElementById("stage").textContent=getStage();
+ ensureTabAP();
+ const totalActions=tabTotalAP(activeTab);
+ const usedActions=tabUsedAP(activeTab);
+ document.getElementById("yearText").textContent=state.prisonYears>0?`${state.prisonYears} prison years remaining`:`${tabDefs.find(x=>x[0]===activeTab)?.[1]||"Tab"} • ${usedActions}/${totalActions} AP used • ${Math.max(0,totalActions-usedActions)} left`;
+ document.getElementById("statusPill").textContent=`Year ${state.age} • ${getStage()} • ${money(netWorth())} net worth`;
+ document.getElementById("cash").textContent=money(state.cash);document.getElementById("bank").textContent=money(state.bank);document.getElementById("income").textContent=money(state.salary);
+ document.getElementById("networth").textContent=money(netWorth());document.getElementById("debt").textContent=money(state.debt);document.getElementById("fame").textContent=`${Math.round(state.fame)}%`;
+ document.getElementById("education").textContent=educationNames[state.educationLevel];document.getElementById("job").textContent=state.job;
+ document.getElementById("sportsCareer").textContent=state.sport ? `${state.sport} • ${state.sportLevel}${state.proTeam?` • ${state.proTeam}`:""}` : "None";
+ document.getElementById("business").textContent=state.business?`${state.business.name} • ${money(state.businessValue)}`:"None";
+ document.getElementById("relationships").textContent=relationText();document.getElementById("property").textContent=state.home?.name||"No home";document.getElementById("vehicle").textContent=state.vehicle?.name||"No vehicle";document.getElementById("legal").textContent=legalText();
+ renderStats();renderTabs();renderActions();renderTimeline();renderAchievements();
+}
+
+const tabDefs=[
+ ["life","🌱 Life"],["sports","🏀 Sports"],["career","💼 Career"],["money","💰 Money"],["love","❤️ Love"],["assets","🏠 Assets"],["crime","🚨 Crime"],["fun","🎉 Lifestyle"]
+];
+function ensureTabAP(){
+ const ids=tabDefs.map(x=>x[0]);
+ state.tabActionsUsed=state.tabActionsUsed||{};
+ state.tabBonusAP=state.tabBonusAP||{};
+ ids.forEach(id=>{
+   if(typeof state.tabActionsUsed[id]!=="number")state.tabActionsUsed[id]=0;
+   if(typeof state.tabBonusAP[id]!=="number")state.tabBonusAP[id]=0;
+ });
+}
+function tabBaseAP(tab=activeTab){return 5}
+function tabTotalAP(tab=activeTab){ensureTabAP();return tabBaseAP(tab)+(state.tabBonusAP[tab]||0)}
+function tabUsedAP(tab=activeTab){ensureTabAP();return state.tabActionsUsed[tab]||0}
+function tabRemainingAP(tab=activeTab){return Math.max(0,tabTotalAP(tab)-tabUsedAP(tab))}
+function resetAllTabAP(){
+ ensureTabAP();
+ Object.keys(state.tabActionsUsed).forEach(k=>state.tabActionsUsed[k]=0);
+ Object.keys(state.tabBonusAP).forEach(k=>state.tabBonusAP[k]=0);
+}
+
+function renderTabs(){
+ ensureTabAP();
+ document.getElementById("tabs").innerHTML=tabDefs.map(([id,n])=>`<button class="tab ${activeTab===id?"active":""}" data-tab="${id}">${n} <small style="opacity:.7">(${tabRemainingAP(id)} AP)</small></button>`).join("");
+ document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{activeTab=b.dataset.tab;render()})
+}
+function action(e,n,id,desc="",free=false){return{e,n,id,desc,free}}
+function actionsForTab(){
+ if(state.prisonYears>0)return[action("💪","Workout","prisonWorkout","Build health",true),action("📚","Read","prisonRead","Gain smarts",true),action("🤝","Make Connections","prisonSocial","Meet inmates",true),action("🙏","Good Behavior","goodBehavior","Chance sentence reduction",true)];
+ if(activeTab==="life")return[
+  ...(state.age>=3?[action("📚","Study","study","Increase smarts")]:[]),...(state.age>=6?[action("🤝","Socialize","social","Build friendships")]:[]),
+  ...(state.age>=10?[action("🏃","Exercise","exercise","Health & fitness")]:[]),...(state.age>=13?[action("🧘","Relax","relax","Lower stress")]:[]),
+  ...(state.age>=18?[action("🏥","Doctor","doctor","Treat health issues"),action("🧠","Therapy","therapy","Improve happiness")]:[])
+ ];
+ if(activeTab==="sports")return state.age>=12?[
+  ...(!state.sport?[action("🏅","Choose Sport","chooseSport","Pick your main sport",true)]:[
+    action("🏋️","Sports Class","sportClass",state.sportTrainingUsed<2?"Parent-paid training":"Extra training"),
+    action("🎯","Skill Training","sportSkill","Improve sport skill"),
+    action("🧠","Film Study","sportIQ","Improve game IQ"),
+    action("🩺","Recovery","sportRecovery","Protect health",true),
+    ...(!state.proAthlete&&!state.retiredFromSports?[action("🏫","Try Out","sportTryout","Join the next team level")]:[]),
+    ...(state.proAthlete?[action("🏟️","Play Game","playProGame","Play a professional game"),action("🔥","Pro Training","proTraining","Improve as a pro")]:[]),
+    ...(state.proAthlete&&state.age>=30?[action("🎙️","Retire","retireSports","End playing career",true)]:[])
+  ])
+ ]:[];
+ if(activeTab==="career")return[
+  ...(state.age>=16?[action("🔎","Find Job","job","Apply for work"),action("⭐","Work Hard","workhard","Promotion chance")]:[]),
+  ...(state.age>=18?[action("🎓","Education","education","Continue school"),action("🏢","Start Business","business","Become an owner")]:[]),
+  ...(state.business?[action("📣","Grow Business","growBusiness","Invest in expansion")]:[])
+ ];
+ if(activeTab==="money")return[
+  ...(state.age>=16?[action("💵","Side Hustle","hustle","Make extra cash")]:[]),
+  ...(state.age>=18?[action("🏦","Bank","bank","Deposit / withdraw",true),action("💳","Pay Debt","payDebt","Reduce liabilities",true)]:[]),
+  ...(state.age>=21?[action("📈","Invest","invest","Stocks & funds"),action("🎰","Gamble","gamble","High risk")]:[])
+ ];
+ if(activeTab==="love")return[
+  ...(state.age>=18?[action("💘",state.partner?"Relationship":"Date","date","Love & romance"),action("💍","Marriage","marriage","Propose or manage marriage")]:[]),
+  ...(state.married&&state.age>=20?[action("👶","Have Child","child","Grow your family")]:[])
+ ];
+ if(activeTab==="assets")return[
+  ...(state.age>=18?[action("🏠","Buy Home","home","Real estate"),action("🚗","Buy Vehicle","car","Transportation")]:[]),
+  ...(state.home?[action("🔧","Home Upgrade","homeUpgrade","Improve property")]:[]),
+  ...(state.vehicle?[action("🛠️","Vehicle Care","carCare","Maintain your car",true)]:[])
+ ];
+ if(activeTab==="crime")return state.age>=15?[
+  action("🕵️","Petty Theft","theft","Low reward / lower risk"),action("🏪","Rob Store","robbery","Higher reward / high risk"),
+  action("💻","Cyber Crime","cyber","Smarts helps"),action("🚘","Steal Vehicle","stealCar","Big risk")
+ ]:[];
+ if(activeTab==="fun")return[
+  ...(state.age>=13?[action("🎮","Have Fun","fun","Boost happiness"),action("🎨","Create","create","Build creativity")]:[]),
+  ...(state.age>=18?[action("✈️","Travel","travel","See the world"),action("📱","Social Media","socialMedia","Chance at fame")]:[]),
+  ...(state.age>=21?[action("🍾","Party","party","Fun but risky")]:[])
+ ];
+ return[];
+}
+function renderActions(){
+ const acts=actionsForTab();document.getElementById("actionTitle").textContent=(tabDefs.find(x=>x[0]===activeTab)||["","Life"])[1]+" Actions";
+ document.getElementById("actions").innerHTML=acts.length?acts.map(a=>`<button class="action" data-action="${a.id}" ${(tabUsedAP(activeTab)>=tabTotalAP(activeTab)&&!a.free)?"disabled":""}><span class="emoji">${a.e}</span>${a.n}<small>${a.desc}</small></button>`).join(""):`<div style="color:var(--muted)">No actions available here yet.</div>`;
+ document.querySelectorAll("[data-action]").forEach(b=>b.onclick=()=>doAction(b.dataset.action));
+}
+function useAction(free=false){
+ ensureTabAP();
+ if(free)return true;
+ const tab=activeTab;
+ const total=tabTotalAP(tab);
+ const used=tabUsedAP(tab);
+ if(used>=total){
+   toast(`${tabDefs.find(x=>x[0]===tab)?.[1]||tab} is out of Action Points.`);
+   return false;
+ }
+ state.tabActionsUsed[tab]=used+1;
+ return true
+}
+function openModal(title,text,choices){
+ document.getElementById("eventTitle").textContent=title;document.getElementById("eventText").textContent=text;const c=document.getElementById("eventChoices");c.innerHTML="";
+ choices.forEach(ch=>{const b=document.createElement("button");b.className="choice";b.innerHTML=`<span>${ch.label}</span>${ch.note?`<small>${ch.note}</small>`:""}`;b.onclick=()=>{document.getElementById("eventModal").classList.remove("show");ch.fn();render()};c.appendChild(b)});
+ document.getElementById("eventModal").classList.add("show");
+}
+
+function doAction(type){
+ const free=["bank","payDebt","carCare","prisonWorkout","prisonRead","prisonSocial","goodBehavior","chooseSport","sportRecovery","retireSports"].includes(type);
+ if(!state.alive||!useAction(free))return;
+ const simple={
+ study:()=>{let g=rand(3,8);state.smarts=clamp(state.smarts+g);state.energy=clamp(state.energy-rand(4,10));addLog("Studied",`You gained ${g}% Smarts.`,"good")},
+ social:()=>{if(chance(.55))state.friends++;state.happiness=clamp(state.happiness+rand(3,8));state.skills.social+=rand(1,3);addLog("Socialized","You strengthened your social life.","good")},
+ exercise:()=>{let g=rand(3,7);state.health=clamp(state.health+g);state.energy=clamp(state.energy-rand(7,13));state.skills.fitness+=g;state.stress=clamp(state.stress-4);addLog("Workout",`Your health improved by ${g}%.`,"good")},
+ relax:()=>{let g=rand(7,16);state.stress=clamp(state.stress-g);state.happiness=clamp(state.happiness+4);addLog("Relaxed",`Stress dropped by ${g}%.`,"good")},
+ doctor:()=>{let cost=rand(100,1800),g=rand(6,18);state.cash-=cost;state.health=clamp(state.health+g);addLog("Doctor Visit",`Treatment cost ${money(cost)} and restored ${g}% Health.`,"good")},
+ therapy:()=>{let cost=rand(80,350),g=rand(6,14);state.cash-=cost;state.happiness=clamp(state.happiness+g);state.stress=clamp(state.stress-g);addLog("Therapy",`You spent ${money(cost)} and improved your mental well-being.`,"good")},
+ hustle:()=>{let e=rand(150,1700)+state.smarts*8;state.cash+=e;state.energy=clamp(state.energy-rand(8,17));addLog("Side Hustle",`You earned ${money(e)}.`,"good")},
+ workhard:()=>{if(state.salary<=0)return addLog("No Job","You need a job first.","warn");state.stress=clamp(state.stress+rand(4,10));state.jobYears++;if(chance(.25+state.smarts/400)){let bump=Math.round(state.salary*pick([.06,.08,.1,.14]));state.salary+=bump;addLog("Promotion",`You earned a raise worth ${money(bump)} per year.`,"good")}else addLog("Worked Hard","Your boss noticed the extra effort.","good")},
+ fun:()=>{let cost=rand(20,250);state.cash-=cost;state.happiness=clamp(state.happiness+rand(6,13));state.stress=clamp(state.stress-5);addLog("Had Fun",`You spent ${money(cost)} enjoying yourself.`,"good")},
+ create:()=>{state.skills.creativity+=rand(2,5);state.happiness=clamp(state.happiness+5);if(chance(.18)){state.fame=clamp(state.fame+rand(3,12));addLog("Creative Breakthrough","Something you created started getting attention.","purple")}else addLog("Created Something","You practiced your creativity.","good")},
+ travel:()=>{let cost=rand(900,4500);state.cash-=cost;state.travelCount++;state.happiness=clamp(state.happiness+rand(8,15));state.stress=clamp(state.stress-10);addLog("Travel",`You took a trip that cost ${money(cost)}.`,"good")},
+ socialMedia:()=>{if(chance(.18+state.looks/500+state.skills.creativity/300)){let g=rand(5,18);state.fame=clamp(state.fame+g);addLog("Viral Post",`You went viral and gained ${g}% Fame.`,"purple")}else{state.happiness=clamp(state.happiness+2);addLog("Social Media","You posted, but nothing major happened.")}},
+ party:()=>{state.cash-=rand(80,600);state.happiness=clamp(state.happiness+rand(5,12));state.health=clamp(state.health-rand(0,5));state.stress=clamp(state.stress-7);addLog("Party Night","You had a wild night out.",chance(.2)?"warn":"good")},
+ prisonWorkout:()=>{state.health=clamp(state.health+3);state.skills.fitness+=3;addLog("Prison Workout","You trained and stayed strong.","good")},
+ prisonRead:()=>{state.smarts=clamp(state.smarts+2);addLog("Prison Reading","You used your time to learn.","good")},
+ prisonSocial:()=>{state.skills.social+=2;if(chance(.35))state.friends++;addLog("Prison Connections","You made connections inside.","warn")},
+ goodBehavior:()=>{if(state.prisonYears>1&&chance(.28)){state.prisonYears--;addLog("Sentence Reduced","Good behavior reduced your remaining sentence by one year.","good")}else addLog("Good Behavior","You stayed out of trouble this year.","good")}
+ };
+ if(simple[type]){simple[type]();normalize();render();return}
+ if(type==="chooseSport")chooseSportMenu();if(type==="sportClass")sportsClass();if(type==="sportSkill")sportsSkillTraining();if(type==="sportIQ")sportsIQTraining();if(type==="sportRecovery")sportsRecovery();if(type==="sportTryout")sportsTryout();if(type==="playProGame")playProfessionalGame();if(type==="proTraining")proTraining();if(type==="retireSports")retireSports();
+ if(type==="job")jobMenu();if(type==="education")educationMenu();if(type==="business")businessMenu();if(type==="growBusiness")growBusiness();
+ if(type==="bank")bankMenu();if(type==="payDebt")debtMenu();if(type==="invest")investMenu();if(type==="gamble")gambleMenu();
+ if(type==="date")dateMenu();if(type==="marriage")marriageMenu();if(type==="child")childMenu();
+ if(type==="home")homeMenu();if(type==="car")carMenu();if(type==="homeUpgrade")homeUpgrade();if(type==="carCare"){state.cash-=rand(200,1200);addLog("Vehicle Maintenance","You serviced your vehicle and kept it in great shape.","good")}
+ if(["theft","robbery","cyber","stealCar"].includes(type))crime(type);
+ normalize();render();
+}
+
+function jobMenu(){
+ const eligible=jobs.filter(j=>state.age>=j.age&&state.smarts>=j.smart&&state.educationLevel>=j.edu).slice(-7).reverse();
+ openModal("Job Market","Choose a position to apply for.",eligible.map(j=>({label:`${j.name}`,note:`${money(j.pay)}/yr`,fn:()=>{let p=.48+(state.smarts-j.smart)/170+state.skills.social/300;if(state.criminalRecord)p-=.18;if(chance(p)){state.job=j.name;state.salary=j.pay;state.jobYears=0;if(j.fame)state.fame=clamp(state.fame+5);addLog("New Job",`You were hired as a ${j.name} earning ${money(j.pay)} per year.`,"good")}else addLog("Rejected",`${j.name} did not hire you.`,"bad")}})).concat([{label:"Stay with current path",fn:()=>addLog("Career","You did not change jobs.")}]));
+}
+function educationMenu(){
+ let next=state.educationLevel+1;if(next>5)return addLog("Education","You've already reached the highest education level.","warn");
+ let ageNeed=[0,5,14,18,20,22][next],cost=[0,0,0,12000,32000,48000][next];if(state.age<ageNeed)return addLog("Education","You're too young for the next education level.","warn");
+ openModal("Education",`Pursue ${educationNames[next]}${cost?` for ${money(cost)}`:""}?`,[
+ {label:"Enroll",note:cost?`Cost: ${money(cost)}`:"Free",fn:()=>{if(cost){if(state.cash+state.bank>=cost){let need=Math.max(0,cost-state.cash);state.cash=Math.max(0,state.cash-cost);if(need)state.bank-=need}else state.debt+=cost}state.educationLevel=next;state.smarts=clamp(state.smarts+rand(4,10));addLog("Graduated",`You completed ${educationNames[next]}.`,"good")}},
+ {label:"Not now",fn:()=>addLog("Education","You postponed further education.")}
+ ]);
+}
+function businessMenu(){
+ openModal("Start a Business","Choose a business to launch.",businesses.map(b=>({label:b.name,note:`Startup: ${money(b.cost)}`,fn:()=>{if(state.business)return addLog("Business","You already own a business.","warn");if(state.cash+state.bank<b.cost)return addLog("Not Enough Money",`You need ${money(b.cost)} to start ${b.name}.`,"warn");let need=Math.max(0,b.cost-state.cash);state.cash=Math.max(0,state.cash-b.cost);if(need)state.bank-=need;state.business={...b};state.businessValue=b.cost;state.skills.business+=5;addLog("Business Owner",`You launched ${b.name}.`,"purple")}})));
+}
+function growBusiness(){if(!state.business)return;let cost=Math.max(5000,Math.round(state.businessValue*.1));if(state.cash+state.bank<cost)return addLog("Expansion Failed",`You need ${money(cost)} to expand.`,"warn");state.cash-=Math.min(state.cash,cost);if(state.cash<0)state.cash=0;state.businessValue+=Math.round(cost*pick([1.2,1.5,2]));state.skills.business+=4;addLog("Business Expansion",`You invested ${money(cost)} into ${state.business.name}.`,"good")}
+function bankMenu(){openModal("Banking",`Cash ${money(state.cash)} • Bank ${money(state.bank)}`,[{label:"Deposit $1,000",fn:()=>transferToBank(1000)},{label:"Deposit $10,000",fn:()=>transferToBank(10000)},{label:"Deposit All",fn:()=>transferToBank(state.cash)},{label:"Withdraw $1,000",fn:()=>withdraw(1000)},{label:"Withdraw All",fn:()=>withdraw(state.bank)}])}
+function transferToBank(x){x=Math.min(x,state.cash);state.cash-=x;state.bank+=x;addLog("Bank Deposit",`You deposited ${money(x)}.`,"good")}
+function withdraw(x){x=Math.min(x,state.bank);state.bank-=x;state.cash+=x;addLog("Bank Withdrawal",`You withdrew ${money(x)}.`)}
+function debtMenu(){if(state.debt<=0)return addLog("Debt Free","You have no debt.","good");let options=[1000,5000,25000,state.debt].map(x=>({label:`Pay ${money(Math.min(x,state.debt))}`,fn:()=>{let amt=Math.min(x,state.debt,state.cash+state.bank);if(amt<=0)return addLog("No Funds","You don't have money available to pay debt.","warn");let fromCash=Math.min(state.cash,amt);state.cash-=fromCash;state.bank-=amt-fromCash;state.debt-=amt;addLog("Debt Payment",`You paid ${money(amt)} toward debt.`,"good")}}));openModal("Pay Debt",`Current debt: ${money(state.debt)}`,options)}
+function investMenu(){openModal("Investments","Choose how much to invest. Returns are uncertain.",[1000,5000,25000,100000].map(amt=>({label:`Invest ${money(amt)}`,fn:()=>{if(state.cash+state.bank<amt)return addLog("Investment","Not enough money.","warn");let fc=Math.min(state.cash,amt);state.cash-=fc;state.bank-=amt-fc;let m=pick([.75,.9,.96,1.04,1.08,1.15,1.3]);let value=Math.round(amt*m);state.investments+=value;addLog("Investment",`Your ${money(amt)} investment is now worth ${money(value)}.`,value>=amt?"good":"bad")}})))}
+function gambleMenu(){openModal("Gambling","Choose a wager. You can lose everything you bet.",[100,500,2500,10000].map(amt=>({label:`Bet ${money(amt)}`,fn:()=>{if(state.cash<amt)return addLog("Gambling","You don't have enough cash.","warn");state.cash-=amt;if(chance(.42)){let win=amt*pick([2,2,3,5]);state.cash+=win;state.gamblingWins++;addLog("Big Win",`You won ${money(win)}!`,"good")}else addLog("Lost Bet",`You lost ${money(amt)}.`,"bad")}})))}
+function dateMenu(){
+ if(state.partner){openModal("Relationship",`You are with ${state.partner}.`,[{label:"Plan a great date",note:"Costs money, boosts relationship",fn:()=>{let c=rand(80,450);state.cash-=c;state.happiness=clamp(state.happiness+9);state.relationshipYears++;addLog("Date Night",`You spent ${money(c)} on a great date with ${state.partner}.`,"good")}},{label:"Break up",fn:()=>{let old=state.partner;state.partner=null;state.married=false;state.happiness=clamp(state.happiness-10);addLog("Breakup",`You ended things with ${old}.`,"bad")}}]);return}
+ let n=pick(["Jordan","Taylor","Morgan","Avery","Riley","Cameron","Skyler","Casey","Jamie","Dakota"]);openModal("Dating",`You met ${n}.`,[{label:`Ask ${n} out`,fn:()=>{if(chance(.38+state.looks/250+state.skills.social/250)){state.partner=n;state.relationshipYears=0;state.happiness=clamp(state.happiness+12);addLog("New Relationship",`You and ${n} started dating.`,"good")}else addLog("Rejected",`${n} wasn't interested.`,"bad")}},{label:"Stay single",fn:()=>addLog("Dating","You stayed single.")}])
+}
+function marriageMenu(){if(!state.partner)return addLog("Marriage","You need a partner first.","warn");if(state.married)return openModal("Marriage",`You are married to ${state.partner}.`,[{label:"Renew your vows",fn:()=>{state.happiness=clamp(state.happiness+8);addLog("Marriage","You renewed your vows.","good")}},{label:"Divorce",fn:()=>{let old=state.partner;let settlement=Math.max(0,Math.round(netWorth()*.2));state.debt+=settlement;state.partner=null;state.married=false;state.happiness=clamp(state.happiness-18);addLog("Divorce",`You divorced ${old}. Settlement: ${money(settlement)}.`,"bad")}}]);openModal("Propose",`Propose to ${state.partner}?`,[{label:"Propose",note:"Success improves happiness",fn:()=>{if(chance(.5+state.relationshipYears*.08)){state.married=true;state.happiness=clamp(state.happiness+18);addLog("Wedding",`You married ${state.partner}!`,"good")}else addLog("Proposal Rejected",`${state.partner} said they weren't ready.`,"bad")}},{label:"Wait",fn:()=>addLog("Relationship","You decided not to propose yet.")}])}
+function childMenu(){if(!state.married)return addLog("Family","You must be married to use this family option.","warn");if(chance(.68)){state.children++;state.happiness=clamp(state.happiness+10);addLog("New Child",`Your family welcomed a child. You now have ${state.children}.`,"good")}else addLog("Trying for a Child","It didn't happen this year.","warn")}
+function homeMenu(){openModal("Real Estate","Choose a home.",homes.map(h=>({label:h.name,note:money(h.cost),fn:()=>{if(state.cash+state.bank<h.cost*.2)return addLog("Home Purchase","You need at least a 20% down payment.","warn");let down=Math.round(h.cost*.2);let fc=Math.min(state.cash,down);state.cash-=fc;state.bank-=down-fc;state.debt+=h.cost-down;state.home={...h};state.happiness=clamp(state.happiness+h.happy);addLog("Homeowner",`You bought a ${h.name} for ${money(h.cost)}.`,"good")}})))}
+function carMenu(){openModal("Vehicle Market","Choose a vehicle.",cars.map(c=>({label:c.name,note:money(c.cost),fn:()=>{if(state.cash+state.bank<c.cost)return addLog("Vehicle Purchase","Not enough money.","warn");let fc=Math.min(state.cash,c.cost);state.cash-=fc;state.bank-=c.cost-fc;state.vehicle={...c};state.happiness=clamp(state.happiness+c.happy);addLog("New Vehicle",`You bought a ${c.name}.`,"good")}})))}
+function homeUpgrade(){if(!state.home)return;let cost=Math.round(state.home.cost*.08);if(state.cash+state.bank<cost)return addLog("Home Upgrade","Not enough money.","warn");let fc=Math.min(state.cash,cost);state.cash-=fc;state.bank-=cost-fc;state.home.cost+=Math.round(cost*1.4);state.happiness=clamp(state.happiness+4);addLog("Home Upgrade",`You invested ${money(cost)} into your property.`,"good")}
+function crime(type){
+ let cfg={theft:{reward:[100,1800],risk:.12},robbery:{reward:[3000,22000],risk:.32},cyber:{reward:[1500,40000],risk:.25},stealCar:{reward:[5000,50000],risk:.36}}[type];
+ let risk=cfg.risk;if(type==="cyber")risk-=state.smarts/500;if(type==="theft")risk-=state.skills.social/700;
+ let reward=rand(...cfg.reward);if(chance(risk)){let sentence=rand(1,type==="theft"?2:type==="cyber"?6:10);state.criminalRecord++;state.prisonYears=sentence;state.job="Unemployed";state.salary=0;state.happiness=clamp(state.happiness-15);addLog("Arrested",`You were caught, convicted, and sentenced to ${sentence} year${sentence===1?"":"s"} in prison.`,"bad")}else{state.cash+=reward;addLog("Crime Paid",`You got away with ${money(reward)}.`,"warn")}
+}
+
+function sportDef(){return sports.find(s=>s.name===state.sport)}
+function chooseSportMenu(){
+ openModal("Choose Your Sport","At age 12+, you can commit to a sport. Your parents will pay for your first 2 sports classes every year.",sports.map(s=>({
+   label:`${s.emoji} ${s.name}`,note:`Path to ${s.league}`,fn:()=>{
+     state.sport=s.name;state.sportPosition=pick(s.positions);state.sportLevel="Recreational";
+     state.sportSkill=rand(20,40);state.sportFitness=Math.round(state.skills.fitness||0);state.sportIQ=rand(15,35);
+     addLog("New Sport",`You chose ${s.name}. Your starting position is ${state.sportPosition}. Your parents will cover 2 training classes per year.`,"purple")
+   }
+ })))
+}
+function sportsClass(){
+ if(!state.sport)return chooseSportMenu();
+ const parentPaid=state.sportTrainingUsed<2;
+ const cost=parentPaid?0:350;
+ if(!parentPaid && state.cash<cost)return addLog("Sports Training",`Your parents already paid for 2 classes this year. Another class costs ${money(cost)}.`,"warn");
+ if(cost)state.cash-=cost;
+ state.sportTrainingUsed++;
+ const gain=rand(4,8);
+ state.sportSkill=clamp(state.sportSkill+gain);
+ state.sportFitness=clamp(state.sportFitness+rand(2,5));
+ state.health=clamp(state.health+rand(1,3));
+ state.energy=clamp(state.energy-rand(5,10));
+ addLog("Sports Class",`${parentPaid?"Your parents paid for":"You paid for"} ${state.sport} training. Skill +${gain}%. ${Math.max(0,2-state.sportTrainingUsed)} parent-paid class${Math.max(0,2-state.sportTrainingUsed)===1?"":"es"} remain this year.`,"good")
+}
+function sportsSkillTraining(){
+ if(!state.sport)return;
+ let gain=rand(3,7);state.sportSkill=clamp(state.sportSkill+gain);state.sportFitness=clamp(state.sportFitness+2);state.energy=clamp(state.energy-rand(7,14));
+ addLog("Skill Training",`You drilled ${state.sport} fundamentals. Sport Skill +${gain}%.`,"good")
+}
+function sportsIQTraining(){
+ if(!state.sport)return;
+ let gain=rand(3,7);state.sportIQ=clamp(state.sportIQ+gain);state.smarts=clamp(state.smarts+1);
+ addLog("Film Study",`You studied strategy and film. Sports IQ +${gain}%.`,"good")
+}
+function sportsRecovery(){
+ if(!state.sport)return;
+ state.health=clamp(state.health+rand(4,9));state.energy=clamp(state.energy+rand(8,15));state.stress=clamp(state.stress-rand(3,8));
+ addLog("Recovery Day","You focused on stretching, treatment, sleep, and recovery.","good")
+}
+function sportsOverall(){
+ return Math.round(state.sportSkill*.55 + state.sportFitness*.25 + state.sportIQ*.20);
+}
+function nextSportLevel(){
+ if(state.age<=13)return "Middle School Team";
+ if(state.age<=17)return "High School Varsity";
+ if(state.age<=22)return "College Athlete";
+ return "Professional";
+}
+function sportsTryout(){
+ if(!state.sport)return;
+ const next=nextSportLevel();
+ if(next==="Professional")return proDraftAttempt();
+ const levels=["Recreational","Middle School Team","High School Varsity","College Athlete","Professional"];
+ if(levels.indexOf(state.sportLevel)>=levels.indexOf(next))return addLog("Tryout",`You're already at ${state.sportLevel}. Keep training and playing.`,"warn");
+ let needed=next==="Middle School Team"?35:next==="High School Varsity"?50:68;
+ let ov=sportsOverall(), p=.28+(ov-needed)/80+state.health/500;
+ if(chance(p)){
+   state.sportLevel=next;state.sportTeam=next==="College Athlete"?pick(["State University","Metro University","National Tech","Coastal College","Capital University"]):`${state.country} ${next}`;
+   state.happiness=clamp(state.happiness+8);state.sportFame=clamp(state.sportFame+rand(2,7));
+   addLog("Made the Team",`You made the ${state.sportTeam} ${state.sport} team as a ${state.sportPosition}.`,"purple")
+ }else addLog("Tryout Cut",`You didn't make the ${next} team this time. Overall rating: ${ov}. Keep training.`,"bad")
+}
+function collegeScholarshipCheck(){
+ if(state.sportLevel!=="High School Varsity"||state.age<17||state.age>19)return;
+ if(sportsOverall()>=70 && chance(.55)){
+   state.sportLevel="College Athlete";state.sportTeam=pick(["State University","Metro University","National Tech","Coastal College","Capital University"]);
+   state.educationLevel=Math.max(state.educationLevel,3);state.debt=Math.max(0,state.debt-12000);
+   addLog("Athletic Scholarship",`${state.sportTeam} offered you a ${state.sport} scholarship! You're now a college athlete.`,"purple")
+ }
+}
+function proDraftAttempt(){
+ if(state.proAthlete)return;
+ if(!["High School Varsity","College Athlete"].includes(state.sportLevel))return addLog("Pro Draft","You need high-level organized sports experience before scouts will consider you.","warn");
+ let ov=sportsOverall();
+ let threshold=state.sport==="Basketball"?78:75;
+ let p=.12+(ov-threshold)/65+state.sportFame/250;
+ if(ov<threshold-8)p*=.3;
+ const s=sportDef();
+ if(chance(p)){
+   state.proAthlete=true;state.sportLevel="Professional";state.proLeague=s.league;state.proTeam=pick(s.teams);
+   state.draftStatus=ov>=90?"1st Round Pick":ov>=82?"Draft Pick":"Undrafted Signing";
+   state.proSalary=Math.round((ov>=90?8500000:ov>=82?3200000:950000)*pick([.8,1,1.2]));
+   state.salary=state.proSalary;state.job=`Professional ${state.sport} Player`;
+   state.fame=clamp(state.fame+rand(15,30));state.sportFame=clamp(state.sportFame+20);
+   addLog(`${s.league} Dream`,`${state.draftStatus}! ${state.proTeam} signed you to play professional ${state.sport} for ${money(state.proSalary)} per year.`,"purple")
+ }else{
+   state.draftStatus="Not Selected";
+   addLog("Draft Night",`You were not selected for the ${s.league}. Your overall rating was ${ov}. You can keep training and try again.`,"bad")
+ }
+}
+function playProfessionalGame(){
+ if(!state.proAthlete)return;
+ const s=sportDef(), ov=sportsOverall(), opponent=pick(s.teams.filter(t=>t!==state.proTeam));
+ const great=chance(.32+(ov-70)/100);
+ const win=chance(.48+(ov-75)/180);
+ state.sportSeasonStats.games++; if(win)state.sportSeasonStats.wins++;
+ let performance=great?rand(28,55):rand(8,27);
+ state.sportSeasonStats.points+=performance;
+ state.energy=clamp(state.energy-rand(8,16));state.health=clamp(state.health-rand(0,3));
+ state.sportFame=clamp(state.sportFame+(great?3:1));state.fame=clamp(state.fame+(great?2:0));
+ if(great&&chance(.12)){state.allStarSelections++;addLog("Star Performance",`You dominated against ${opponent}. The media is calling you one of the league's hottest players.`,"purple")}
+ else addLog("Pro Game",`${state.proTeam} ${win?"defeated":"lost to"} ${opponent}. Your performance score: ${performance}.`,win?"good":"warn")
+}
+function proTraining(){
+ if(!state.proAthlete)return;
+ let gain=rand(2,5);state.sportSkill=clamp(state.sportSkill+gain);state.sportFitness=clamp(state.sportFitness+rand(1,4));
+ state.energy=clamp(state.energy-rand(6,12));addLog("Professional Training",`You trained with the pros. Sport Skill +${gain}%.`,"good")
+}
+function proSportsYear(){
+ if(!state.proAthlete||state.retiredFromSports)return;
+ state.proYears++;
+ const ov=sportsOverall();
+ const games=rand(45,82), winRate=Math.min(.78,.3+ov/180), wins=Math.round(games*winRate);
+ state.sportSeasonStats={games,wins,points:Math.round(games*(ov*.32+rand(0,8)))};
+ if(chance(.12+(ov-78)/120)){state.allStarSelections++;addLog("All-Star",`You were selected as a ${state.proLeague} All-Star.`,"purple")}
+ if(chance(.06+(ov-84)/120)){state.mvpAwards++;state.fame=clamp(state.fame+10);addLog("League MVP",`You won the ${state.proLeague} MVP award!`,"purple")}
+ if(chance(.05+(wins/games-.5)*.35)){state.championships++;state.fame=clamp(state.fame+15);addLog("CHAMPION",`${state.proTeam} won the ${state.proLeague} championship! You now have ${state.championships} title${state.championships===1?"":"s"}.`,"purple")}
+ if(state.proYears>0 && chance(.25)){
+   const raise=Math.round(state.proSalary*pick([.08,.15,.25,.4]));
+   state.proSalary+=raise;state.salary=state.proSalary;
+   addLog("New Contract",`${state.proTeam} increased your annual contract by ${money(raise)} to ${money(state.proSalary)}.`,"good")
+ }
+ if(state.age>33){state.sportFitness=clamp(state.sportFitness-rand(1,4));state.sportSkill=clamp(state.sportSkill-rand(0,2))}
+ if(state.age>=40&&chance(.3))retireSports(true);
+}
+function retireSports(auto=false){
+ if(!state.proAthlete||state.retiredFromSports)return;
+ state.retiredFromSports=true;state.proAthlete=false;state.salary=0;state.job="Retired Professional Athlete";state.sportLevel="Retired Professional";
+ addLog("Sports Retirement",`${auto?"Age finally caught up with you. ":""}You retired after ${state.proYears} professional seasons, ${state.championships} championship${state.championships===1?"":"s"}, ${state.mvpAwards} MVP award${state.mvpAwards===1?"":"s"}, and ${state.allStarSelections} All-Star selection${state.allStarSelections===1?"":"s"}.`,"purple")
+}
+
+function normalize(){state.health=clamp(state.health);state.happiness=clamp(state.happiness);state.smarts=clamp(state.smarts);state.looks=clamp(state.looks);state.energy=clamp(state.energy);state.stress=clamp(state.stress);state.fame=clamp(state.fame);if(state.cash<0){state.debt+=Math.abs(state.cash);state.cash=0}}
+
+
+function birthdayBonus(){
+ const wholeAge=Math.floor(state.age);
+ if(Number.isInteger(state.age) && wholeAge>0 && state.lastBirthdayAge!==wholeAge){
+   state.lastBirthdayAge=wholeAge;
+   ensureTabAP();
+   Object.keys(state.tabBonusAP).forEach(tab=>state.tabBonusAP[tab]=(state.tabBonusAP[tab]||0)+5);
+   addLog("Birthday Wish",`Happy ${wholeAge}${wholeAge===1?"st":wholeAge===2?"nd":wholeAge===3?"rd":"th"} birthday! Every category received +5 Birthday AP. Each tab now has ${tabTotalAP("life")} AP available for this birthday year.`,"purple");
+ }
+}
+function halfYearFinance(){
+ if(state.salary>0&&state.prisonYears<=0){
+   const halfIncome=state.salary/2;
+   const tax=Math.round(halfIncome*(state.salary>150000?.29:.22));
+   const living=Math.round((11500+state.age*120+state.children*4200+(state.home?.annual||0)+(state.vehicle?.annual||0))/2);
+   const net=halfIncome-tax-living;
+   state.bank+=net;
+   addLog("Half-Year Finances",`6 months passed: income ${money(halfIncome)} • taxes ${money(tax)} • expenses ${money(living)} • saved ${money(net)}.`,net>=0?"good":"warn");
+ }else if(state.age>=18&&state.prisonYears<=0){
+   const living=Math.round((rand(7000,16000)+(state.children*3500))/2);
+   state.cash-=living;
+   addLog("Half-Year Living Costs",`Six months of living expenses cost ${money(living)}.`,"warn");
+ }
+ if(state.debt>0){
+   const interest=Math.round(state.debt*.0225);
+   state.debt+=interest;
+   if(interest>0)addLog("Debt Interest",`${money(interest)} in six-month interest was added to your debt.`,"warn");
+ }
+ if(state.bank>0)state.bank+=Math.round(state.bank*.01);
+ if(state.investments>0){
+   const m=pick([.9,.96,.99,1.02,1.05,1.08,1.12]);
+   state.investments=Math.max(0,Math.round(state.investments*m));
+ }
+ if(state.business){
+   const b=state.business,base=(b.profit/2)*(1+state.skills.business/100);
+   const factor=chance(b.risk/2)?pick([-.45,-.25,-.1]):pick([.7,.9,1.05,1.2]);
+   const profit=Math.round(base*factor);
+   if(profit>=0){state.bank+=profit;state.businessValue+=Math.round(profit*.15);addLog("Half-Year Business",`${b.name} made ${money(profit)} over the last 6 months.`,"good")}
+   else{state.cash+=profit;state.businessValue=Math.max(0,state.businessValue+profit);addLog("Half-Year Business Loss",`${b.name} lost ${money(Math.abs(profit))} over the last 6 months.`,"bad")}
+ }
+}
+function halfFamilyYear(){
+ if(state.partner&&state.married&&chance(.03)&&state.age<55){state.children++;addLog("Family News","Your family welcomed another child.","good")}
+}
+function halfSportsYear(){
+ if(state.proAthlete&&!state.retiredFromSports){
+   const s=sportDef(), ov=sportsOverall();
+   const games=rand(20,41), wins=Math.round(games*Math.min(.78,.3+ov/180));
+   state.sportSeasonStats.games+=games;state.sportSeasonStats.wins+=wins;
+   state.sportSeasonStats.points+=Math.round(games*(ov*.3+rand(0,8)));
+   if(chance(.035+(ov-84)/180)){state.fame=clamp(state.fame+5);addLog("Midseason Buzz",`You're having an elite stretch for ${state.proTeam}.`,"purple")}
+ }
+}
+
+function annualRandomEvent(){
+ const pool=[];
+ pool.push(()=>{let x=rand(50,900);state.cash+=x;addLog("Lucky Day",`You unexpectedly received ${money(x)}.`,"good")});
+ pool.push(()=>{let h=rand(2,9);state.health-=h;addLog("Illness",`You got sick and lost ${h}% Health.`,"bad")});
+ pool.push(()=>{state.happiness+=rand(3,8);addLog("Great Memories","A few great moments made this year special.","good")});
+ if(state.age>=16)pool.push(()=>{let x=rand(200,4000);state.cash-=x;addLog("Unexpected Expense",`A surprise expense cost ${money(x)}.`,"bad")});
+ if(state.partner)pool.push(()=>{if(chance(.65)){state.relationshipYears++;state.happiness+=4;addLog("Relationship Growth",`You and ${state.partner} grew closer.`,"good")}else{state.happiness-=6;state.stress+=6;addLog("Relationship Trouble",`You and ${state.partner} had a difficult year.`,"warn")}});
+ if(state.fame>30)pool.push(()=>{let x=rand(2000,25000)*Math.max(1,Math.floor(state.fame/20));state.cash+=x;addLog("Brand Deal",`Your fame earned you a ${money(x)} sponsorship.`,"purple")});
+ pick(pool)();
+}
+function businessYear(){
+ if(!state.business)return;let b=state.business,base=b.profit*(1+state.skills.business/100);let factor=chance(b.risk)?pick([-.8,-.45,-.25]):pick([.7,.9,1.05,1.2,1.45]);let profit=Math.round(base*factor);
+ if(profit>=0){state.bank+=profit;state.businessValue+=Math.round(profit*.25);addLog("Business Results",`${b.name} made ${money(profit)} this year.`,"good")}else{state.cash+=profit;state.businessValue=Math.max(0,state.businessValue+profit);addLog("Business Loss",`${b.name} lost ${money(Math.abs(profit))}.`,"bad")}
+ state.skills.business+=2;
+}
+function annualFinance(){
+ if(state.salary>0&&state.prisonYears<=0){let tax=Math.round(state.salary*(state.salary>150000?.29:.22)),living=Math.round(11500+state.age*120+state.children*4200+(state.home?.annual||0)+(state.vehicle?.annual||0));let net=state.salary-tax-living;state.bank+=net;addLog("Annual Finances",`Income ${money(state.salary)} • taxes ${money(tax)} • expenses ${money(living)} • saved ${money(net)}.`,net>=0?"good":"warn")}
+ else if(state.age>=18&&state.prisonYears<=0){let living=rand(7000,16000)+(state.children*3500);state.cash-=living;addLog("Living Costs",`Without a salary, life cost you ${money(living)} this year.`,"warn")}
+ if(state.debt>0){let interest=Math.round(state.debt*.045);state.debt+=interest;if(interest>0)addLog("Debt Interest",`${money(interest)} interest was added to your debt.`,"warn")}
+ if(state.bank>0)state.bank+=Math.round(state.bank*.02);
+ if(state.investments>0){let m=pick([.82,.92,.98,1.04,1.08,1.13,1.22]);state.investments=Math.max(0,Math.round(state.investments*m))}
+ businessYear();
+}
+function familyYear(){
+ if(state.partner&&state.married&&chance(.06)&&state.age<55){state.children++;addLog("Surprise Baby",`Your family unexpectedly welcomed another child.`,"good")}
+ if(state.parents>0&&state.age>30&&chance(.018*(state.age-25))){state.parents--;let inh=state.parents===0?rand(5000,90000):rand(1000,25000);state.bank+=inh;state.inheritance+=inh;addLog("Family Loss",`A parent passed away. You inherited ${money(inh)}.`,"bad")}
+}
+function checkDeath(){
+ let risk=0;if(state.health<35)risk+=(35-state.health)/130;if(state.age>55)risk+=(state.age-55)*.0025;if(state.age>80)risk+=(state.age-80)*.018;if(state.age>100)risk+=.25;
+ if(chance(risk)||state.age>=116||state.health<=0){state.alive=false;render();document.getElementById("deathSummary").textContent=`${state.name} lived to age ${state.age}. Final net worth: ${money(netWorth())}. Children: ${state.children}. Fame: ${Math.round(state.fame)}%. Education: ${educationNames[state.educationLevel]}. Career: ${state.job}. Achievements: ${state.achievements.length}/${achievements.length}.`;document.getElementById("deathModal").classList.add("show");addLog("Life Ended",`${state.name} passed away at age ${state.age}.`);return true}return false
+}
+function ageUp(){
+ if(!state.alive)return;
+ const previousWhole=Math.floor(state.age);
+ state.age=Math.round((state.age+1)*10)/10;
+ resetAllTabAP();
+ state.sportTrainingUsed=0;
+ state.energy=clamp(state.energy+rand(18,35));state.stress=clamp(state.stress-rand(0,5));
+ if(state.prisonYears>0){state.prisonYears--;state.happiness-=rand(3,8);state.stress+=rand(2,7);if(state.prisonYears===0)addLog("Released","You completed your prison sentence and returned home.","good")}
+ else annualFinance();
+ birthdayBonus();
+ if(state.age>35)state.health-=rand(0,2);if(state.age>50)state.looks-=rand(0,2);if(state.age>65)state.health-=rand(0,2);
+ if(state.age===5){state.educationLevel=1;addLog("School","You started elementary school.","good")}if(state.age===14){state.educationLevel=2;addLog("School","You entered high school.","good")}if(state.age===12)addLog("Sports Unlocked","You can now choose a sport. Your parents will pay for your first 2 sports classes every year.","purple");if(state.age===18)addLog("Adulthood","You are officially an adult. The full world is now open to you.","purple");
+ collegeScholarshipCheck();proSportsYear();familyYear();if(chance(.68)&&state.prisonYears<=0)annualRandomEvent();if(state.stress>80){state.health-=rand(2,7);state.happiness-=rand(3,8);addLog("Burnout","Extreme stress started hurting your health.","bad")}
+ normalize();checkDeath();render();
+}
+
+function halfAgeUp(){
+ if(!state.alive)return;
+ const before=Math.floor(state.age);
+ state.age=Math.round((state.age+0.5)*10)/10;
+
+ // Do not reset action usage or bonus AP mid-year.
+ state.energy=clamp(state.energy+rand(8,18));
+ state.stress=clamp(state.stress-rand(0,3));
+
+ if(state.prisonYears>0){
+   // Two half-year sims reduce a one-year sentence.
+   state._prisonHalf=(state._prisonHalf||0)+0.5;
+   if(state._prisonHalf>=1){
+     state.prisonYears=Math.max(0,state.prisonYears-1);
+     state._prisonHalf=0;
+     if(state.prisonYears===0)addLog("Released","You completed your prison sentence and returned home.","good");
+   }
+   state.happiness-=rand(1,4);state.stress+=rand(1,4);
+ }else{
+   halfYearFinance();
+ }
+
+ if(state.age>35)state.health-=rand(0,1);
+ if(state.age>50)state.looks-=rand(0,1);
+ if(state.age>65)state.health-=rand(0,1);
+
+ // If crossing onto an integer age, it's a birthday.
+ if(Number.isInteger(state.age)){
+   resetAllTabAP();
+   state.sportTrainingUsed=0;
+   birthdayBonus();
+
+   if(state.age===5){state.educationLevel=1;addLog("School","You started elementary school.","good")}
+   if(state.age===12)addLog("Sports Unlocked","You can now choose a sport. Your parents will pay for your first 2 sports classes every year.","purple");
+   if(state.age===14){state.educationLevel=2;addLog("School","You entered high school.","good")}
+   if(state.age===18)addLog("Adulthood","You are officially an adult. The full world is now open to you.","purple");
+   collegeScholarshipCheck();
+ }
+
+ halfSportsYear();
+ halfFamilyYear();
+ if(chance(.35)&&state.prisonYears<=0)annualRandomEvent();
+
+ if(state.stress>80){state.health-=rand(1,4);state.happiness-=rand(1,4);addLog("Burnout","Stress is starting to hurt your health.","bad")}
+ normalize();
+ checkDeath();
+ render();
+}
+
+function summary(){
+ openModal("Life Summary",`${state.name}, age ${state.age}. Net worth ${money(netWorth())}. ${educationNames[state.educationLevel]}. ${state.job}. ${relationText()}. ${state.home?`Owns a ${state.home.name}.`:"No home yet."} ${state.vehicle?`Drives a ${state.vehicle.name}.`:"No vehicle."} Fame ${Math.round(state.fame)}%. ${state.sport?`Sports: ${state.sport} — ${state.sportLevel}${state.proTeam?`, ${state.proTeam}`:""}${state.proAthlete?`, ${money(state.proSalary)}/yr`:""}.`:""} Criminal convictions ${state.criminalRecord}.`,[
+ {label:"Close",fn:()=>{}},{label:"Set Goal: Wealth",fn:()=>{state.goal="Become wealthy";addLog("New Goal","You decided to focus on building wealth.","purple")}}
+ ]);
+}
+function saveGame(){localStorage.setItem("lifeSimulatorComplete",JSON.stringify(state));toast("Game saved")}
+function loadGame(){
+ let s=localStorage.getItem("lifeSimulatorComplete");if(!s)return toast("No save found");
+ state=JSON.parse(s);
+ ensureTabAP();
+ delete state.yearlyActions;
+ delete state.bonusActionPoints;
+ if(typeof state.lastBirthdayAge!=="number")state.lastBirthdayAge=Math.floor(state.age||0);
+ toast("Save loaded");render()
+}
+function startLife(){
+ state=freshState();let f=document.getElementById("firstName").value.trim()||"Alex",l=document.getElementById("lastName").value.trim()||"Carter";
+ state.name=`${f} ${l}`;state.country=document.getElementById("country").value;state.goal=document.getElementById("goalSelect").value;
+ addLog("Born",`${state.name} was born in ${state.country}. Health ${state.health}%, Smarts ${state.smarts}%, Looks ${state.looks}%.`,"good");
+ document.getElementById("startModal").classList.remove("show");render();
+}
+function restart(){document.getElementById("startModal").classList.add("show")}
+
+document.getElementById("startBtn").onclick=startLife;document.getElementById("ageBtn").onclick=ageUp;document.getElementById("halfAgeBtn").onclick=halfAgeUp;document.getElementById("specialBtn").onclick=summary;
+document.getElementById("saveBtn").onclick=saveGame;document.getElementById("loadBtn").onclick=loadGame;document.getElementById("restartBtn").onclick=restart;
+document.getElementById("deathRestart").onclick=()=>{document.getElementById("deathModal").classList.remove("show");restart()};
+state=freshState();render();
+</script>
+</body>
+</html>
