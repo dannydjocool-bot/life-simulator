@@ -39,7 +39,7 @@
   <div class="panel" style="width:min(900px,100%)">
     <div class="menu-layout">
       <div>
-        <span class="eyebrow">TEST BUILD v0.8 · 3D LIFE SIMULATOR</span>
+        <span class="eyebrow">TEST BUILD v0.8.1 · 3D LIFE SIMULATOR</span>
         <h1>FROM<br>NOTHING</h1>
         <p>Start with almost nothing. Work, save, build a reputation, and create your legacy.</p>
         <div class="menu-actions">
@@ -231,8 +231,19 @@ function loadRiggedPlayer(kind){
   const oldVisual=player.getObjectByName('riggedVisual');if(oldVisual)player.remove(oldVisual);
   gltfLoader.load(RIGGED_MODEL_URLS[kind]||RIGGED_MODEL_URLS.boy,gltf=>{
     const model=gltf.scene;model.name='riggedVisual';
-    model.scale.setScalar(.95);model.position.y=0;
     model.rotation.y=0;
+    // Normalize any imported GLB to a sane human height so the camera never spawns inside it.
+    model.scale.setScalar(1);
+    model.updateMatrixWorld(true);
+    const rawBox=new THREE.Box3().setFromObject(model);
+    const rawSize=new THREE.Vector3();rawBox.getSize(rawSize);
+    const targetHeight=kind==='girl'?1.72:1.82;
+    const safeHeight=Math.max(.001,rawSize.y);
+    const uniformScale=targetHeight/safeHeight;
+    model.scale.setScalar(uniformScale);
+    model.updateMatrixWorld(true);
+    const scaledBox=new THREE.Box3().setFromObject(model);
+    model.position.y=-scaledBox.min.y;
     model.traverse(o=>{
       if(o.isMesh){o.castShadow=true;o.receiveShadow=true;
         if(o.material){o.material=o.material.clone();o.material.roughness=Math.min(.82,o.material.roughness??.7);
@@ -241,9 +252,9 @@ function loadRiggedPlayer(kind){
         }
       }
     });
-    if(kind==='girl')model.scale.set(.88,.94,.88);else model.scale.set(.94,.98,.94);
     addRiggedStyle(model,kind);
     player.add(model);
+    player.userData.visualHeight=targetHeight;
     // Hide procedural fallback once the GLB is actually ready.
     player.children.filter(x=>x!==model).forEach(x=>x.visible=false);
     playerMixer=new THREE.AnimationMixer(model);playerActions={};
@@ -384,7 +395,7 @@ function tick(){
    const hour=state.minutes/60,daylight=Math.max(.08,Math.sin(((hour-5.5)/24)*Math.PI*2)*.5+.5);sun.intensity=.55+daylight*3.55;hemi.intensity=.55+daylight*1.75;
    const topDay=new THREE.Color(0x6e9bc0),botDay=new THREE.Color(0xe8b36f),topNight=new THREE.Color(0x071322),botNight=new THREE.Color(0x1b2635);sky.material.uniforms.top.value.copy(topNight).lerp(topDay,daylight);sky.material.uniforms.bottom.value.copy(botNight).lerp(botDay,daylight);scene.fog.color.copy(topNight).lerp(topDay,daylight*.7);hud()
  }
- const camDist=7.45,camHeight=2.65+(slideTimer>0?-1.05:0);const cp=Math.cos(pitch),sp=Math.sin(pitch),sy=Math.sin(yaw),cy=Math.cos(yaw);const target=player.position.clone().add(new THREE.Vector3(0,slideTimer>0?1.05:1.95,0));const desired=target.clone().add(new THREE.Vector3(sy*cp*camDist,-sp*camDist+camHeight,cy*cp*camDist));camera.position.lerp(desired,1-Math.pow(.00003,dt));camera.lookAt(target);
+ const camDist=8.6,camHeight=3.0+(slideTimer>0?-1.05:0);const cp=Math.cos(pitch),sp=Math.sin(pitch),sy=Math.sin(yaw),cy=Math.cos(yaw);const target=player.position.clone().add(new THREE.Vector3(0,slideTimer>0?1.0:1.55,0));const desired=target.clone().add(new THREE.Vector3(sy*cp*camDist,-sp*camDist+camHeight,cy*cp*camDist));camera.position.lerp(desired,1-Math.pow(.00003,dt));camera.lookAt(target);
  nearest=null;let best=999;if(gameActive){for(const i of interactions){const d=player.position.distanceTo(i.pos);i.ring.material.opacity=.12+Math.sin(elapsed*3)*.06;if(d<i.r&&d<best){best=d;nearest=i}}els.prompt.classList.toggle('hidden',!nearest||paused);if(nearest)els.prompt.innerHTML='Press <kbd>E</kbd> · '+nearest.name}
  renderer.render(scene,camera)
 }
