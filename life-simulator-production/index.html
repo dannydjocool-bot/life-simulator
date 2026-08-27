@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Life Simulator: Complete Edition</title>
+<title>Life Simulator: DEV Immersion Build</title>
 <style>
 :root{
   --bg:#080c12;--panel:#111824;--panel2:#172131;--panel3:#0d141f;
@@ -36,7 +36,7 @@ button,input,select{font:inherit}.app{max-width:1500px;margin:auto;padding:18px}
 <body>
 <div class="app">
   <div class="topbar">
-    <div class="brand"><h1>LIFE SIMULATOR</h1><p>Complete Edition — one life, hundreds of possible outcomes.</p></div>
+    <div class="brand"><h1>LIFE SIMULATOR</h1><p>DEV IMMERSION BUILD — job interviews, parents, college sports, recruiting & draft logic.</p></div>
     <div class="pill" id="statusPill">Year 0 • New Life</div>
   </div>
 
@@ -84,6 +84,8 @@ button,input,select{font:inherit}.app{max-width:1500px;margin:auto;padding:18px}
       <div class="right-block">
         <div class="section-title">Life</div>
         <div class="info-card"><div class="label">Relationships</div><div class="value" id="relationships">Single</div></div>
+        <div class="info-card"><div class="label">Family Background</div><div class="value" id="familyBackground">Unknown</div></div>
+        <div class="info-card"><div class="label">College</div><div class="value" id="collegeView">Not enrolled</div></div>
         <div class="info-card"><div class="label">Property</div><div class="value" id="property">No home</div></div>
         <div class="info-card"><div class="label">Vehicle</div><div class="value" id="vehicle">No vehicle</div></div>
         <div class="info-card"><div class="label">Legal Status</div><div class="value" id="legal">Clean record</div></div>
@@ -166,6 +168,31 @@ const sports=[
  {name:"Boxing",emoji:"🥊",league:"World Boxing",positions:["Lightweight","Welterweight","Middleweight","Light Heavyweight","Heavyweight"],teams:["Independent"]},
  {name:"Tennis",emoji:"🎾",league:"Pro Tennis Tour",positions:["Singles Player","Doubles Specialist"],teams:["Independent"]}
 ];
+const colleges=[
+ {name:"State University",prestige:62,tuition:18000,team:65},
+ {name:"Metro University",prestige:72,tuition:26000,team:74},
+ {name:"Coastal College",prestige:78,tuition:32000,team:80},
+ {name:"National Tech",prestige:86,tuition:42000,team:86},
+ {name:"Capital University",prestige:92,tuition:52000,team:91}
+];
+const interviewBanks={
+ "Fast Food Worker":[["A customer says their order is wrong. What do you do?",["Argue with them","Apologize, verify the order, and fix it","Ignore them"],1],["The restaurant gets very busy. What matters most?",["Stay calm and communicate","Leave early","Rush and skip safety"],0],["A coworker needs help during a rush.",["Help once your station is safe","Tell them it's not your job","Walk away"],0]],
+ "Retail Associate":[["A customer cannot find an item.",["Point vaguely","Walk them to the item or find someone who can","Say you're busy"],1],["You notice damaged merchandise.",["Hide it","Report and remove it from sale","Sell it anyway"],1],["A customer is upset.",["Listen and stay respectful","Match their attitude","Ignore them"],0]],
+ "Construction Worker":[["What comes first on a work site?",["Speed","Safety","Finishing early"],1],["You see an unsafe ladder.",["Use it carefully","Report it and replace it","Let someone else use it"],1],["A supervisor changes the plan.",["Confirm instructions before continuing","Guess what they mean","Ignore the change"],0]],
+ "Mechanic":[["A car has an unknown noise.",["Replace random parts","Diagnose step by step","Tell the customer it's fine"],1],["A repair estimate changes after inspection.",["Hide the change","Explain it before extra work","Charge it later"],1],["What protects both customer and shop?",["Documenting work","Memory","Skipping tests"],0]],
+ "Police Officer":[["A tense subject is yelling but not attacking.",["Use de-escalation and clear commands","Immediately escalate force","Argue back"],0],["A coworker violates policy.",["Document/report through proper channels","Ignore it","Help cover it up"],0],["What matters in an investigation?",["Facts and evidence","Assumptions","Personal dislike"],0]],
+ "Firefighter":[["At an emergency scene, what matters first?",["Scene safety and command","Running in alone","Speed over communication"],0],["A teammate is exhausted.",["Communicate and rotate if needed","Tell them to tough it out","Ignore it"],0],["Equipment check finds a problem.",["Report and replace it","Use it anyway","Hide it"],0]],
+ "Web Developer":[["A page works on desktop but breaks on mobile.",["Ignore mobile","Reproduce, inspect responsive CSS, and test fixes","Rewrite everything immediately"],1],["A bug appears after a change.",["Check logs/diff and isolate the cause","Guess randomly","Blame the user"],0],["Why use version control?",["Track changes and collaborate safely","Make code run faster","Replace testing"],0]],
+ "Accountant":[["Two totals do not match.",["Force them to match","Reconcile the records and find the discrepancy","Delete one record"],1],["A manager asks you to hide an expense.",["Refuse and follow policy","Do it quietly","Move it somewhere else"],0],["What matters most in reporting?",["Accuracy and documentation","Speed only","Making numbers look good"],0]],
+ "Registered Nurse":[["A patient's condition suddenly worsens.",["Assess, call for help, and follow protocol","Wait until later","Guess the diagnosis"],0],["Medication information looks inconsistent.",["Verify before administering","Give it anyway","Ask another patient"],0],["A family member is upset.",["Communicate calmly within privacy rules","Share all private details","Ignore them"],0]],
+ "Engineer":[["A design test fails.",["Review assumptions, data, and failure mode","Ship it anyway","Delete the test"],0],["A requirement is unclear.",["Clarify before finalizing the design","Guess","Ignore it"],0],["Safety margin exists because:",["Real systems have uncertainty","It makes drawings look better","It is optional"],0]],
+ "Teacher":[["A student is struggling.",["Adjust support and check understanding","Embarrass them","Ignore it"],0],["Two students are arguing.",["De-escalate and apply fair rules","Pick a favorite","Yell immediately"],0],["Good assessment should:",["Measure learning goals","Only be difficult","Surprise students"],0]],
+ "Pilot":[["Weather worsens near destination.",["Use procedures and choose the safest option","Continue no matter what","Ignore updated weather"],0],["A checklist item is abnormal.",["Stop and resolve it","Skip it","Assume it's fine"],0],["Crew communication should be:",["Clear and direct","Minimal even in emergencies","Based on guesses"],0]],
+ "Lawyer":[["A client asks you to misrepresent a fact.",["Refuse and remain ethical","Do it if it helps","Hide it in paperwork"],0],["Strong legal analysis starts with:",["Facts, law, and evidence","Personal feelings","Guessing the judge"],0],["You discover harmful evidence.",["Handle it under applicable legal duties","Destroy it","Pretend it never existed"],0]],
+ "Doctor":[["A diagnosis is uncertain.",["Gather more information and use differential diagnosis","Pretend certainty","Ignore symptoms"],0],["A medication may interact with another.",["Verify before prescribing","Prescribe anyway","Ask the patient to guess"],0],["Informed consent means:",["Explain material risks, benefits, and alternatives","Just get a signature","Avoid questions"],0]],
+ "Actor":[["You receive difficult direction.",["Try the adjustment professionally","Argue with everyone","Leave set"],0],["A scene requires preparation.",["Study the material and rehearse","Improvise everything without reading","Skip rehearsal"],0],["Rejection in the industry means:",["Keep improving and auditioning","Attack the casting team","Quit immediately"],0]],
+ "Musician":[["A bandmate misses rehearsal.",["Communicate and solve the schedule issue","Start a public feud","Cancel everything"],0],["A live mix sounds wrong.",["Communicate with the engineer and adapt","Stop playing immediately","Blame the audience"],0],["Long-term growth comes from:",["Practice and consistency","Luck only","Never taking feedback"],0]]
+};
 
 const achievements=[
 {id:"adult",name:"Adulting",test:s=>s.age>=18},{id:"graduate",name:"Graduate",test:s=>s.educationLevel>=4},
@@ -183,6 +210,7 @@ function freshState(){
  health:rand(78,100),happiness:rand(65,100),smarts:rand(35,82),looks:rand(35,88),energy:100,stress:0,
  cash:0,bank:0,debt:0,investments:0,salary:0,job:"Unemployed",jobYears:0,educationLevel:0,
  partner:null,married:false,relationshipYears:0,children:0,friends:0,parents:2,
+ mother:null,father:null,parentRelationship:75,parentSupportUsed:0,
  home:null,vehicle:null,business:null,businessValue:0,fame:0,criminalRecord:0,prisonYears:0,
  skills:{fitness:0,social:0,creativity:0,business:0},
  tabActionsUsed:{life:0,sports:0,career:0,money:0,love:0,assets:0,crime:0,fun:0},
@@ -193,6 +221,8 @@ function freshState(){
  sportLevel:"None",sportTeam:null,sportPosition:null,sportSeasonStats:{games:0,wins:0,points:0},
  sportAwards:[],proAthlete:false,proLeague:null,proTeam:null,proSalary:0,proYears:0,
  championships:0,mvpAwards:0,allStarSelections:0,draftStatus:"Undrafted",retiredFromSports:false,
+ sportsCareerClosed:false,college:null,collegeYear:0,collegeGPA:0,collegeScholarship:0,
+ recruitingInterest:0,draftStock:0,redshirt:false,starter:false,coachTrust:50,
  lastBirthdayAge:0};
 }
 function netWorth(s=state){return s.cash+s.bank+s.investments+(s.home?.cost||0)+(s.vehicle?.cost||0)+(s.businessValue||0)-s.debt}
@@ -226,7 +256,10 @@ function render(){
  document.getElementById("education").textContent=educationNames[state.educationLevel];document.getElementById("job").textContent=state.job;
  document.getElementById("sportsCareer").textContent=state.sport ? `${state.sport} • ${state.sportLevel}${state.proTeam?` • ${state.proTeam}`:""}` : "None";
  document.getElementById("business").textContent=state.business?`${state.business.name} • ${money(state.businessValue)}`:"None";
- document.getElementById("relationships").textContent=relationText();document.getElementById("property").textContent=state.home?.name||"No home";document.getElementById("vehicle").textContent=state.vehicle?.name||"No vehicle";document.getElementById("legal").textContent=legalText();
+ document.getElementById("relationships").textContent=relationText();
+ document.getElementById("familyBackground").textContent=parentSummary();
+ document.getElementById("collegeView").textContent=state.college?`${state.college.name} • Year ${state.collegeYear}${state.collegeScholarship?` • ${state.collegeScholarship}% scholarship`:""}`:"Not enrolled";
+ document.getElementById("property").textContent=state.home?.name||"No home";document.getElementById("vehicle").textContent=state.vehicle?.name||"No vehicle";document.getElementById("legal").textContent=legalText();
  renderStats();renderTabs();renderActions();renderTimeline();renderAchievements();
 }
 
@@ -263,10 +296,10 @@ function actionsForTab(){
  if(activeTab==="life")return[
   ...(state.age>=3?[action("📚","Study","study","Increase smarts")]:[]),...(state.age>=6?[action("🤝","Socialize","social","Build friendships")]:[]),
   ...(state.age>=10?[action("🏃","Exercise","exercise","Health & fitness")]:[]),...(state.age>=13?[action("🧘","Relax","relax","Lower stress")]:[]),
-  ...(state.age>=18?[action("🏥","Doctor","doctor","Treat health issues"),action("🧠","Therapy","therapy","Improve happiness")]:[])
+  ...(state.age>=18?[action("🏥","Doctor","doctor","Treat health issues"),action("🧠","Therapy","therapy","Improve happiness"),action("👪","Ask Parents","askParents","Request financial help",true)]:[])
  ];
  if(activeTab==="sports")return state.age>=12?[
-  ...(!state.sport?[action("🏅","Choose Sport","chooseSport","Pick your main sport",true)]:[
+  ...(!state.sport?[(state.age<25&&!state.sportsCareerClosed)?action("🏅","Choose Sport","chooseSport","Pick your main sport",true):action("🔒","Sports Career Closed","sportsClosed","Pro path closed at age 25",true)]:[
     action("🏋️","Sports Class","sportClass",state.sportTrainingUsed<2?"Parent-paid training":"Extra training"),
     action("🎯","Skill Training","sportSkill","Improve sport skill"),
     action("🧠","Film Study","sportIQ","Improve game IQ"),
@@ -278,7 +311,7 @@ function actionsForTab(){
  ]:[];
  if(activeTab==="career")return[
   ...(state.age>=16?[action("🔎","Find Job","job","Apply for work"),action("⭐","Work Hard","workhard","Promotion chance")]:[]),
-  ...(state.age>=18?[action("🎓","Education","education","Continue school"),action("🏢","Start Business","business","Become an owner")]:[]),
+  ...(state.age>=18?[action("🎓","Education","education","Continue school"),action("🏫","College","college","Apply / manage college"),action("🏢","Start Business","business","Become an owner")]:[]),
   ...(state.business?[action("📣","Grow Business","growBusiness","Invest in expansion")]:[])
  ];
  if(activeTab==="money")return[
@@ -353,7 +386,7 @@ function doAction(type){
  goodBehavior:()=>{if(state.prisonYears>1&&chance(.28)){state.prisonYears--;addLog("Sentence Reduced","Good behavior reduced your remaining sentence by one year.","good")}else addLog("Good Behavior","You stayed out of trouble this year.","good")}
  };
  if(simple[type]){simple[type]();normalize();render();return}
- if(type==="chooseSport")chooseSportMenu();if(type==="sportClass")sportsClass();if(type==="sportSkill")sportsSkillTraining();if(type==="sportIQ")sportsIQTraining();if(type==="sportRecovery")sportsRecovery();if(type==="sportTryout")sportsTryout();if(type==="playProGame")playProfessionalGame();if(type==="proTraining")proTraining();if(type==="retireSports")retireSports();
+ if(type==="askParents")askParentsMenu();if(type==="college")collegeMenu();if(type==="sportsClosed")addLog("Sports Career Closed","You did not choose a sport before age 25, so the Special Career path is permanently closed. Recreational exercise is still available.","warn");if(type==="chooseSport")chooseSportMenu();if(type==="sportClass")sportsClass();if(type==="sportSkill")sportsSkillTraining();if(type==="sportIQ")sportsIQTraining();if(type==="sportRecovery")sportsRecovery();if(type==="sportTryout")sportsTryout();if(type==="playProGame")playProfessionalGame();if(type==="proTraining")proTraining();if(type==="retireSports")retireSports();
  if(type==="job")jobMenu();if(type==="education")educationMenu();if(type==="business")businessMenu();if(type==="growBusiness")growBusiness();
  if(type==="bank")bankMenu();if(type==="payDebt")debtMenu();if(type==="invest")investMenu();if(type==="gamble")gambleMenu();
  if(type==="date")dateMenu();if(type==="marriage")marriageMenu();if(type==="child")childMenu();
@@ -362,9 +395,139 @@ function doAction(type){
  normalize();render();
 }
 
+
+function generateParent(role){
+ const wealth=pick(["Struggling","Working Class","Middle Class","Comfortable","Wealthy","Rich"]);
+ const ranges={
+  "Struggling":[18000,32000],"Working Class":[30000,52000],"Middle Class":[50000,85000],
+  "Comfortable":[80000,140000],"Wealthy":[140000,300000],"Rich":[300000,900000]
+ };
+ const [a,b]=ranges[wealth];
+ return {role,wealth,income:rand(a,b),savings:rand(Math.floor(a*.2),Math.floor(b*2.2)),generosity:rand(30,90),alive:true};
+}
+function parentSummary(){
+ if(!state.mother||!state.father)return "Not generated";
+ const richest=[state.mother,state.father].sort((a,b)=>b.income-a.income)[0];
+ return `${state.mother.wealth} mother • ${state.father.wealth} father • relationship ${Math.round(state.parentRelationship)}%`;
+}
+function parentsCanPay(amount){
+ const ps=[state.mother,state.father].filter(p=>p&&p.alive);
+ return ps.reduce((s,p)=>s+p.savings,0)>=amount;
+}
+function requestParentSupport(amount,purpose="expenses"){
+ const ps=[state.mother,state.father].filter(p=>p&&p.alive);
+ if(!ps.length)return {paid:0,msg:"You have no living parent available to ask."};
+ const combined=ps.reduce((s,p)=>s+p.savings,0);
+ const generosity=ps.reduce((s,p)=>s+p.generosity,0)/ps.length;
+ const rich=ps.some(p=>["Wealthy","Rich"].includes(p.wealth));
+ let willingness=generosity + (state.parentRelationship-50)*.5 - Math.max(0,state.age-18)*2.5;
+ if(rich)willingness+=28;
+ if(state.age<18)willingness+=35;
+ if(combined<amount)willingness-=40;
+ if(state.age>=18&&!rich&&chance(.28))return {paid:0,msg:`Your parents refused to pay for ${purpose}: "You're an adult now."`};
+ if(combined<=0)return {paid:0,msg:`Your parents want to help with ${purpose}, but they cannot afford it.`};
+ let paid=0;
+ if(rich&&combined>=amount){paid=amount}
+ else if(willingness>=70){paid=Math.min(amount,Math.round(combined*.12))}
+ else if(willingness>=48){paid=Math.min(amount,Math.round(combined*.05))}
+ else return {paid:0,msg:`Your parents refused to pay for ${purpose}.`};
+ for(const p of ps){
+   const share=paid/ps.length;p.savings=Math.max(0,p.savings-share);
+ }
+ state.parentRelationship=clamp(state.parentRelationship-(state.age>=18?rand(0,3):0));
+ return {paid,msg:`Your parents helped with ${money(paid)} toward ${purpose}.`};
+}
+function askParentsMenu(){
+ openModal("Ask Parents for Help",`Your family background: ${parentSummary()}. After age 18, support depends on money, generosity, and your relationship. Wealthy/rich parents are much more likely to cover costs.`,[
+  {label:"Ask for $1,000",fn:()=>{const r=requestParentSupport(1000,"general expenses");state.cash+=r.paid;addLog("Parent Support",r.msg,r.paid?"good":"warn")}},
+  {label:"Ask for $10,000",fn:()=>{const r=requestParentSupport(10000,"tuition or major expenses");state.cash+=r.paid;addLog("Parent Support",r.msg,r.paid?"good":"warn")}},
+  {label:"Ask for $50,000",fn:()=>{const r=requestParentSupport(50000,"a major life expense");state.cash+=r.paid;addLog("Parent Support",r.msg,r.paid?"good":"warn")}},
+  {label:"Never mind",fn:()=>{}}
+ ])
+}
+function interviewQuestion(job,index,score){
+ const bank=interviewBanks[job.name]||[["Why do you want this job?",["I want to learn and contribute","I don't really care","I just want to leave early"],0],["How do you handle pressure?",["Prioritize and communicate","Panic","Ignore problems"],0],["How do you handle feedback?",["Listen and improve","Argue every time","Ignore it"],0]];
+ if(index>=Math.min(3,bank.length))return finishInterview(job,score);
+ const [q,answers,correct]=bank[index];
+ openModal(`${job.name} Interview • ${index+1}/3`,q,answers.map((a,i)=>({label:a,fn:()=>interviewQuestion(job,index+1,score+(i===correct?1:0))})));
+}
+function finishInterview(job,score){
+ const qual=(state.smarts-job.smart)/100 + (state.educationLevel-job.edu)*.06 + state.skills.social/250 - state.criminalRecord*.08;
+ const p=.12 + score*.22 + qual;
+ if(score>=2&&chance(clamp(p,0.08,.92))){
+   state.job=job.name;state.salary=job.pay;state.jobYears=0;if(job.fame)state.fame=clamp(state.fame+5);
+   addLog("Interview Passed",`You answered ${score}/3 interview questions strongly and were hired as a ${job.name} for ${money(job.pay)} per year.`,"good")
+ }else{
+   addLog("Interview Failed",`You scored ${score}/3 in the ${job.name} interview and were not hired. Improve your knowledge, education, or social skills and try again.`,"bad")
+ }
+}
 function jobMenu(){
- const eligible=jobs.filter(j=>state.age>=j.age&&state.smarts>=j.smart&&state.educationLevel>=j.edu).slice(-7).reverse();
- openModal("Job Market","Choose a position to apply for.",eligible.map(j=>({label:`${j.name}`,note:`${money(j.pay)}/yr`,fn:()=>{let p=.48+(state.smarts-j.smart)/170+state.skills.social/300;if(state.criminalRecord)p-=.18;if(chance(p)){state.job=j.name;state.salary=j.pay;state.jobYears=0;if(j.fame)state.fame=clamp(state.fame+5);addLog("New Job",`You were hired as a ${j.name} earning ${money(j.pay)} per year.`,"good")}else addLog("Rejected",`${j.name} did not hire you.`,"bad")}})).concat([{label:"Stay with current path",fn:()=>addLog("Career","You did not change jobs.")}]));
+ const eligible=jobs.filter(j=>state.age>=j.age&&state.smarts>=j.smart&&state.educationLevel>=j.edu).slice(-8).reverse();
+ openModal("Job Market","Choose a position. Every job now has a role-specific interview before hiring.",eligible.map(j=>({
+   label:`${j.name}`,note:`${money(j.pay)}/yr • interview required`,fn:()=>interviewQuestion(j,0,0)
+ })).concat([{label:"Stay with current path",fn:()=>addLog("Career","You did not change jobs.")}]));
+}
+
+function collegeMenu(){
+ if(state.age<18)return addLog("College","You must be at least 18 to enroll.","warn");
+ if(state.college){
+   openModal("College Life",`${state.college.name} • Year ${state.collegeYear} • GPA ${state.collegeGPA.toFixed(2)} • Scholarship ${state.collegeScholarship}%${state.sportLevel==="College Athlete"?` • ${state.sport} athlete`:""}`,[
+    {label:"Study hard",fn:()=>{state.collegeGPA=Math.min(4, state.collegeGPA+0.25);state.smarts=clamp(state.smarts+3);addLog("College Study",`Your GPA improved to ${state.collegeGPA.toFixed(2)}.`,"good")}},
+    {label:"Meet coach",fn:()=>{if(state.sportLevel==="College Athlete"){state.coachTrust=clamp(state.coachTrust+rand(4,10));state.starter=state.coachTrust>=70&&sportsOverall()>=68;addLog("Coach Meeting",`Coach trust is now ${state.coachTrust}%. ${state.starter?"You earned a starting role.":"Keep competing for playing time."}`,"good")}else addLog("College","You are not currently a college athlete.","warn")}},
+    {label:"Transfer school",fn:()=>{state.college=null;state.collegeYear=0;addLog("Transfer Portal","You entered the transfer portal and can apply to a new college.","warn")}},
+    {label:"Close",fn:()=>{}}
+   ]);return;
+ }
+ const options=colleges.map(c=>{
+   let scholarship=0;
+   if(state.sport&&["High School Varsity","College Athlete"].includes(state.sportLevel)){
+     const ov=sportsOverall();scholarship=ov>=88?100:ov>=80?75:ov>=72?50:ov>=65?25:0;
+   }
+   return {label:c.name,note:`Prestige ${c.prestige} • Tuition ${money(c.tuition)}/yr${scholarship?` • Athletic scholarship ${scholarship}%`:""}`,fn:()=>enrollCollege(c,scholarship)}
+ });
+ openModal("College Applications","Choose a college. Sports performance can create athletic scholarship offers and a path to the draft.",options);
+}
+function enrollCollege(c,scholarship){
+ const academicChance=.45 + (state.smarts-50)/120 + (state.educationLevel>=2?.15:0);
+ const athleticBoost=scholarship?Math.min(.3,sportsOverall()/300):0;
+ if(!chance(clamp(academicChance+athleticBoost,.15,.95)))return addLog("College Rejection",`${c.name} did not admit you this cycle.`,"bad");
+ state.college=c;state.collegeYear=1;state.collegeGPA=Math.max(2,Math.min(4,2.2+(state.smarts-50)/40));state.collegeScholarship=scholarship;
+ const cost=Math.round(c.tuition*(1-scholarship/100));
+ if(cost>0){
+   const support=requestParentSupport(cost,"college tuition");
+   const remaining=Math.max(0,cost-support.paid);
+   if(remaining>0)state.debt+=remaining;
+   addLog("College Tuition",`${support.msg} ${remaining?`${money(remaining)} was added to student debt.`:"Tuition was fully covered."}`,remaining?"warn":"good");
+ }
+ if(scholarship>0&&state.sport){
+   state.sportLevel="College Athlete";state.sportTeam=c.name;state.recruitingInterest=clamp(state.recruitingInterest+scholarship/2);state.coachTrust=rand(45,70);
+ }
+ state.educationLevel=Math.max(state.educationLevel,3);
+ addLog("College Enrollment",`You enrolled at ${c.name}${scholarship?` on a ${scholarship}% athletic scholarship`:""}.`,"purple")
+}
+function collegeYearProgress(){
+ if(!state.college)return;
+ state.collegeYear++;
+ state.collegeGPA=Math.max(0,Math.min(4,state.collegeGPA + (state.smarts>=65?0.08:-0.08) + rand(-10,10)/100));
+ if(state.sportLevel==="College Athlete"){
+   const ov=sportsOverall();
+   state.coachTrust=clamp(state.coachTrust + rand(-4,8));
+   state.starter=state.coachTrust>=68&&ov>=66;
+   state.draftStock=clamp(Math.round(ov*.7+state.sportFame*.2+state.coachTrust*.1));
+   if(state.collegeGPA<2.0){
+     state.starter=false;addLog("Academic Ineligible",`Your GPA fell to ${state.collegeGPA.toFixed(2)}. You cannot compete until your grades recover.`,"bad")
+   }else{
+     const games=rand(10,32), wins=Math.round(games*(.35+ov/220));
+     state.sportSeasonStats={games,wins,points:Math.round(games*(ov*.25+rand(2,12)))};
+     if(state.starter)state.sportFame=clamp(state.sportFame+rand(3,9));
+     addLog("College Sports Season",`${state.college.name}: ${games} games, ${wins} wins. ${state.starter?"You started most games.":"You spent much of the season fighting for playing time."} Draft stock: ${state.draftStock}.`,"purple")
+   }
+ }
+ if(state.collegeYear>=5){
+   state.educationLevel=Math.max(state.educationLevel,4);
+   addLog("College Graduation",`You graduated from ${state.college.name} with a ${state.collegeGPA.toFixed(2)} GPA.`,"good");
+   if(state.sportLevel==="College Athlete"&&!state.proAthlete)addLog("Draft Decision","Your college career is complete. Use Sports → Try Out to enter the professional draft.","purple");
+ }
 }
 function educationMenu(){
  let next=state.educationLevel+1;if(next>5)return addLog("Education","You've already reached the highest education level.","warn");
@@ -401,7 +564,8 @@ function crime(type){
 
 function sportDef(){return sports.find(s=>s.name===state.sport)}
 function chooseSportMenu(){
- openModal("Choose Your Sport","At age 12+, you can commit to a sport. Your parents will pay for your first 2 sports classes every year.",sports.map(s=>({
+ if(state.age>=25&&!state.sport){state.sportsCareerClosed=true;return addLog("Sports Career Closed","You reached age 25 without choosing a sport. The Special Career/pro-athlete path is now permanently closed.","warn")}
+ openModal("Choose Your Sport","At age 12+, you can commit to a sport. Before 18, parents normally cover 2 classes per year. After 18, support depends on their money, generosity, and relationship.",sports.map(s=>({
    label:`${s.emoji} ${s.name}`,note:`Path to ${s.league}`,fn:()=>{
      state.sport=s.name;state.sportPosition=pick(s.positions);state.sportLevel="Recreational";
      state.sportSkill=rand(20,40);state.sportFitness=Math.round(state.skills.fitness||0);state.sportIQ=rand(15,35);
@@ -411,17 +575,22 @@ function chooseSportMenu(){
 }
 function sportsClass(){
  if(!state.sport)return chooseSportMenu();
- const parentPaid=state.sportTrainingUsed<2;
- const cost=parentPaid?0:350;
- if(!parentPaid && state.cash<cost)return addLog("Sports Training",`Your parents already paid for 2 classes this year. Another class costs ${money(cost)}.`,"warn");
- if(cost)state.cash-=cost;
+ let parentPaid=false,cost=350,paid=0;
+ if(state.sportTrainingUsed<2){
+   if(state.age<18){parentPaid=true;paid=cost}
+   else{
+     const r=requestParentSupport(cost,`${state.sport} training`);
+     if(r.paid>=cost){parentPaid=true;paid=cost}
+     else if(r.paid>0){state.cash+=r.paid}
+   }
+ }
+ const playerCost=Math.max(0,cost-paid);
+ if(playerCost>0&&state.cash<playerCost)return addLog("Sports Training",`Training costs ${money(playerCost)} and your parents did not fully cover it.`,"warn");
+ if(playerCost)state.cash-=playerCost;
  state.sportTrainingUsed++;
  const gain=rand(4,8);
- state.sportSkill=clamp(state.sportSkill+gain);
- state.sportFitness=clamp(state.sportFitness+rand(2,5));
- state.health=clamp(state.health+rand(1,3));
- state.energy=clamp(state.energy-rand(5,10));
- addLog("Sports Class",`${parentPaid?"Your parents paid for":"You paid for"} ${state.sport} training. Skill +${gain}%. ${Math.max(0,2-state.sportTrainingUsed)} parent-paid class${Math.max(0,2-state.sportTrainingUsed)===1?"":"es"} remain this year.`,"good")
+ state.sportSkill=clamp(state.sportSkill+gain);state.sportFitness=clamp(state.sportFitness+rand(2,5));state.health=clamp(state.health+rand(1,3));state.energy=clamp(state.energy-rand(5,10));
+ addLog("Sports Class",`${parentPaid?"Your parents covered":"You covered"} ${state.sport} training. Skill +${gain}%.`,"good")
 }
 function sportsSkillTraining(){
  if(!state.sport)return;
@@ -462,18 +631,23 @@ function sportsTryout(){
  }else addLog("Tryout Cut",`You didn't make the ${next} team this time. Overall rating: ${ov}. Keep training.`,"bad")
 }
 function collegeScholarshipCheck(){
- if(state.sportLevel!=="High School Varsity"||state.age<17||state.age>19)return;
- if(sportsOverall()>=70 && chance(.55)){
-   state.sportLevel="College Athlete";state.sportTeam=pick(["State University","Metro University","National Tech","Coastal College","Capital University"]);
-   state.educationLevel=Math.max(state.educationLevel,3);state.debt=Math.max(0,state.debt-12000);
-   addLog("Athletic Scholarship",`${state.sportTeam} offered you a ${state.sport} scholarship! You're now a college athlete.`,"purple")
+ if(state.sportLevel!=="High School Varsity"||state.age<16||state.age>19||state.college)return;
+ const ov=sportsOverall();
+ state.recruitingInterest=clamp(Math.round(ov*.75+state.sportFame*.25));
+ if(ov>=68&&chance(.35+(ov-68)/80)){
+   const c=pick(colleges.filter(x=>x.team<=ov+15));
+   const scholarship=ov>=88?100:ov>=80?75:ov>=72?50:25;
+   addLog("Recruiting Interest",`${c.name} is recruiting you for ${state.sport} and is prepared to offer up to a ${scholarship}% athletic scholarship. Apply through Career → College.`,"purple")
  }
 }
 function proDraftAttempt(){
  if(state.proAthlete)return;
  if(!["High School Varsity","College Athlete"].includes(state.sportLevel))return addLog("Pro Draft","You need high-level organized sports experience before scouts will consider you.","warn");
  let ov=sportsOverall();
+ if(state.age>=25&&!state.sport)return addLog("Pro Draft","The Special Sports Career path is closed because no sport was chosen before age 25.","warn");
+ if(state.sportLevel==="College Athlete"&&state.collegeGPA<2.0)return addLog("Pro Draft","You are academically ineligible and need to restore your GPA before declaring.","warn");
  let threshold=state.sport==="Basketball"?78:75;
+ if(state.draftStock)ov=Math.round(ov*.75+state.draftStock*.25);
  let p=.12+(ov-threshold)/65+state.sportFame/250;
  if(ov<threshold-8)p*=.3;
  const s=sportDef();
@@ -628,8 +802,9 @@ function ageUp(){
  else annualFinance();
  birthdayBonus();
  if(state.age>35)state.health-=rand(0,2);if(state.age>50)state.looks-=rand(0,2);if(state.age>65)state.health-=rand(0,2);
- if(state.age===5){state.educationLevel=1;addLog("School","You started elementary school.","good")}if(state.age===14){state.educationLevel=2;addLog("School","You entered high school.","good")}if(state.age===12)addLog("Sports Unlocked","You can now choose a sport. Your parents will pay for your first 2 sports classes every year.","purple");if(state.age===18)addLog("Adulthood","You are officially an adult. The full world is now open to you.","purple");
- collegeScholarshipCheck();proSportsYear();familyYear();if(chance(.68)&&state.prisonYears<=0)annualRandomEvent();if(state.stress>80){state.health-=rand(2,7);state.happiness-=rand(3,8);addLog("Burnout","Extreme stress started hurting your health.","bad")}
+ if(state.age===5){state.educationLevel=1;addLog("School","You started elementary school.","good")}if(state.age===14){state.educationLevel=2;addLog("School","You entered high school.","good")}if(state.age===12)addLog("Sports Unlocked","You can now choose a sport. Your parents normally cover 2 sports classes per year while you are a minor.","purple");if(state.age===18)addLog("Adulthood","You are officially an adult. Parent financial help is no longer guaranteed and now depends on their wealth, generosity, and your relationship.","purple");
+ if(state.age>=25&&!state.sport&&!state.sportsCareerClosed){state.sportsCareerClosed=true;addLog("Sports Career Window Closed","You reached age 25 without choosing a sport. The Special Sports Career path is permanently closed.","warn")}
+ collegeScholarshipCheck();collegeYearProgress();proSportsYear();familyYear();if(chance(.68)&&state.prisonYears<=0)annualRandomEvent();if(state.stress>80){state.health-=rand(2,7);state.happiness-=rand(3,8);addLog("Burnout","Extreme stress started hurting your health.","bad")}
  normalize();checkDeath();render();
 }
 
@@ -668,8 +843,10 @@ function halfAgeUp(){
    if(state.age===5){state.educationLevel=1;addLog("School","You started elementary school.","good")}
    if(state.age===12)addLog("Sports Unlocked","You can now choose a sport. Your parents will pay for your first 2 sports classes every year.","purple");
    if(state.age===14){state.educationLevel=2;addLog("School","You entered high school.","good")}
-   if(state.age===18)addLog("Adulthood","You are officially an adult. The full world is now open to you.","purple");
+   if(state.age===18)addLog("Adulthood","You are officially an adult. Parent financial help is no longer guaranteed.","purple");
+   if(state.age>=25&&!state.sport&&!state.sportsCareerClosed){state.sportsCareerClosed=true;addLog("Sports Career Window Closed","You reached age 25 without choosing a sport. The Special Sports Career path is permanently closed.","warn")}
    collegeScholarshipCheck();
+   collegeYearProgress();
  }
 
  halfSportsYear();
@@ -695,12 +872,19 @@ function loadGame(){
  delete state.yearlyActions;
  delete state.bonusActionPoints;
  if(typeof state.lastBirthdayAge!=="number")state.lastBirthdayAge=Math.floor(state.age||0);
+ if(!state.mother)state.mother=generateParent("Mother");if(!state.father)state.father=generateParent("Father");
+ if(typeof state.parentRelationship!=="number")state.parentRelationship=75;
+ if(typeof state.sportsCareerClosed!=="boolean")state.sportsCareerClosed=state.age>=25&&!state.sport;
+ if(typeof state.collegeYear!=="number")state.collegeYear=0;if(typeof state.collegeGPA!=="number")state.collegeGPA=0;
+ if(typeof state.recruitingInterest!=="number")state.recruitingInterest=0;if(typeof state.draftStock!=="number")state.draftStock=0;
  toast("Save loaded");render()
 }
 function startLife(){
  state=freshState();let f=document.getElementById("firstName").value.trim()||"Alex",l=document.getElementById("lastName").value.trim()||"Carter";
  state.name=`${f} ${l}`;state.country=document.getElementById("country").value;state.goal=document.getElementById("goalSelect").value;
+ state.mother=generateParent("Mother");state.father=generateParent("Father");
  addLog("Born",`${state.name} was born in ${state.country}. Health ${state.health}%, Smarts ${state.smarts}%, Looks ${state.looks}%.`,"good");
+ addLog("Family Background",`Mother: ${state.mother.wealth} (${money(state.mother.income)}/yr). Father: ${state.father.wealth} (${money(state.father.income)}/yr). Their finances may affect future support.`,"purple");
  document.getElementById("startModal").classList.remove("show");render();
 }
 function restart(){document.getElementById("startModal").classList.add("show")}
