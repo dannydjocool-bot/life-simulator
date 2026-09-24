@@ -642,14 +642,21 @@ function advancePlayoffRound(){
  save();render();toast("Advanced to "+playoffRoundName())
 }
 function evaluateSeasonAwards(){
- const p=S.player,s={...p.stats},teamWins=S.record.w,awards={};
- const allStars=[...NBA_TEAMS].map(t=>teamLeader(t)).filter(Boolean).sort((a,b)=>b.ppg-a.ppg);
- awards.mvp=s.ppg>=29&&teamWins>=50?p.name:(allStars[0]?allStars[0].name:"League Star");
- awards.dpoy=p.attrs.Defense>=90&&s.rpg>=5?p.name:"Jabari Knox";
- const rookies=NBA_TEAMS.flatMap(t=>rosterFor(t.id)).filter(x=>x.source==="rookie"&&(x.draftYear===S.year||x.yearsPro<=1)).sort((a,b)=>(b.ppg||0)-(a.ppg||0));awards.roty=S.year===1&&s.ppg>=18?p.name:(rookies[0]?rookies[0].name:"Rookie Star");
+ ensureLeagueRosters();ensureLeagueStandings();
+ const p=S.player,s={...p.stats},teamWins=S.record.w,awards={},leaguePlayers=NBA_TEAMS.flatMap(t=>rosterFor(t.id).map(x=>({...x,teamId:t.id})));
+ const mvpCandidates=leaguePlayers.map(x=>({...x,score:(x.ppg||0)*1.7+(x.apg||0)*1.15+(x.rpg||0)*.55+(S.leagueStandings?.[x.teamId]?.w||0)*.18})).sort((a,b)=>b.score-a.score);
+ const userMvpScore=(s.ppg||0)*1.7+(s.apg||0)*1.15+(s.rpg||0)*.55+teamWins*.18;
+ awards.mvp=mvpCandidates[0]&&mvpCandidates[0].score>userMvpScore?mvpCandidates[0].name:(s.ppg>=24?p.name:(mvpCandidates[0]?.name||"League Star"));
+ const dpoyCandidates=[...leaguePlayers].sort((a,b)=>((b.ovr||75)*.45+(b.rpg||0)*2.2)-((a.ovr||75)*.45+(a.rpg||0)*2.2));
+ const userD=(p.attrs.Defense||0)*.6+(s.rpg||0)*2.2;
+ awards.dpoy=dpoyCandidates[0]&&((dpoyCandidates[0].ovr||75)*.45+(dpoyCandidates[0].rpg||0)*2.2)>userD?dpoyCandidates[0].name:(p.attrs.Defense>=88?p.name:(dpoyCandidates[0]?.name||"Defensive Star"));
+ const rookies=leaguePlayers.filter(x=>x.source==="rookie"&&(x.draftYear===S.year||x.yearsPro<=1)).sort((a,b)=>((b.ppg||0)+(b.apg||0)*.65+(b.rpg||0)*.4)-((a.ppg||0)+(a.apg||0)*.65+(a.rpg||0)*.4));
+ awards.roty=S.year===1&&s.ppg>=18?p.name:(rookies[0]?rookies[0].name:"Rookie Star");
  awards.allNBA=s.ppg>=24?p.name:null;awards.allStar=s.ppg>=18?p.name:null;S.seasonAwards=awards;
  const add=a=>{if(a&&!S.accolades.includes(a))S.accolades.push(a)};
- if(awards.allStar===p.name){add("All-Star");if(!(S.nbaWorld.allStar&&S.nbaWorld.allStar.year===S.year&&S.nbaWorld.allStar.selected)){S.nbaWorld.allStarSelections=(S.nbaWorld.allStarSelections||0)+1}}if(awards.allNBA===p.name)add("All-NBA");if(awards.mvp===p.name)add("MVP");if(awards.dpoy===p.name)add("Defensive Player of the Year");if(awards.roty===p.name)add("Rookie of the Year");if(awards.allNBA===p.name)addCareerPathXP("superstar",35);if(awards.mvp===p.name)addCareerPathXP("superstar",90);if(awards.dpoy===p.name)addCareerPathXP("superstar",45);if((S.year||1)>=5)addCareerPathXP("veteran",30)
+ if(awards.allStar===p.name){add("All-Star");if(!(S.nbaWorld.allStar&&S.nbaWorld.allStar.year===S.year&&S.nbaWorld.allStar.selected))S.nbaWorld.allStarSelections=(S.nbaWorld.allStarSelections||0)+1}
+ if(awards.allNBA===p.name)add("All-NBA");if(awards.mvp===p.name)add("MVP");if(awards.dpoy===p.name)add("Defensive Player of the Year");if(awards.roty===p.name)add("Rookie of the Year");
+ if(awards.allNBA===p.name)addCareerPathXP("superstar",35);if(awards.mvp===p.name)addCareerPathXP("superstar",90);if(awards.dpoy===p.name)addCareerPathXP("superstar",45);if((S.year||1)>=5)addCareerPathXP("veteran",30)
 }
 const DRAFT_FIRST_NAMES=["Aiden","Andre","Amari","Bryce","Cam","Cameron","Carter","Chris","Darius","Darren","Devin","Eli","Elijah","Emari","Isaiah","Jace","Jalen","Jamal","Jared","Javon","Jayden","Jaylen","Jordan","Josiah","Kaden","Kai","Khalil","KJ","Malachi","Malik","Marcus","Mason","Micah","Miles","Nasir","Noah","Omari","Quentin","Rashad","RJ","Roman","Terrence","Theo","Trey","Tristan","Ty","Tyler","Xavier","Zaire","Zion","Ace","Dante","Desmond","Keon","Kobe","Landon","Marcellus","Nico","Tre","Weston"];
 const DRAFT_LAST_NAMES=["Banks","Bennett","Brooks","Bryant","Caldwell","Carter","Cole","Daniels","Ellis","Fields","Ford","Foster","Grant","Green","Hall","Harper","Hart","Hayes","Henderson","Holloway","Jackson","James","Jefferson","Johnson","Knox","Lawson","Lewis","Marshall","Mercer","Mitchell","Moore","Parker","Pierce","Porter","Price","Reed","Reid","Rivers","Robinson","Rose","Scott","Stone","Taylor","Thomas","Turner","Vale","Walker","Ward","Wells","West","Williams","Wilson","Young","Cross","Frost","King","Moss","Ray","Voss","Wade"];
