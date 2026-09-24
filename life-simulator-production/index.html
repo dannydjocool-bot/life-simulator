@@ -187,7 +187,7 @@ const STORE_ITEMS=[
 {id:"duplex",name:"Duplex Investment",type:"Real Estate",price:180000,income:4500,morale:0,desc:"Two-unit rental with stronger passive income."},
 {id:"house",name:"Luxury Home",type:"Housing",price:350000,income:0,morale:8,desc:"A major lifestyle upgrade once your career takes off."}
 ];
-const fresh=()=>({version:"0.8.3",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false},finance:{cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null},social:{followers:100,fame:0,posted:false,posts:0},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null},fullGame:null,news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
+const fresh=()=>({version:"0.8.4",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false},finance:{cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null},social:{followers:100,fame:0,posted:false,posts:0},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null},fullGame:null,news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
 function merge(a,b){for(const k in b){if(a[k]===undefined)a[k]=b[k];else if(a[k]&&b[k]&&typeof a[k]==="object"&&!Array.isArray(a[k])&&!Array.isArray(b[k]))merge(a[k],b[k])}return a}
 const SAVE_SLOT_COUNT=3;
 let activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+(localStorage.getItem("mycareer-active-slot")||1)));
@@ -603,10 +603,16 @@ function momentSkill(t){
  return base+clutchBadgeBoost(t)*.65
 }
 const MAX_CLUTCH_POSSESSIONS=3;
+function openClutchResponseChoice(){
+ const g=S.live;if(!g)return;
+ modal('<h2>Answer Back • Chance '+((g.clutchPossessions||0)+1)+'/'+MAX_CLUTCH_POSSESSIONS+'</h2><p class="muted">Choose how you want to respond right now.</p><div class="list"><button class="btn primary" data-clutch-response="iso">Attack the Rim</button><button class="btn" data-clutch-response="three">Hunt the Three</button><button class="btn" data-clutch-response="pnr">Run Pick-and-Roll</button><button class="btn" data-clutch-response="team">Make the Team Play</button></div>');
+ document.querySelectorAll("[data-clutch-response]").forEach(b=>b.onclick=()=>{const type=b.dataset.clutchResponse;closeModal();if(!S.live)return;S.live.response=true;S.live.lastMessage="Answer-back possession underway.";resolveMoment(type)})
+}
 function showClutchResult(title,body,canRespond){
+ if(!S.live)return;
  const button=canRespond?'<button class="btn primary" id="answerBackBtn">Answer Back • Chance '+((S.live.clutchPossessions||0)+1)+'/'+MAX_CLUTCH_POSSESSIONS+'</button>':'<button class="btn primary" id="finishGameBtn">Conclude Game</button>';
  modal('<h2>'+title+'</h2><p class="muted">'+body+'</p><div class="modalFoot">'+button+'</div>');
- if($("answerBackBtn"))$("answerBackBtn").onclick=()=>{closeModal();S.live.response=true;S.live.lastMessage="Opponent answered. Clutch chance "+((S.live.clutchPossessions||0)+1)+" of "+MAX_CLUTCH_POSSESSIONS+".";save();render()};
+ if($("answerBackBtn"))$("answerBackBtn").onclick=openClutchResponseChoice;
  if($("finishGameBtn"))$("finishGameBtn").onclick=finishGame
 }
 function resolveMoment(t){
@@ -619,7 +625,7 @@ function resolveMoment(t){
    else {g.team+=2;if(t==="iso")g.pts+=2;if(t==="team")S.player.trust=Math.min(100,S.player.trust+2)}
  }else{
    g.lastMessage="The defense wins the possession.";
-   showClutchResult("Clutch possession missed","You could not convert on chance "+g.clutchPossessions+"/"+MAX_CLUTCH_POSSESSIONS+". The sequence is over and the final score will decide the game.",false);return
+   finishGame();return
  }
  const opponentScores=Math.random()*100<opponentAnswerChance();
  if(opponentScores){
@@ -628,9 +634,13 @@ function resolveMoment(t){
    const canRespond=underCap&&Math.random()*100<chance;
    g.lastMessage="They answered with "+pts+".";
    if(!underCap){
-     showClutchResult("Final clutch exchange","You executed, but "+g.opp+" answered again. You used all "+MAX_CLUTCH_POSSESSIONS+" clutch possessions. The score now decides the game.",false)
+     g.lastMessage="Final clutch exchange complete.";
+     finishGame();return
+   }else if(canRespond){
+     showClutchResult("They answered back","You executed, but "+g.opp+" scored again. You have "+(MAX_CLUTCH_POSSESSIONS-g.clutchPossessions)+" clutch chance"+((MAX_CLUTCH_POSSESSIONS-g.clutchPossessions)===1?"":"s")+" left. Response chance: "+chance+"%. You earned another possession.",true)
    }else{
-     showClutchResult("They answered back","You executed, but "+g.opp+" scored again. You have "+(MAX_CLUTCH_POSSESSIONS-g.clutchPossessions)+" clutch chance"+((MAX_CLUTCH_POSSESSIONS-g.clutchPossessions)===1?"":"s")+" left. Response chance: "+chance+"%."+(canRespond?" You earned another possession.":" The game ends here."),canRespond)
+     g.lastMessage="Opponent answered and no extra response was earned.";
+     finishGame();return
    }
  }else{
    g.lastMessage="Your defense gets the stop.";
@@ -643,7 +653,7 @@ function resolveMoment(t){
      toast("CLUTCH WIN • "+finalScore);
      return
    }
-   showClutchResult("Big-time sequence!","You executed and your defense got the stop. The score on the board will decide the game.",false)
+   finishGame();return
  }
 }
 function quickSim(){const p=S.player,g={opp:nextOpp(),stage:S.stage,playoff:!!(S.playoffs&&S.playoffs.active),homeAway:S.playoffs&&S.playoffs.active?"PLAYOFF":nextGameLocation(),pts:Math.max(5,Math.round(ovr()/3+(Math.random()-.35)*14)),ast:Math.max(0,Math.round(p.attrs.Playmaking/16+Math.random()*4)),reb:Math.max(0,Math.round(p.attrs.Athleticism/20+Math.random()*4))};g.win=ovr()+Math.random()*30>62+Math.random()*35;g.team=Math.round((g.win?88:74)+Math.random()*17);g.oppScore=g.win?g.team-Math.ceil(Math.random()*9):g.team+Math.ceil(Math.random()*9);recordGame(g)}
