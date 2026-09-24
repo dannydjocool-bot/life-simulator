@@ -187,7 +187,7 @@ const STORE_ITEMS=[
 {id:"duplex",name:"Duplex Investment",type:"Real Estate",price:180000,income:4500,morale:0,desc:"Two-unit rental with stronger passive income."},
 {id:"house",name:"Luxury Home",type:"Housing",price:350000,income:0,morale:8,desc:"A major lifestyle upgrade once your career takes off."}
 ];
-const fresh=()=>({version:"0.8.0",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false},finance:{cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null},social:{followers:100,fame:0,posted:false,posts:0},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null},fullGame:null,news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
+const fresh=()=>({version:"0.8.1",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false},finance:{cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null},social:{followers:100,fame:0,posted:false,posts:0},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null},fullGame:null,news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
 function merge(a,b){for(const k in b){if(a[k]===undefined)a[k]=b[k];else if(a[k]&&b[k]&&typeof a[k]==="object"&&!Array.isArray(a[k])&&!Array.isArray(b[k]))merge(a[k],b[k])}return a}
 const SAVE_SLOT_COUNT=3;
 let activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+(localStorage.getItem("mycareer-active-slot")||1)));
@@ -400,7 +400,7 @@ function fullAdvance(seconds){
  if(onBefore)g.minutesPlayed+=used/60;
  g.clock-=used;
  if(g.clock<=0){
-   if(g.quarter===2&&!g.halftimeDone){g.clock=0;g.onCourt=false;fullLog("Halftime. Review your line and choose an adjustment.");return}
+   if(g.quarter===2&&!g.halftimeDone){g.clock=0;g.onCourt=false;fullLog("Halftime. Review your line and choose an adjustment.");openHalftime();return}
    if(g.quarter>=4){finishFullGame();return}
    g.quarter++;g.clock=720;g.onCourt=true;g.stint=0;g.turn=Math.random()<.5?"offense":"defense";g.energy=Math.min(100,g.energy+7);fullLog("Quarter "+g.quarter+" begins.")
  }
@@ -433,7 +433,8 @@ function fullSimBench(){
 }
 function openHalftime(){
  const g=S.fullGame;if(!g||g.halftimeDone)return;
- modal('<h2>Halftime • '+g.team+'-'+g.oppScore+'</h2><p class="muted">'+g.stats.pts+' PTS • '+g.stats.ast+' AST • '+g.stats.reb+' REB • Grade '+gameGradeLetter(g.grade)+'</p><div class="list"><button class="btn" data-half="aggressive">Stay Aggressive • +Scoring, more stamina use</button><button class="btn" data-half="defense">Lock In Defensively • +Defense / steals</button><button class="btn" data-half="team">Get Teammates Involved • +Playmaking / chemistry</button><button class="btn" data-half="energy">Conserve Energy • Recover stamina</button></div>')
+ modal('<h2>Halftime • '+g.team+'-'+g.oppScore+'</h2><p class="muted">'+g.stats.pts+' PTS • '+g.stats.ast+' AST • '+g.stats.reb+' REB • Grade '+gameGradeLetter(g.grade)+'</p><div class="list"><button class="btn" data-half="aggressive">Stay Aggressive • +Scoring, more stamina use</button><button class="btn" data-half="defense">Lock In Defensively • +Defense / steals</button><button class="btn" data-half="team">Get Teammates Involved • +Playmaking / chemistry</button><button class="btn" data-half="energy">Conserve Energy • Recover stamina</button></div>');
+ document.querySelectorAll("[data-half]").forEach(b=>b.onclick=()=>halftimeChoice(b.dataset.half))
 }
 function halftimeChoice(type){
  const g=S.fullGame;if(!g||g.halftimeDone)return;g.adjustment=type;g.halftimeDone=true;g.quarter=3;g.clock=720;g.onCourt=true;g.stint=0;g.turn="offense";
@@ -468,7 +469,7 @@ function fullDefense(type){
  if(type==="rebound"){stop+=a.Athleticism*.06;cost=5}
  if(adj==="defense")stop+=8;
  let foulChance=type==="steal"?14:type==="pressure"?9:4;
- if(Math.random()*100<foulChance){g.stats.pf++;fullGrade(-1.5);g.oppScore+=Math.random()<.72?2:1;fullLog("Whistle — defensive foul.");}
+ if(Math.random()*100<foulChance){g.stats.pf++;fullGrade(-1.5);g.oppScore+=Math.random()<.72?2:1;fullLog("Whistle — defensive foul.");if(g.stats.pf>=6){g.onCourt=false;fullLog("You fouled out. The rest of the game will be simulated.");}}
  else if(type==="steal"&&Math.random()*100<Math.max(8,(a.Defense+a.IQ)/5)){g.stats.stl++;fullGrade(3);fullLog("You jump the passing lane for a steal.");}
  else if(Math.random()*100<Math.max(30,Math.min(88,stop))){if(type==="rebound"||Math.random()<.4){g.stats.reb++;fullGrade(1.5);fullLog("Defensive stop and you secure the rebound.")}else{if(type==="help"&&Math.random()<.18){g.stats.blk++;fullGrade(2.5);fullLog("Perfect help defense — blocked shot.")}else{fullGrade(1);fullLog("Strong defense forces a miss.")}}}
  else {const pts=Math.random()<.28?3:2;g.oppScore+=pts;fullGrade(-1);fullLog(g.opp+" scores "+pts+".")}
