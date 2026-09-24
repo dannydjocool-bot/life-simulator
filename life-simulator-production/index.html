@@ -211,7 +211,7 @@ const STORE_ITEMS=[
 {id:"duplex",name:"Duplex Investment",type:"Real Estate",price:180000,income:4500,morale:0,desc:"Two-unit rental with stronger passive income."},
 {id:"house",name:"Luxury Home",type:"Housing",price:350000,income:0,morale:8,desc:"A major lifestyle upgrade once your career takes off."}
 ];
-const fresh=()=>({version:"0.10.2",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false},finance:{cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null},social:{followers:100,fame:0,posted:false,posts:0},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],recordBook:{seasons:seedRecordBook()},championshipCelebration:null,playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null},fullGame:null,postgameMedia:null,mediaProfile:{interviews:0,rivalryHeat:0},news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
+const fresh=()=>({version:"0.10.3",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false},finance:{cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null},social:{followers:100,fame:0,posted:false,posts:0},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],recordBook:{seasons:seedRecordBook()},championshipCelebration:null,playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null},fullGame:null,postgameMedia:null,mediaProfile:{interviews:0,rivalryHeat:0},news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
 function merge(a,b){for(const k in b){if(a[k]===undefined)a[k]=b[k];else if(a[k]&&b[k]&&typeof a[k]==="object"&&!Array.isArray(a[k])&&!Array.isArray(b[k]))merge(a[k],b[k])}return a}
 const SAVE_SLOT_COUNT=3;
 let activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+(localStorage.getItem("mycareer-active-slot")||1)));
@@ -258,24 +258,42 @@ function isExtensionEligible(){return isUnderContract()&&contractYearsRemaining(
 function isFreeAgent(){return !S.finance.contract||contractYearsRemaining()===0}
 function contractExpirationLabel(){
  const c=S.finance&&S.finance.contract;if(!c||contractYearsRemaining()<=0)return "Free Agent";
- const finalYear=S.stage==="Offseason"?(S.year||1)+contractYearsRemaining():(S.year||1)+contractYearsRemaining()-1;
+ const finalYear=(c.startYear||S.year||1)+c.years-1;
  return nbaSeasonLabel(finalYear)
+}
+function inferLegacyContractLedger(con){
+ const year=Math.max(1,S.year||1),rookie=(con.type==="Rookie Contract"||(con.label||"").includes("Rookie")||!!(S.draftProcess&&S.draftProcess.pick));
+ if(typeof con.startYear!=="number"){
+   if(rookie)con.startYear=1;
+   else{
+     const used=Math.max(0,(con.years||0)-(con.yearsRemaining||con.years||0));
+     con.startYear=Math.max(1,(S.stage==="Offseason"?year+1:year)-used)
+   }
+ }
+ if(typeof con.lastProcessedOffseasonYear!=="number"){
+   if(rookie){
+     const completed=S.stage==="Offseason"?year:Math.max(0,year-1);
+     const expected=Math.max(0,con.years-completed);
+     if(con.yearsRemaining>expected)con.yearsRemaining=expected;
+     con.lastProcessedOffseasonYear=completed
+   }else{
+     const used=Math.max(0,con.years-(con.yearsRemaining||0));
+     con.lastProcessedOffseasonYear=Math.max(0,(con.startYear||1)+used-1)
+   }
+ }
 }
 function repairContractState(){
  const con=S.finance&&S.finance.contract;if(!con)return;
  if(typeof con.years!=="number"||con.years<1)return;
- if(typeof con.yearsRemaining!=="number"){
-   con.yearsRemaining=S.stage==="Offseason"?Math.max(0,con.years-(S.year||1)):Math.max(1,con.years-((S.year||1)-1))
- }
- if((S.year||1)===1&&S.draftProcess&&S.draftProcess.pick&&con.yearsRemaining<=0){
-   con.yearsRemaining=S.stage==="Offseason"?Math.max(1,con.years-1):con.years
- }
- con.yearsRemaining=Math.max(0,Math.min(con.years,con.yearsRemaining));
+ if(typeof con.yearsRemaining!=="number")con.yearsRemaining=con.years;
  if(!con.teamId&&S.team)con.teamId=S.team;
  if(!con.type)con.type=(con.label||"").includes("Rookie")?"Rookie Contract":(con.label||"").includes("Extension")?"Extension":"NBA Contract";
+ inferLegacyContractLedger(con);
+ con.yearsRemaining=Math.max(0,Math.min(con.years,con.yearsRemaining));
  if(con.pendingExtension&&typeof con.pendingExtension==="object"){
    if(!con.pendingExtension.teamId)con.pendingExtension.teamId=con.teamId||S.team;
    if(!con.pendingExtension.type)con.pendingExtension.type="Extension";
+   if(typeof con.pendingExtension.startYear!=="number")con.pendingExtension.startYear=(S.year||1)+1
  }
  if(S.offseason&&S.offseason.active){
    if(isUnderContract()){
@@ -283,15 +301,26 @@ function repairContractState(){
      const offers=Array.isArray(S.offseason.contractOffers)?S.offseason.contractOffers:[];
      S.offseason.contractOffers=onlyExtension?offers.filter(o=>o&&o.kind==="extension"&&o.teamId===S.team):[];
      S.offseason.decisionMade=true
-   }else if(S.offseason.decisionMade&&(!con||contractYearsRemaining()===0)){
+   }else if(S.offseason.decisionMade){
      S.offseason.decisionMade=false
    }
  }
 }
+function processContractSeasonEnd(){
+ const con=S.finance&&S.finance.contract;if(!con)return false;
+ repairContractState();
+ const completedYear=Math.max(1,S.year||1);
+ if(contractYearsRemaining()>0&&(con.startYear||1)<=completedYear&&(con.lastProcessedOffseasonYear||0)<completedYear){
+   con.yearsRemaining=Math.max(0,con.yearsRemaining-1);
+   con.lastProcessedOffseasonYear=completedYear
+ }
+ if(contractYearsRemaining()===0&&con.pendingExtension)return activatePendingExtensionIfDue();
+ return false
+}
 function activatePendingExtensionIfDue(){
  const con=S.finance&&S.finance.contract;if(!con||contractYearsRemaining()>0||!con.pendingExtension)return false;
- const ext=con.pendingExtension;
- S.finance.contract={label:ext.label||"Contract Extension",type:"Extension",teamId:S.team,years:ext.years,yearsRemaining:ext.years,total:ext.total,perGame:ext.perGame,pendingExtension:null};
+ const ext=con.pendingExtension,startYear=ext.startYear||((S.year||1)+1);
+ S.finance.contract={label:ext.label||"Contract Extension",type:"Extension",teamId:S.team,years:ext.years,yearsRemaining:ext.years,total:ext.total,perGame:ext.perGame,pendingExtension:null,startYear,lastProcessedOffseasonYear:startYear-1};
  S.news.unshift("Contract extension activated: "+ext.years+" years with "+currentTeamName()+".");
  pushLeagueNews(S.player.name+"'s extension with "+currentTeamName()+" is now active.");
  return true
@@ -310,7 +339,7 @@ function repairCurrentChampionshipHistory(){
  }
  S.recordBook.seasons=S.recordBook.seasons.slice(-10)
 }
-function render(){if(!S.careerHistory)S.careerHistory={highSchool:null,collegeSeasons:[]};if(!S.training)S.training={used:0,max:3};if(typeof S.training.max!=="number")S.training.max=3;if(typeof S.training.used!=="number")S.training.used=0;if(typeof S.training.recovered!=="boolean")S.training.recovered=false;if(!S.finance)S.finance={cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null};if(!Array.isArray(S.finance.owned))S.finance.owned=[];if(!Array.isArray(S.finance.sponsors))S.finance.sponsors=[];if(S.finance.sponsor&&S.finance.sponsors.length===0)S.finance.sponsors=[S.finance.sponsor];if(!S.social)S.social={followers:100,fame:0,posted:false,posts:0};if(typeof S.social.followers!=="number")S.social.followers=100;if(typeof S.social.fame!=="number")S.social.fame=0;if(typeof S.social.posted!=="boolean")S.social.posted=false;if(!S.draftProcess)S.draftProcess={declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null};if(!S.draftProcess.events)S.draftProcess.events={shooting:false,agility:false,scrimmage:false};if(!S.careerStats)S.careerStats={highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}};if(!S.saveMeta)S.saveMeta={lastSaved:null,manualSaves:0};if(!S.playoffs)S.playoffs={active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false};if(!S.offseason)S.offseason={active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false};if(typeof S.offseason.draftApplied!=="boolean")S.offseason.draftApplied=false;if(!Array.isArray(S.leagueNews))S.leagueNews=[];if(!Array.isArray(S.accolades))S.accolades=[];if(!S.recordBook||!Array.isArray(S.recordBook.seasons))S.recordBook={seasons:seedRecordBook()};if(S.championshipCelebration===undefined)S.championshipCelebration=null;if(S.seasonAwards===undefined)S.seasonAwards=null;if(S.playoffBracket===undefined)S.playoffBracket=null;if(typeof S.player.chemistry!=="number")S.player.chemistry=60;if(!S.player.role)S.player.role="Rotation";if(typeof S.player.minutes!=="number")S.player.minutes=22;if(S.player.injury===undefined)S.player.injury=null;if(!S.coach)S.coach={talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null};if(S.fullGame===undefined)S.fullGame=null;if(S.postgameMedia===undefined)S.postgameMedia=null;if(!S.mediaProfile)S.mediaProfile={interviews:0,rivalryHeat:0};repairContractState();repairCurrentChampionshipHistory();if(S.stage==="NBA"&&!S.team){S.team="bos"}ensureAppearance();nav();head();if(!S.created){$("content").innerHTML=startView();bindStart();return}const views={home:home,career:career,games:games,player:player,life:life,league:league};$("content").innerHTML=(views[S.screen]||home)();bindDynamic()}
+function render(){if(!S.careerHistory)S.careerHistory={highSchool:null,collegeSeasons:[]};if(!S.training)S.training={used:0,max:3};if(typeof S.training.max!=="number")S.training.max=3;if(typeof S.training.used!=="number")S.training.used=0;if(typeof S.training.recovered!=="boolean")S.training.recovered=false;if(!S.finance)S.finance={cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null};if(!Array.isArray(S.finance.owned))S.finance.owned=[];if(!Array.isArray(S.finance.sponsors))S.finance.sponsors=[];if(S.finance.sponsor&&S.finance.sponsors.length===0)S.finance.sponsors=[S.finance.sponsor];if(!S.social)S.social={followers:100,fame:0,posted:false,posts:0};if(typeof S.social.followers!=="number")S.social.followers=100;if(typeof S.social.fame!=="number")S.social.fame=0;if(typeof S.social.posted!=="boolean")S.social.posted=false;if(!S.draftProcess)S.draftProcess={declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null};if(!S.draftProcess.events)S.draftProcess.events={shooting:false,agility:false,scrimmage:false};if(!S.careerStats)S.careerStats={highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}};if(!S.saveMeta)S.saveMeta={lastSaved:null,manualSaves:0};if(!S.playoffs)S.playoffs={active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false};if(!S.offseason)S.offseason={active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false};if(typeof S.offseason.draftApplied!=="boolean")S.offseason.draftApplied=false;if(!Array.isArray(S.leagueNews))S.leagueNews=[];if(!Array.isArray(S.accolades))S.accolades=[];if(!S.recordBook||!Array.isArray(S.recordBook.seasons))S.recordBook={seasons:seedRecordBook()};if(S.championshipCelebration===undefined)S.championshipCelebration=null;if(S.seasonAwards===undefined)S.seasonAwards=null;if(S.playoffBracket===undefined)S.playoffBracket=null;if(typeof S.player.chemistry!=="number")S.player.chemistry=60;if(!S.player.role)S.player.role="Rotation";if(typeof S.player.minutes!=="number")S.player.minutes=22;if(S.player.injury===undefined)S.player.injury=null;if(!S.coach)S.coach={talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null};if(S.fullGame===undefined)S.fullGame=null;if(S.postgameMedia===undefined)S.postgameMedia=null;if(!S.mediaProfile)S.mediaProfile={interviews:0,rivalryHeat:0};repairContractState();if(S.stage==="Offseason"&&S.finance.contract&&S.finance.contract.lastProcessedOffseasonYear<(S.year||1))processContractSeasonEnd();repairCurrentChampionshipHistory();if(S.stage==="NBA"&&!S.team){S.team="bos"}ensureAppearance();nav();head();if(!S.created){$("content").innerHTML=startView();bindStart();return}const views={home:home,career:career,games:games,player:player,life:life,league:league};$("content").innerHTML=(views[S.screen]||home)();bindDynamic()}
 function startView(){
  const slots=[1,2,3].map(i=>({i,data:slotData(i)}));
  return '<div class="hero"><section class="heroBox"><span class="kicker">MYCAREER SAVE SELECT</span><h2>Choose your player.</h2><p>You have three independent career slots. Each player autosaves separately.</p><div class="saveSlots">'+slots.map(({i,data})=>'<div class="card saveSlot">'+(data?'<div class="slotAvatar">'+avatarMarkup("md",data.player)+'</div><div class="slotMeta"><b>Slot '+i+' • '+data.player.name+'</b><small>'+slotTeamLabel(data)+' • '+slotOvr(data)+' OVR</small><small>Last saved: '+slotSavedLabel(data)+'</small></div><button class="btn primary" data-loadslot="'+i+'">Play This Career</button>':'<div class="slotMeta"><b>Slot '+i+' • Empty</b><small>Create a new player in this slot.</small></div><button class="btn primary" data-newslot="'+i+'">Create Player</button>')+'</div>').join("")+'</div></section><section class="card ovr"><div class="ring" style="--p:3%"><div><div><b>3</b><small>SAVE SLOTS</small></div></div></div></section></div><div class="grid"><section class="card s6"><h3>Independent Careers</h3><p class="muted">Each slot has its own player, stats, team, money, playoffs, contracts and progression.</p></section><section class="card s6"><h3>Autosave</h3><p class="muted">The active slot saves after games and major career decisions.</p></section></div>'
@@ -325,7 +354,7 @@ function currentTeamName(){if(S.team&&(S.stage==="NBA"||S.stage==="Offseason"))r
 function opponentPool(){if(S.stage==="NBA")return NBA_TEAMS.filter(t=>t.id!==S.team).map(t=>t.city+" "+t.name);if(S.stage==="College")return COLLEGES.filter(x=>x!==S.college);return HS_TEAMS}
 function combineComplete(){const e=S.draftProcess&&S.draftProcess.events;return !!(e&&e.shooting&&e.agility&&e.scrimmage)}
 function combineEvent(id){if(S.stage!=="Draft Combine"){toast("You are not in the Draft Combine");return}const e=S.draftProcess.events;if(e[id]){toast("That combine event is already complete");return}let boost=0,label="";if(id==="shooting"){boost=Math.max(1,Math.min(5,Math.round((S.player.attrs.Shooting-55)/9)+Math.floor(Math.random()*2)));label="Shooting Drill"}else if(id==="agility"){boost=Math.max(1,Math.min(5,Math.round((S.player.attrs.Athleticism-55)/9)+Math.floor(Math.random()*2)));label="Agility Test"}else{boost=Math.max(1,Math.min(6,Math.round(((S.player.attrs.IQ+S.player.attrs.Playmaking+S.player.attrs.Defense)/3-55)/8)+Math.floor(Math.random()*2)));label="5-on-5 Scrimmage"}e[id]=true;S.draftProcess.boost+=boost;S.player.draft=Math.min(99,S.player.draft+boost);S.player.xp+=60+boost*10;if(combineComplete())S.draftProcess.combineDone=true;S.news.unshift(label+" complete: Draft Stock +"+boost+".");save();render();toast(label+" • Draft Stock +"+boost)}
-function completeDraftNight(){if(S.stage!=="Draft Combine"||!combineComplete()){toast("Finish every combine event first");return}const rating=ovr(),stock=S.player.draft;let pick=Math.max(1,Math.min(30,31-Math.round((stock*.65+rating*.35-55)/44*29)));if(!Number.isFinite(pick))pick=30;const team=NBA_TEAMS[(pick-1)%NBA_TEAMS.length];let deal;if(pick<=10)deal={label:"Lottery Rookie Deal",years:4,total:36000000,perGame:110000};else if(pick<=20)deal={label:"First-Round Rookie Deal",years:4,total:18000000,perGame:55000};else deal={label:"Late First / Second-Round Deal",years:3,total:8000000,perGame:28000};S.draftProcess.pick=pick;S.team=team.id;S.stage="NBA";S.year=1;S.record={w:0,l:0};S.game=1;deal.yearsRemaining=deal.years;deal.teamId=team.id;deal.type="Rookie Contract";deal.pendingExtension=null;S.finance.contract=deal;S.player.age=Math.max(19,S.player.age+1);S.leagueStandings=null;S.leagueRosters=null;ensureLeagueStandings();ensureLeagueRosters();updateRole();S.news.unshift("Draft Night: Pick #"+pick+" — "+team.city+" "+team.name+" selected you. Signed "+deal.label+".");S.social.fame=Math.min(100,S.social.fame+15);S.social.followers+=5000;S.training.used=0;S.training.max=3;S.training.recovered=false;S.social.posted=false;save();setScreen("home");toast("Drafted #"+pick+" by "+team.city+" "+team.name)}
+function completeDraftNight(){if(S.stage!=="Draft Combine"||!combineComplete()){toast("Finish every combine event first");return}const rating=ovr(),stock=S.player.draft;let pick=Math.max(1,Math.min(30,31-Math.round((stock*.65+rating*.35-55)/44*29)));if(!Number.isFinite(pick))pick=30;const team=NBA_TEAMS[(pick-1)%NBA_TEAMS.length];let deal;if(pick<=10)deal={label:"Lottery Rookie Deal",years:4,total:36000000,perGame:110000};else if(pick<=20)deal={label:"First-Round Rookie Deal",years:4,total:18000000,perGame:55000};else deal={label:"Late First / Second-Round Deal",years:3,total:8000000,perGame:28000};S.draftProcess.pick=pick;S.team=team.id;S.stage="NBA";S.year=1;S.record={w:0,l:0};S.game=1;deal.yearsRemaining=deal.years;deal.teamId=team.id;deal.type="Rookie Contract";deal.pendingExtension=null;deal.startYear=1;deal.lastProcessedOffseasonYear=0;S.finance.contract=deal;S.player.age=Math.max(19,S.player.age+1);S.leagueStandings=null;S.leagueRosters=null;ensureLeagueStandings();ensureLeagueRosters();updateRole();S.news.unshift("Draft Night: Pick #"+pick+" — "+team.city+" "+team.name+" selected you. Signed "+deal.label+".");S.social.fame=Math.min(100,S.social.fame+15);S.social.followers+=5000;S.training.used=0;S.training.max=3;S.training.recovered=false;S.social.posted=false;save();setScreen("home");toast("Drafted #"+pick+" by "+team.city+" "+team.name)}
 function stageStats(){const key=(S.stage==="NBA"||S.stage==="Offseason")?"nba":S.stage==="College"?"college":"highSchool";return S.careerStats[key]}
 function statLineCard(){const st=S.player.stats,cs=stageStats();return '<div class="row"><span>Season</span><strong>'+st.ppg.toFixed(1)+' PPG • '+st.apg.toFixed(1)+' APG • '+st.rpg.toFixed(1)+' RPG</strong></div><div class="row"><span>Career '+S.stage+'</span><strong>'+cs.gp+' GP • '+cs.pts+' PTS • '+cs.ast+' AST • '+cs.reb+' REB</strong></div>'}
 function offseasonCareerView(){
@@ -504,9 +533,8 @@ function generateOffseason(){
 }
 function startOffseason(){
  if(S.stage!=="Offseason"){
-   evaluateSeasonAwards();archiveCompletedSeason();
-   if(S.finance.contract&&S.finance.contract.yearsRemaining>0)S.finance.contract.yearsRemaining--;
-   if(!activatePendingExtensionIfDue()&&S.finance.contract&&S.finance.contract.yearsRemaining===0)S.finance.contract.teamId=S.team;
+   evaluateSeasonAwards();archiveCompletedSeason();processContractSeasonEnd();
+   if(S.finance.contract&&S.finance.contract.yearsRemaining===0)S.finance.contract.teamId=S.team;
    S.player.age++
  }
  S.stage="Offseason";
@@ -521,7 +549,7 @@ function acceptContract(idx){
  if(offer.kind==="extension"){
    if(!isExtensionEligible()||offer.teamId!==S.team){toast("You are not eligible for this extension");return}
    const con=S.finance.contract;
-   con.pendingExtension={label:offer.label||"Contract Extension",type:"Extension",teamId:S.team,years:offer.years,total:offer.total,perGame:Math.round(offer.total/(offer.years*82))};
+   con.pendingExtension={label:offer.label||"Contract Extension",type:"Extension",teamId:S.team,years:offer.years,total:offer.total,perGame:Math.round(offer.total/(offer.years*82)),startYear:(S.year||1)+1};
    S.offseason.contractOffers=[];S.offseason.decisionMade=true;
    S.news.unshift("Agreed to a "+offer.years+"-year extension with "+currentTeamName()+". It begins after your current contract ends.");
    pushLeagueNews(S.player.name+" agreed to an extension with "+currentTeamName()+".");
@@ -533,7 +561,7 @@ function acceptContract(idx){
  if(!isFreeAgent()){toast("You are not eligible for free agency");return}
  if(offer.kind!=="freeAgency"){toast("Invalid contract offer");return}
  S.team=offer.teamId;
- S.finance.contract={label:offer.label,kind:"signed",type:"NBA Contract",teamId:offer.teamId,years:offer.years,yearsRemaining:offer.years,total:offer.total,perGame:Math.round(offer.total/(offer.years*82)),pendingExtension:null};
+ S.finance.contract={label:offer.label,kind:"signed",type:"NBA Contract",teamId:offer.teamId,years:offer.years,yearsRemaining:offer.years,total:offer.total,perGame:Math.round(offer.total/(offer.years*82)),pendingExtension:null,startYear:(S.year||1)+1,lastProcessedOffseasonYear:S.year||1};
  S.offseason.contractOffers=[];S.offseason.decisionMade=true;
  S.news.unshift("Signed with "+teamNameById(offer.teamId)+" for $"+offer.total.toLocaleString()+".");pushLeagueNews(S.player.name+" signed with "+teamNameById(offer.teamId)+".");
  save();render();toast("Contract signed")
