@@ -760,6 +760,24 @@ function updateLeagueEvolution(){
   S.nbaWorld.leagueEvents=S.nbaWorld.leagueEvents.slice(0,10)
  }
 }
+function updateLeaguePlayerCareers(){
+ if(S.nbaWorld.leagueCareerProcessedYear===S.year)return;ensureLeagueRosters();
+ const all=NBA_TEAMS.flatMap(t=>rosterFor(t.id).map(p=>({p,teamId:t.id})));
+ const allStarNames=new Set([...all].sort((a,b)=>((b.p.ppg||0)+(b.p.apg||0)*.55+(b.p.rpg||0)*.35)-((a.p.ppg||0)+(a.p.apg||0)*.55+(a.p.rpg||0)*.35)).slice(0,24).map(x=>x.p.name));
+ const champId=S.playoffs?.champion?S.team:(S.playoffBracket?.[4]?.[0]?.winner||null);
+ all.forEach(({p,teamId})=>{
+   if(!p.career)p.career={gp:0,pts:0,ast:0,reb:0,allStars:0,mvps:0,titles:0};
+   const gp=76+Math.round(Math.random()*6);p.career.gp+=gp;p.career.pts+=Math.round((p.ppg||0)*gp);p.career.ast+=Math.round((p.apg||0)*gp);p.career.reb+=Math.round((p.rpg||0)*gp);
+   if(allStarNames.has(p.name))p.career.allStars++;if(S.seasonAwards?.mvp===p.name)p.career.mvps++;if(champId===teamId)p.career.titles++
+ });
+ S.nbaWorld.leagueCareerProcessedYear=S.year
+}
+function leagueCareerLeadersHTML(){
+ ensureLeagueRosters();const all=NBA_TEAMS.flatMap(t=>rosterFor(t.id).map(p=>({...p,teamId:t.id}))).filter(p=>p.career);
+ const score=p=>(p.career.pts||0)+(p.career.mvps||0)*5000+(p.career.titles||0)*3500+(p.career.allStars||0)*900;
+ const top=[...all].sort((a,b)=>score(b)-score(a)).slice(0,10);
+ return '<section class="card s12"><span class="kicker">LEAGUE CAREERS</span><h2 style="margin:6px 0">Active Career Leaders</h2><div class="list">'+top.map((p,i)=>'<div class="item"><div><b>#'+(i+1)+' '+p.name+' • '+teamNameById(p.teamId)+'</b><small>'+Math.round(p.career.pts||0).toLocaleString()+' PTS • '+(p.career.allStars||0)+'× All-Star • '+(p.career.mvps||0)+' MVP • '+(p.career.titles||0)+' title(s)</small></div><span class="pill '+((p.ovr||0)>=90?'good':'')+'">'+(p.ovr||"—")+' OVR</span></div>').join("")+'</div></section>'
+}
 function developLeaguePlayers(){
  ensureLeagueRosters();
  NBA_TEAMS.forEach(t=>rosterFor(t.id).forEach(p=>{
@@ -790,7 +808,7 @@ function tradeRumorHTML(){
 }
 function startOffseason(){
  if(S.stage!=="Offseason"){
-   evaluateSeasonAwards();evaluateComebackSeason();processSeasonPromisesAndIncentives();archiveCompletedSeason();processContractSeasonEnd();S.nbaWorld.comebackEligible=(S.nbaWorld.loadManagement.missedInjury||0)>=3;
+   evaluateSeasonAwards();evaluateComebackSeason();processSeasonPromisesAndIncentives();updateLeaguePlayerCareers();archiveCompletedSeason();processContractSeasonEnd();S.nbaWorld.comebackEligible=(S.nbaWorld.loadManagement.missedInjury||0)>=3;
    if(S.finance.contract&&S.finance.contract.yearsRemaining===0)S.finance.contract.teamId=S.team;
    S.player.age++
  }
