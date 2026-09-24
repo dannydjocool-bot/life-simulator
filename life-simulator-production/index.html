@@ -149,9 +149,13 @@ const NBA_TEAMS=[
 ];
 const TIERS=[["Locked",0],["Bronze",60],["Silver",70],["Gold",82],["Legend",94]];
 const BADGES=[
-["Catch & Shoot","Shooting","Shooting",1],["Deadeye","Shooting","Shooting",.8,"IQ",.2],["Limitless Range","Shooting","Shooting",.9,"Athleticism",.1],["Clutch Shooter","Shooting","Shooting",.7,"IQ",.3],
-["Clamps","Defense","Defense",1],["Interceptor","Defense","Defense",.7,"IQ",.3],["Challenger","Defense","Defense",.85,"Athleticism",.15],
-["Dimer","Playmaking","Playmaking",.75,"IQ",.25],["Quick First Step","Playmaking","Playmaking",.65,"Athleticism",.35],["Needle Threader","Playmaking","Playmaking",.8,"IQ",.2],["Floor General","Playmaking","Playmaking",.55,"IQ",.45]
+["Posterizer","Finishing","Finishing",.72,"Athleticism",.28],["Fearless Finisher","Finishing","Finishing",.82,"IQ",.18],["Acrobat","Finishing","Finishing",.7,"Athleticism",.3],["Giant Slayer","Finishing","Finishing",.78,"IQ",.22],["Slithery Finisher","Finishing","Finishing",.68,"Playmaking",.32],["Float Game","Finishing","Finishing",.72,"Shooting",.28],
+["Catch & Shoot","Shooting","Shooting",1],["Deadeye","Shooting","Shooting",.8,"IQ",.2],["Limitless Range","Shooting","Shooting",.9,"Athleticism",.1],["Clutch Shooter","Shooting","Shooting",.7,"IQ",.3],["Green Machine","Shooting","Shooting",.82,"IQ",.18],["Agent 3","Shooting","Shooting",.72,"Playmaking",.28],["Middy Magician","Shooting","Shooting",.82,"Finishing",.18],["Heat Check","Shooting","Shooting",.68,"Athleticism",.32],
+["Dimer","Playmaking","Playmaking",.75,"IQ",.25],["Quick First Step","Playmaking","Playmaking",.65,"Athleticism",.35],["Needle Threader","Playmaking","Playmaking",.8,"IQ",.2],["Floor General","Playmaking","Playmaking",.55,"IQ",.45],["Handles for Days","Playmaking","Playmaking",.7,"Athleticism",.3],["Unpluckable","Playmaking","Playmaking",.82,"IQ",.18],["Ankle Breaker","Playmaking","Playmaking",.74,"Athleticism",.26],["Break Starter","Playmaking","Playmaking",.58,"IQ",.42],
+["Clamps","Defense","Defense",1],["Interceptor","Defense","Defense",.7,"IQ",.3],["Challenger","Defense","Defense",.85,"Athleticism",.15],["Pick Dodger","Defense","Defense",.72,"Athleticism",.28],["Anchor","Defense","Defense",.76,"IQ",.24],["Chase Down Artist","Defense","Defense",.58,"Athleticism",.42],["Glove","Defense","Defense",.74,"IQ",.26],
+["Boxout Beast","Rebounding","Defense",.48,"Athleticism",.52],["Rebound Chaser","Rebounding","Athleticism",.58,"Defense",.42],
+["Relentless Motor","Athleticism","Athleticism",.72,"IQ",.28],
+["Killer Instinct","Mental / Clutch","IQ",.52,"Shooting",.48],["Ice in Veins","Mental / Clutch","IQ",.62,"Playmaking",.38],["Road Warrior","Mental / Clutch","IQ",.55,"Athleticism",.45],["Big Game Player","Mental / Clutch","IQ",.5,"Shooting",.5]
 ];
 const DRILLS=[
 {id:"shoot",name:"Shooting Workout",min:55,energy:15,gains:{Shooting:[1,2]},xp:50,desc:"Core jumper mechanics and repetition."},
@@ -192,7 +196,7 @@ const STORE_ITEMS=[
 {id:"duplex",name:"Duplex Investment",type:"Real Estate",price:180000,income:4500,morale:0,desc:"Two-unit rental with stronger passive income."},
 {id:"house",name:"Luxury Home",type:"Housing",price:350000,income:0,morale:8,desc:"A major lifestyle upgrade once your career takes off."}
 ];
-const fresh=()=>({version:"0.9.0",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false},finance:{cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null},social:{followers:100,fame:0,posted:false,posts:0},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null},fullGame:null,postgameMedia:null,mediaProfile:{interviews:0,rivalryHeat:0},news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
+const fresh=()=>({version:"0.9.1",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false},finance:{cash:1000,earnings:0,owned:[],sponsor:null,sponsors:[],contract:null},social:{followers:100,fame:0,posted:false,posts:0},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null},fullGame:null,postgameMedia:null,mediaProfile:{interviews:0,rivalryHeat:0},news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
 function merge(a,b){for(const k in b){if(a[k]===undefined)a[k]=b[k];else if(a[k]&&b[k]&&typeof a[k]==="object"&&!Array.isArray(a[k])&&!Array.isArray(b[k]))merge(a[k],b[k])}return a}
 const SAVE_SLOT_COUNT=3;
 let activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+(localStorage.getItem("mycareer-active-slot")||1)));
@@ -460,9 +464,9 @@ function answerBackFull(type){
  const g=S.fullGame;if(!g||!g.pendingAnswer)return;
  const challenge=g.pendingAnswer;g.pendingAnswer=null;
  const a=S.player.attrs;let skill=(a.Shooting+a.Finishing+a.IQ)/3;
- if(type==="three")skill=a.Shooting+badgeRank("Clutch Shooter")*3+badgeRank("Deadeye")*2;
- if(type==="drive")skill=(a.Finishing+a.Athleticism)/2+badgeRank("Quick First Step")*3;
- if(type==="playmake")skill=(a.Playmaking+a.IQ)/2+badgeRank("Dimer")*2;
+ if(type==="three")skill=a.Shooting+badgeRank("Clutch Shooter")*3+badgeRank("Deadeye")*2+badgeRank("Killer Instinct")*2+badgeRank("Big Game Player")*2;
+ if(type==="drive")skill=(a.Finishing+a.Athleticism)/2+badgeRank("Quick First Step")*3+badgeRank("Posterizer")*2+badgeRank("Fearless Finisher")*1.5+badgeRank("Killer Instinct")*2;
+ if(type==="playmake")skill=(a.Playmaking+a.IQ)/2+badgeRank("Dimer")*2+badgeRank("Ice in Veins")*2+badgeRank("Floor General")*1.5;
  const success=Math.random()*100<Math.max(32,Math.min(92,skill+(g.hype||30)*.08));
  g.energy=Math.max(20,g.energy-8);
  if(success){
@@ -535,36 +539,57 @@ function halftimeChoice(type){
  if(type==="team")S.player.chemistry=Math.min(100,S.player.chemistry+2);
  fullLog("Second half adjustment: "+({aggressive:"stay aggressive",defense:"lock in defensively",team:"get teammates involved",energy:"conserve energy"}[type]||type)+".");closeModal();save();render()
 }
+function venueBadgeBoost(g){
+ if(!g)return 0;
+ if(g.homeAway==="AWAY")return badgeRank("Road Warrior")*1.7;
+ if(g.homeAway==="HOME")return badgeRank("Big Game Player")*.65;
+ return 0
+}
+function bigGameBadgeBoost(g){
+ if(!g)return 0;
+ const audience=(g.peakViewers||g.viewers||0);
+ return (g.playoff?badgeRank("Big Game Player")*2:0)+(audience>=5000000?badgeRank("Big Game Player")*1.5:0)
+}
+function finishingBadgeBoost(){return ["Posterizer","Fearless Finisher","Acrobat","Giant Slayer","Slithery Finisher"].reduce((s,n)=>s+badgeRank(n)*1.35,0)}
+function shootingStreakBoost(g,type){
+ if(!g)return 0;
+ const makes=g.stats&&g.stats.fgm||0,miss=g.stats&&g.stats.fga||0;
+ let v=0;if(makes>=2)v+=badgeRank("Green Machine")*1.4;if(makes>=3)v+=badgeRank("Heat Check")*1.6;
+ if(type==="three")v+=badgeRank("Agent 3")*1.4;
+ if(type==="mid")v+=badgeRank("Middy Magician")*1.8;
+ return v-Math.max(0,miss-makes)*.15
+}
 function fullOffense(type){
  const g=S.fullGame;if(!g||!g.active||!g.onCourt||g.turn!=="offense")return;
- const a=S.player.attrs,adj=g.adjustment,energyMod=(g.energy-50)*.12;let chance=55,pts=0,assist=false,cost=5;
- if(type==="drive"){chance=(a.Finishing*.62+a.Athleticism*.28+a.IQ*.1)+energyMod+badgeRank("Quick First Step")*2;pts=2;cost=8}
- if(type==="mid"){chance=a.Shooting*.78+a.IQ*.22+energyMod;pts=2;cost=5}
- if(type==="three"){chance=a.Shooting*.82+a.IQ*.18+energyMod+badgeRank("Deadeye")*2;pts=3;cost=6}
- if(type==="pnr"){chance=a.Playmaking*.5+a.IQ*.35+a.Shooting*.15+badgeRank("Dimer")*2;pts=2;assist=true;cost=5}
- if(type==="pass"){chance=a.Playmaking*.55+a.IQ*.45+S.player.chemistry*.08;assist=true;pts=2;cost=3}
+ const a=S.player.attrs,adj=g.adjustment,energyMod=(g.energy-50)*.12,venue=venueBadgeBoost(g),big=bigGameBadgeBoost(g);let chance=55,pts=0,assist=false,cost=5;
+ if(type==="drive"){chance=(a.Finishing*.62+a.Athleticism*.28+a.IQ*.1)+energyMod+badgeRank("Quick First Step")*2+finishingBadgeBoost()+venue+big;pts=2;cost=Math.max(4,8-badgeRank("Relentless Motor"))}
+ if(type==="mid"){chance=a.Shooting*.78+a.IQ*.22+energyMod+shootingStreakBoost(g,"mid")+venue+big;pts=2;cost=5}
+ if(type==="three"){chance=a.Shooting*.82+a.IQ*.18+energyMod+badgeRank("Deadeye")*2+shootingStreakBoost(g,"three")+venue+big;pts=3;cost=6}
+ if(type==="pnr"){chance=a.Playmaking*.5+a.IQ*.35+a.Shooting*.15+badgeRank("Dimer")*2+badgeRank("Needle Threader")*1.2+venue;pts=2;assist=true;cost=Math.max(3,5-badgeRank("Handles for Days")*.4)}
+ if(type==="pass"){chance=a.Playmaking*.55+a.IQ*.45+S.player.chemistry*.08+badgeRank("Floor General")*1.5+badgeRank("Break Starter")*.8;assist=true;pts=2;cost=3}
  if(adj==="aggressive"&&type!=="pass"&&type!=="pnr")chance+=5;
  if(adj==="team"&&(type==="pass"||type==="pnr"))chance+=7;
- const turnover=Math.random()*100>Math.min(96,a.Playmaking*.7+a.IQ*.3+22);
+ const ballSecurity=badgeRank("Unpluckable")*3+badgeRank("Handles for Days")*1.4;
+ const turnover=Math.random()*100>Math.min(98,a.Playmaking*.7+a.IQ*.3+22+ballSecurity);
  if(turnover){g.stats.tov++;fullGrade(-3);g.energy=Math.max(20,g.energy-cost);fullLog("Turnover on the possession.");g.turn="defense";fullAdvance(38);save();render();return}
- const made=Math.random()*100<Math.max(28,Math.min(91,chance));
+ const made=Math.random()*100<Math.max(28,Math.min(94,chance));
  g.stats.fga++;if(type==="three")g.stats.tpa++;
- if(made){g.team+=pts;g.stats.fgm++;if(type==="three")g.stats.tpm++;if(assist&&Math.random()<.72){g.stats.ast++;fullGrade(2);fullLog("Great read — teammate converts off your setup.")}else{g.stats.pts+=pts;fullGrade(type==="three"?2.2:1.5);fullLog(type==="three"?"Knocked down the three.":"You convert the scoring chance.")}}
+ if(made){g.team+=pts;g.stats.fgm++;if(type==="three")g.stats.tpm++;if(assist&&Math.random()<Math.min(.9,.72+badgeRank("Dimer")*.025)){g.stats.ast++;fullGrade(2);fullLog("Great read — teammate converts off your setup.")}else{g.stats.pts+=pts;fullGrade(type==="three"?2.2:1.5);fullLog(type==="three"?"Knocked down the three.":"You convert the scoring chance.")}}
  else {fullGrade(-.7);fullLog("Shot misses. Get back on defense.")}
  g.energy=Math.max(20,g.energy-cost);g.stint+=.65;g.turn="defense";fullAdvance(36+Math.floor(Math.random()*20));save();render()
 }
 function fullDefense(type){
  const g=S.fullGame;if(!g||!g.active||!g.onCourt||g.turn!=="defense")return;
- const a=S.player.attrs,adj=g.adjustment;let stop=a.Defense*.55+a.IQ*.25+a.Athleticism*.2,cost=4;
- if(type==="pressure"){stop+=5+badgeRank("Clamps")*2;cost=7}
- if(type==="steal"){stop-=5;cost=6}
- if(type==="help"){stop+=a.IQ*.08;cost=4}
- if(type==="rebound"){stop+=a.Athleticism*.06;cost=5}
+ const a=S.player.attrs,adj=g.adjustment,venue=venueBadgeBoost(g),big=bigGameBadgeBoost(g);let stop=a.Defense*.55+a.IQ*.25+a.Athleticism*.2+venue+big,cost=4;
+ if(type==="pressure"){stop+=5+badgeRank("Clamps")*2+badgeRank("Pick Dodger")*1.3;cost=7}
+ if(type==="steal"){stop-=5-badgeRank("Glove")*1.7;cost=6}
+ if(type==="help"){stop+=a.IQ*.08+badgeRank("Anchor")*2+badgeRank("Chase Down Artist")*1.2;cost=4}
+ if(type==="rebound"){stop+=a.Athleticism*.06+badgeRank("Rebound Chaser")*2+badgeRank("Boxout Beast")*1.5;cost=5}
  if(adj==="defense")stop+=8;
- let foulChance=type==="steal"?14:type==="pressure"?9:4;
+ let foulChance=(type==="steal"?14:type==="pressure"?9:4)-badgeRank("Glove")*.6-badgeRank("Anchor")*.35;
  if(Math.random()*100<foulChance){g.stats.pf++;fullGrade(-1.5);g.oppScore+=Math.random()<.72?2:1;fullLog("Whistle — defensive foul.");if(g.stats.pf>=6){g.fouledOut=true;g.onCourt=false;fullLog("You fouled out. The rest of the game will be simulated.");}}
- else if(type==="steal"&&Math.random()*100<Math.max(8,(a.Defense+a.IQ)/5)){g.stats.stl++;fullGrade(3);fullLog("You jump the passing lane for a steal.");}
- else if(Math.random()*100<Math.max(30,Math.min(88,stop))){if(type==="rebound"||Math.random()<.4){g.stats.reb++;fullGrade(1.5);fullLog("Defensive stop and you secure the rebound.")}else{if(type==="help"&&Math.random()<.18){g.stats.blk++;fullGrade(2.5);fullLog("Perfect help defense — blocked shot.")}else{fullGrade(1);fullLog("Strong defense forces a miss.")}}}
+ else if(type==="steal"&&Math.random()*100<Math.max(8,(a.Defense+a.IQ)/5+badgeRank("Glove")*3)){g.stats.stl++;fullGrade(3);fullLog("You rip the ball loose for a steal.");}
+ else if(Math.random()*100<Math.max(30,Math.min(92,stop))){if(type==="rebound"||Math.random()<.4+badgeRank("Rebound Chaser")*.025){g.stats.reb++;fullGrade(1.5);fullLog("Defensive stop and you secure the rebound.")}else{if(type==="help"&&Math.random()<.18+badgeRank("Anchor")*.03+badgeRank("Chase Down Artist")*.02){g.stats.blk++;fullGrade(2.5);fullLog("Perfect help defense — blocked shot.")}else{fullGrade(1);fullLog("Strong defense forces a miss.")}}}
  else {const pts=Math.random()<.28?3:2;g.oppScore+=pts;fullGrade(-1);fullLog(g.opp+" scores "+pts+".")}
  g.energy=Math.max(20,g.energy-cost);g.stint+=.65;g.turn="offense";if(!maybeOpponentStarMoment())fullAdvance(34+Math.floor(Math.random()*22));save();render()
 }
@@ -579,7 +604,7 @@ function fullGameView(){
 function gradeValue(letter){return {"A+":5,"A":4.5,"A-":4,"B+":3.5,"B":3,"B-":2.5,"C+":2,"C":1.5,"C-":1,"D+":.5,"D":0}[letter]||0}
 function fullGameFollowerGain(g,out){
  const peak=Math.max(0,g.peakViewers||0),grade=gameGradeLetter(g.grade),perf=g.stats;
- let gain=Math.round(peak*.0012+perf.pts*120+perf.ast*180+perf.reb*100+gradeValue(grade)*650+(g.hype||0)*45);
+ let gain=Math.round(peak*.0012+perf.pts*120+perf.ast*180+perf.reb*100+gradeValue(grade)*650+(g.hype||0)*45);gain=Math.round(gain*(1+badgeRank("Big Game Player")*.04));
  if(out.win)gain=Math.round(gain*1.15);
  if(g.playoff)gain=Math.round(gain*(S.playoffs&&S.playoffs.round===4?2.2:1.55));
  if(perf.pts>=40)gain+=8000;else if(perf.pts>=30)gain+=3500;
@@ -625,7 +650,7 @@ function finishFullGame(){
  if(interview)openPostgameInterview();else{S.news.unshift(S.postgameMedia.headline);pushLeagueNews(S.postgameMedia.headline);S.postgameMedia.pending=false;save();render();toast((out.win?"FULL GAME WIN":"FULL GAME LOSS")+" • +"+followersGain.toLocaleString()+" followers")}
 }
 function liveGame(){const g=S.live;return '<div class="grid" style="margin-top:0"><section class="card s8"><span class="pill bad">4TH • CLUTCH</span><h3 style="margin-top:14px">'+currentTeamName()+' '+g.team+' — '+g.oppScore+' '+g.opp+'</h3><p class="muted">'+(g.lastMessage||"Coach puts the ball in your hands.")+' Choose your action.</p><div class="list"><button class="btn" data-moment="iso">Attack the switch • Finishing + Athleticism • Quick First Step</button><button class="btn" data-moment="three">Hunt the three • Shooting • Clutch Shooter / Deadeye</button><button class="btn" data-moment="pnr">Run pick-and-roll • Playmaking + IQ • Dimer / Needle Threader</button><button class="btn" data-moment="team">Make the team play • IQ + Trust • Floor General</button></div></section><section class="card"><h3>Your Line</h3><div class="big">'+g.pts+'</div>'+row("Assists",g.ast)+row("Rebounds",g.reb)+row("Energy",S.player.energy)+row("Clutch chance",Math.min(MAX_CLUTCH_POSSESSIONS,(g.clutchPossessions||0)+1)+"/"+MAX_CLUTCH_POSSESSIONS)+'</section></div>'}
-function player(){const p=S.player;const overall=ovr();const best=Object.entries(p.attrs).sort((a,b)=>b[1]-a[1]).slice(0,2);const available=DRILLS.filter(d=>overall>=d.min);const locked=DRILLS.filter(d=>overall<d.min);return '<div class="grid" style="margin-top:0"><section class="card s12"><div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"><div><span class="kicker">PLAYER OVERVIEW</span><h2 style="margin:5px 0 4px;font-size:28px">'+p.name+'</h2><p class="muted" style="margin:0">'+p.position+' • '+p.height+' • '+p.archetype+' • '+S.stage+(S.college?" • "+S.college:"")+'</p></div><div style="text-align:center;min-width:96px"><div class="big" style="font-size:48px;line-height:1">'+overall+'</div><small class="muted" style="font-weight:900;letter-spacing:1px">OVERALL</small></div></div><div class="actions" style="margin-top:14px"><span class="pill good">LV '+p.level+'</span><span class="pill">'+best[0][0]+' '+best[0][1]+'</span><span class="pill">'+best[1][0]+' '+best[1][1]+'</span></div></section><section class="card s8"><h3>Attributes <span class="pill" style="float:right">'+overall+' OVR</span></h3>'+Object.entries(p.attrs).map(([k,v])=>meter(k,v)).join("")+'</section><section class="card"><h3>Development</h3><div class="big">LV '+p.level+'</div><p class="muted">'+p.xp+'/'+(p.level*220)+' XP</p>'+meter("Energy",p.energy)+meter("Draft Stock",p.draft)+'</section><section class="card s12"><h3>Training Gym <span class="pill" style="float:right">'+Math.max(0,S.training.max-S.training.used)+' LEFT</span></h3><p class="muted">'+S.training.used+'/'+S.training.max+' sessions used. Higher OVR unlocks advanced drills. All sessions reset after a game.</p><div class="grid" style="margin-top:10px">'+available.map(d=>'<div class="card" style="grid-column:span 4"><b>'+d.name+'</b><p class="muted">'+d.desc+'</p><small class="muted">'+d.energy+' energy • unlock '+d.min+' OVR</small><div style="margin-top:10px"><button class="btn" data-drill="'+d.id+'" '+(S.training.used>=S.training.max?'disabled':'')+'>Train</button></div></div>').join("")+(locked.length?'<div class="card" style="grid-column:1/-1"><h3>Locked Drills</h3>'+locked.map(d=>'<div class="row"><span>'+d.name+'</span><span class="pill">'+d.min+' OVR</span></div>').join("")+'</div>':'')+'</div>'+(S.training.used>=S.training.max?'<div class="item" style="margin-top:10px"><div><b>Training Locked</b><small>Play your next game to unlock '+S.training.max+' new sessions.</small></div><span class="pill bad">0 LEFT</span></div>':'')+'<div class="actions"><button class="btn good" id="restBtn" '+(S.training.recovered?'disabled':'')+'>'+(S.training.recovered?'Recovery Used — Play Next Game':'Recovery Day • 100% Energy +3 Training')+'</button></div></section><section class="card s6"><h3>Badge Rarity</h3><p class="muted">Bronze: 60 fit • Silver: 70 fit + 70 OVR • Gold: 82 fit + 80 OVR • Legend: 94 fit + 90 OVR.</p></section><section class="card s6"><h3>Career Money</h3><div class="big">$'+Math.round(S.finance.cash).toLocaleString()+'</div><p class="muted">Career earnings: $'+Math.round(S.finance.earnings).toLocaleString()+'</p><button class="btn" data-go="life">Store & Sponsorships</button></section><section class="card s12"><h3>Player Stats</h3>'+statLineCard()+'</section><section class="card s6"><h3>Team Role</h3>'+row("Role",p.role||"Rotation")+row("Minutes",(p.minutes||22)+" MPG")+meter("Coach Trust",p.trust)+meter("Chemistry",p.chemistry||60)+(p.injury?'<div class="item"><div><b>'+p.injury.name+'</b><small>'+p.injury.gamesLeft+' games remaining</small></div><span class="pill bad">INJURED</span></div>':'')+'</section><section class="card s6"><h3>Career Resume</h3>'+row("Age",p.age)+row("Contract",S.finance.contract?(S.finance.contract.yearsRemaining||S.finance.contract.years||0)+" years remaining":"Free Agent")+'<div class="list">'+(S.accolades.length?S.accolades.map(a=>'<div class="item"><b>'+a+'</b></div>').join(""):'<p class="muted">No NBA accolades yet.</p>')+'</div></section><section class="card s12"><h3>Appearance & Identity</h3><div class="appearanceCard"><div>'+avatarMarkup("md",p)+'</div><div style="flex:1;min-width:220px"><div class="row"><span>Jersey</span><strong>#'+p.number+'</strong></div><div class="row"><span>Hair</span><strong>'+p.appearance.hairStyle+' / '+p.appearance.hairColor+'</strong></div><div class="row"><span>Accessory</span><strong>'+p.appearance.accessory+'</strong></div><div class="actions"><button class="btn primary" id="editAppearance">Customize Face & Look</button></div></div></div></section><section class="card s12"><h3>Badges</h3><div class="badgeCats">'+["Shooting","Defense","Playmaking"].map(badgeSection).join("")+'</div></section></div>'}
+function player(){const p=S.player;const overall=ovr();const best=Object.entries(p.attrs).sort((a,b)=>b[1]-a[1]).slice(0,2);const available=DRILLS.filter(d=>overall>=d.min);const locked=DRILLS.filter(d=>overall<d.min);return '<div class="grid" style="margin-top:0"><section class="card s12"><div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap"><div><span class="kicker">PLAYER OVERVIEW</span><h2 style="margin:5px 0 4px;font-size:28px">'+p.name+'</h2><p class="muted" style="margin:0">'+p.position+' • '+p.height+' • '+p.archetype+' • '+S.stage+(S.college?" • "+S.college:"")+'</p></div><div style="text-align:center;min-width:96px"><div class="big" style="font-size:48px;line-height:1">'+overall+'</div><small class="muted" style="font-weight:900;letter-spacing:1px">OVERALL</small></div></div><div class="actions" style="margin-top:14px"><span class="pill good">LV '+p.level+'</span><span class="pill">'+best[0][0]+' '+best[0][1]+'</span><span class="pill">'+best[1][0]+' '+best[1][1]+'</span></div></section><section class="card s8"><h3>Attributes <span class="pill" style="float:right">'+overall+' OVR</span></h3>'+Object.entries(p.attrs).map(([k,v])=>meter(k,v)).join("")+'</section><section class="card"><h3>Development</h3><div class="big">LV '+p.level+'</div><p class="muted">'+p.xp+'/'+(p.level*220)+' XP</p>'+meter("Energy",p.energy)+meter("Draft Stock",p.draft)+'</section><section class="card s12"><h3>Training Gym <span class="pill" style="float:right">'+Math.max(0,S.training.max-S.training.used)+' LEFT</span></h3><p class="muted">'+S.training.used+'/'+S.training.max+' sessions used. Higher OVR unlocks advanced drills. All sessions reset after a game.</p><div class="grid" style="margin-top:10px">'+available.map(d=>'<div class="card" style="grid-column:span 4"><b>'+d.name+'</b><p class="muted">'+d.desc+'</p><small class="muted">'+d.energy+' energy • unlock '+d.min+' OVR</small><div style="margin-top:10px"><button class="btn" data-drill="'+d.id+'" '+(S.training.used>=S.training.max?'disabled':'')+'>Train</button></div></div>').join("")+(locked.length?'<div class="card" style="grid-column:1/-1"><h3>Locked Drills</h3>'+locked.map(d=>'<div class="row"><span>'+d.name+'</span><span class="pill">'+d.min+' OVR</span></div>').join("")+'</div>':'')+'</div>'+(S.training.used>=S.training.max?'<div class="item" style="margin-top:10px"><div><b>Training Locked</b><small>Play your next game to unlock '+S.training.max+' new sessions.</small></div><span class="pill bad">0 LEFT</span></div>':'')+'<div class="actions"><button class="btn good" id="restBtn" '+(S.training.recovered?'disabled':'')+'>'+(S.training.recovered?'Recovery Used — Play Next Game':'Recovery Day • 100% Energy +3 Training')+'</button></div></section><section class="card s6"><h3>Badge Rarity</h3><p class="muted">Bronze: 60 fit • Silver: 70 fit + 70 OVR • Gold: 82 fit + 80 OVR • Legend: 94 fit + 90 OVR.</p></section><section class="card s6"><h3>Career Money</h3><div class="big">$'+Math.round(S.finance.cash).toLocaleString()+'</div><p class="muted">Career earnings: $'+Math.round(S.finance.earnings).toLocaleString()+'</p><button class="btn" data-go="life">Store & Sponsorships</button></section><section class="card s12"><h3>Player Stats</h3>'+statLineCard()+'</section><section class="card s6"><h3>Team Role</h3>'+row("Role",p.role||"Rotation")+row("Minutes",(p.minutes||22)+" MPG")+meter("Coach Trust",p.trust)+meter("Chemistry",p.chemistry||60)+(p.injury?'<div class="item"><div><b>'+p.injury.name+'</b><small>'+p.injury.gamesLeft+' games remaining</small></div><span class="pill bad">INJURED</span></div>':'')+'</section><section class="card s6"><h3>Career Resume</h3>'+row("Age",p.age)+row("Contract",S.finance.contract?(S.finance.contract.yearsRemaining||S.finance.contract.years||0)+" years remaining":"Free Agent")+'<div class="list">'+(S.accolades.length?S.accolades.map(a=>'<div class="item"><b>'+a+'</b></div>').join(""):'<p class="muted">No NBA accolades yet.</p>')+'</div></section><section class="card s12"><h3>Appearance & Identity</h3><div class="appearanceCard"><div>'+avatarMarkup("md",p)+'</div><div style="flex:1;min-width:220px"><div class="row"><span>Jersey</span><strong>#'+p.number+'</strong></div><div class="row"><span>Hair</span><strong>'+p.appearance.hairStyle+' / '+p.appearance.hairColor+'</strong></div><div class="row"><span>Accessory</span><strong>'+p.appearance.accessory+'</strong></div><div class="actions"><button class="btn primary" id="editAppearance">Customize Face & Look</button></div></div></div></section><section class="card s12"><h3>Badges</h3><div class="badgeCats">'+["Finishing","Shooting","Playmaking","Defense","Rebounding","Athleticism","Mental / Clutch"].map(badgeSection).join("")+'</div></section></div>'}
 function badgeScore(b){let v=S.player.attrs[b[2]]*b[3];if(b[4])v+=S.player.attrs[b[4]]*b[5];return Math.round(v)}
 function tier(v){
   const overall=ovr();
@@ -657,13 +682,13 @@ function modal(h){$("modal").innerHTML=h;$("modalWrap").classList.remove("hidden
 function badgeRank(name){const b=BADGES.find(x=>x[0]===name);if(!b)return 0;const t=tier(badgeScore(b));return {Locked:0,Bronze:1,Silver:2,Gold:3,Legend:4}[t]||0}
 function clutchBadgeBoost(type){
  let names=[];
- if(type==="three")names=["Clutch Shooter","Deadeye","Limitless Range","Catch & Shoot"];
- else if(type==="iso")names=["Quick First Step","Clutch Shooter"];
- else if(type==="pnr")names=["Dimer","Needle Threader","Floor General"];
- else names=["Floor General","Dimer","Needle Threader"];
+ if(type==="three")names=["Clutch Shooter","Deadeye","Limitless Range","Catch & Shoot","Killer Instinct","Ice in Veins","Big Game Player"];
+ else if(type==="iso")names=["Quick First Step","Posterizer","Fearless Finisher","Slithery Finisher","Killer Instinct","Ice in Veins"];
+ else if(type==="pnr")names=["Dimer","Needle Threader","Floor General","Ice in Veins"];
+ else names=["Floor General","Dimer","Needle Threader","Big Game Player"];
  return names.reduce((sum,n)=>sum+badgeRank(n)*2.5,0)
 }
-function defensiveClutchBoost(){return ["Clamps","Challenger","Interceptor"].reduce((sum,n)=>sum+badgeRank(n)*2,0)}
+function defensiveClutchBoost(){return ["Clamps","Challenger","Interceptor","Anchor","Glove","Big Game Player"].reduce((sum,n)=>sum+badgeRank(n)*2,0)}
 function clutchResponseChance(type){
  const a=S.player.attrs;
  const base=28+(ovr()-60)*1.15+(a.IQ-55)*.35+(S.player.energy-45)*.12+clutchBadgeBoost(type);
