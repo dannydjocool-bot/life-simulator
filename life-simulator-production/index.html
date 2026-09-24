@@ -778,6 +778,25 @@ function leagueCareerLeadersHTML(){
  const top=[...all].sort((a,b)=>score(b)-score(a)).slice(0,10);
  return '<section class="card s12"><span class="kicker">LEAGUE CAREERS</span><h2 style="margin:6px 0">Active Career Leaders</h2><div class="list">'+top.map((p,i)=>'<div class="item"><div><b>#'+(i+1)+' '+p.name+' • '+teamNameById(p.teamId)+'</b><small>'+Math.round(p.career.pts||0).toLocaleString()+' PTS • '+(p.career.allStars||0)+'× All-Star • '+(p.career.mvps||0)+' MVP • '+(p.career.titles||0)+' title(s)</small></div><span class="pill '+((p.ovr||0)>=90?'good':'')+'">'+(p.ovr||"—")+' OVR</span></div>').join("")+'</div></section>'
 }
+function teamDirection(teamId){const r=S.leagueStandings?.[teamId]||{w:41,l:41};return r.w>=48?"Contender":r.w<=32?"Rebuilding":"Balanced"}
+function freeAgentDestination(player,currentTeamId){
+ const teams=NBA_TEAMS.map(t=>{const dir=teamDirection(t.id),r=S.leagueStandings?.[t.id]||{w:41,l:41},top=rosterFor(t.id)[0],youth=Math.max(0,29-(player.age||27)),pot=player.potential||player.ovr||75,ov=player.ovr||75;let score=Math.random()*12;
+  if(dir==="Contender")score+=ov*.18+r.w*.18;if(dir==="Rebuilding")score+=pot*.22+youth*.8;if(dir==="Balanced")score+=ov*.11+pot*.1;
+  if(player.personality==="Loyal"&&t.id===currentTeamId)score+=22;if(player.personality==="Ring Chaser"&&dir==="Contender")score+=24;if(player.personality==="Competitive")score+=r.w*.16;if(player.personality==="Money-Focused")score+=Math.random()*24;if(player.personality==="Leader"&&(!top||(top.ovr||75)<ov))score+=12;
+  if(t.id===currentTeamId)score+=5;return {team:t,score,dir}
+ }).sort((a,b)=>b.score-a.score);return teams[0]
+}
+function processLeagueFreeAgency(){
+ if(S.nbaWorld.leagueFAProcessedYear===S.year)return;ensureLeagueRosters();ensureLeagueStandings();const free=[];
+ NBA_TEAMS.forEach(t=>rosterFor(t.id).forEach(p=>{p.contractYears=Math.max(0,(p.contractYears||1)-1);p.age=(p.age||27)+1;if(p.contractYears===0)free.push({p,from:t.id})}));
+ free.sort((a,b)=>(b.p.ovr||0)-(a.p.ovr||0));
+ free.forEach(({p,from})=>{const pick=freeAgentDestination(p,from),to=pick.team.id,years=p.age>=33?2:2+Math.floor(Math.random()*3);p.contractYears=years;p.contractValue=Math.round((p.ovr||75)*(p.ovr||75)*26000*years);
+  if(to!==from){const src=rosterFor(from),idx=src.indexOf(p);if(idx>=0)src.splice(idx,1);rosterFor(to).push(p);const msg=p.name+" signed with "+teamNameById(to)+" after leaving "+teamNameById(from)+" • "+years+" years • "+pick.dir;S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg)}
+  else if((p.ovr||0)>=82){const msg=p.name+" re-signed with "+teamNameById(from)+" for "+years+" years.";S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg)}
+ });
+ S.nbaWorld.leagueTransactions=S.nbaWorld.leagueTransactions.slice(0,30);NBA_TEAMS.forEach(t=>rosterFor(t.id).sort((a,b)=>(b.ovr||0)-(a.ovr||0)||(b.ppg||0)-(a.ppg||0)));S.nbaWorld.leagueFAProcessedYear=S.year
+}
+function leagueTransactionsHTML(){return '<section class="card s12"><h3>League Transactions</h3><div class="list">'+(S.nbaWorld.leagueTransactions.length?S.nbaWorld.leagueTransactions.slice(0,10).map(x=>'<div class="item"><small>'+x+'</small></div>').join(""):'<div class="item"><small>No major AI free-agent moves yet.</small></div>')+'</div></section>'}
 function developLeaguePlayers(){
  ensureLeagueRosters();
  NBA_TEAMS.forEach(t=>rosterFor(t.id).forEach(p=>{
@@ -808,7 +827,7 @@ function tradeRumorHTML(){
 }
 function startOffseason(){
  if(S.stage!=="Offseason"){
-   evaluateSeasonAwards();evaluateComebackSeason();processSeasonPromisesAndIncentives();updateLeaguePlayerCareers();archiveCompletedSeason();processContractSeasonEnd();S.nbaWorld.comebackEligible=(S.nbaWorld.loadManagement.missedInjury||0)>=3;
+   evaluateSeasonAwards();evaluateComebackSeason();processSeasonPromisesAndIncentives();updateLeaguePlayerCareers();archiveCompletedSeason();processLeagueFreeAgency();processContractSeasonEnd();S.nbaWorld.comebackEligible=(S.nbaWorld.loadManagement.missedInjury||0)>=3;
    if(S.finance.contract&&S.finance.contract.yearsRemaining===0)S.finance.contract.teamId=S.team;
    S.player.age++
  }
