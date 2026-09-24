@@ -663,9 +663,9 @@ function evaluateSeasonAwards(){
  awards.dpoy=dpoyCandidates[0]&&((dpoyCandidates[0].ovr||75)*.45+(dpoyCandidates[0].rpg||0)*2.2)>userD?dpoyCandidates[0].name:(p.attrs.Defense>=88?p.name:(dpoyCandidates[0]?.name||"Defensive Star"));
  const rookies=leaguePlayers.filter(x=>x.source==="rookie"&&(x.draftYear===S.year||x.yearsPro<=1)).sort((a,b)=>((b.ppg||0)+(b.apg||0)*.65+(b.rpg||0)*.4)-((a.ppg||0)+(a.apg||0)*.65+(a.rpg||0)*.4));
  awards.roty=S.year===1&&s.ppg>=18?p.name:(rookies[0]?rookies[0].name:"Rookie Star");
- awards.allNBA=s.ppg>=24?p.name:null;awards.allStar=s.ppg>=18?p.name:null;S.seasonAwards=awards;
+ awards.allNBA=s.ppg>=24?p.name:null;awards.allStar=(S.nbaWorld.allStar&&S.nbaWorld.allStar.year===S.year&&S.nbaWorld.allStar.selected)?p.name:null;S.seasonAwards=awards;
  const add=a=>{if(a&&!S.accolades.includes(a))S.accolades.push(a)};
- if(awards.allStar===p.name){add("All-Star");if(!(S.nbaWorld.allStar&&S.nbaWorld.allStar.year===S.year&&S.nbaWorld.allStar.selected))S.nbaWorld.allStarSelections=(S.nbaWorld.allStarSelections||0)+1}
+ if(awards.allStar===p.name)add("All-Star")
  if(awards.allNBA===p.name)add("All-NBA");if(awards.mvp===p.name)add("MVP");if(awards.dpoy===p.name)add("Defensive Player of the Year");if(awards.roty===p.name)add("Rookie of the Year");
  if(awards.allNBA===p.name)addCareerPathXP("superstar",35);if(awards.mvp===p.name)addCareerPathXP("superstar",90);if(awards.dpoy===p.name)addCareerPathXP("superstar",45);if((S.year||1)>=5)addCareerPathXP("veteran",30)
 }
@@ -964,6 +964,11 @@ function maybeTriggerAllStarBreak(){
  const teamGames=(S.record?.w||0)+(S.record?.l||0),a=S.nbaWorld.allStar||{};
  if(teamGames<41)return false;
  if(a.year===S.year&&(a.breakActive||a.completed))return a.breakActive;
+ // Never interrupt a migrated/older save after the real midseason window has already passed.
+ if(teamGames>41){
+   S.nbaWorld.allStar={year:S.year,selected:false,pending:false,breakActive:false,completed:true,events:{},captains:[],teams:[],pool:[]};
+   return false
+ }
  const pool=allStarVotePool(),selected=pool.slice(0,24),draft=buildAllStarTeams(selected),userSelected=selected.some(x=>x.user);
  S.nbaWorld.allStar={year:S.year,selected:userSelected,pending:userSelected,breakActive:true,completed:false,events:{three:false,skills:false,dunk:false,game:false},captains:draft.captains,teams:draft.teams,pool:selected};
  if(userSelected){
@@ -983,14 +988,16 @@ function allStarWeekendHTML(){
  const captainHTML=caps.length===2?'<section class="card s12"><span class="kicker">FAN VOTE CAPTAINS</span><div class="grid"><div class="card s6"><h3>#1 '+caps[0].name+'</h3><p class="muted">'+caps[0].team+' • '+caps[0].votes.toLocaleString()+' votes</p></div><div class="card s6"><h3>#2 '+caps[1].name+'</h3><p class="muted">'+caps[1].team+' • '+caps[1].votes.toLocaleString()+' votes</p></div></div></section>':'';
  const teamsHTML=teams.length===2?'<section class="card s12"><h3>Captain Draft Results</h3><div class="grid"><div class="card s6"><h3>Team '+teams[0].captain.name+'</h3><div class="list">'+teams[0].players.map(allStarPlayerRow).join("")+'</div></div><div class="card s6"><h3>Team '+teams[1].captain.name+'</h3><div class="list">'+teams[1].players.map(allStarPlayerRow).join("")+'</div></div></div></section>':'';
  if(!a.selected)return '<section class="card s12"><span class="kicker">NBA ALL-STAR BREAK</span><h2 style="margin:6px 0">Midseason Break • 41 Team Games</h2><p class="muted">You were not selected this season, but the league has paused before Game 42.</p><button class="btn primary" id="continueAllStarBreakBtn">Continue After All-Star Break</button></section>'+captainHTML+teamsHTML;
- return '<section class="card s12"><span class="kicker">NBA ALL-STAR WEEKEND</span><h2 style="margin:6px 0">You were voted into the All-Star Game</h2><p class="muted">The regular season is paused after 41 team games. The top two fan-vote finishers are captains and drafted the teams below.</p><div class="actions"><button class="btn" data-allstar="three" '+(a.events.three?'disabled':'')+'>3-Point Contest</button><button class="btn" data-allstar="skills" '+(a.events.skills?'disabled':'')+'>Skills Challenge</button><button class="btn" data-allstar="dunk" '+(a.events.dunk?'disabled':'')+'>Dunk Contest</button><button class="btn primary" data-allstar="game" '+(a.events.game?'disabled':'')+'>Play All-Star Game</button><button class="btn" id="simAllStarWeekendBtn">Quick Sim All-Star Weekend</button></div></section>'+captainHTML+teamsHTML
+ return '<section class="card s12"><span class="kicker">NBA ALL-STAR WEEKEND</span><h2 style="margin:6px 0">You were voted into the All-Star Game</h2><p class="muted">The regular season is paused after 41 team games. The top two fan-vote finishers are captains and drafted the teams below.</p><div class="actions"><button class="btn" data-allstar="three" '+(a.events.three?'disabled':'')+'>3-Point Contest</button><button class="btn" data-allstar="skills" '+(a.events.skills?'disabled':'')+'>Skills Challenge</button><button class="btn" data-allstar="dunk" '+(a.events.dunk?'disabled':'')+'>Dunk Contest</button><button class="btn primary" data-allstar="game" '+(a.events.game||!a.events.three||!a.events.skills||!a.events.dunk?'disabled':'')+'>Play All-Star Game</button><button class="btn" id="simAllStarWeekendBtn">Quick Sim All-Star Weekend</button></div></section>'+captainHTML+teamsHTML
 }
 function continueAllStarBreak(){
  const a=S.nbaWorld.allStar;if(!a||!a.breakActive||a.selected)return;
  a.breakActive=false;a.pending=false;a.completed=true;S.player.energy=100;S.news.unshift("All-Star break complete. The second half of the season begins.");save();render();toast("All-Star break complete")
 }
 function playAllStarEvent(type){
- const a=S.nbaWorld.allStar;if(!a||!a.breakActive||!a.selected||!a.pending||a.events[type])return;let skill=70;
+ const a=S.nbaWorld.allStar;if(!a||!a.breakActive||!a.selected||!a.pending||a.events[type])return;
+ if(type==="game"&&(!a.events.three||!a.events.skills||!a.events.dunk)){toast("Complete or quick sim the weekend events before the All-Star Game");return}
+ let skill=70;
  if(type==="three")skill=S.player.attrs.Shooting;if(type==="skills")skill=(S.player.attrs.Playmaking+S.player.attrs.IQ)/2;if(type==="dunk")skill=(S.player.attrs.Finishing+S.player.attrs.Athleticism)/2;if(type==="game")skill=ovr();
  const win=skill+Math.random()*35>92;a.events[type]=true;const label={three:"3-Point Contest",skills:"Skills Challenge",dunk:"Dunk Contest",game:"All-Star Game"}[type];
  if(win){S.social.followers+=type==="game"?15000:8000;S.social.fame=Math.min(100,S.social.fame+(type==="game"?5:3));if(!S.accolades.includes(label+" Winner"))S.accolades.push(label+" Winner");addCareerPathXP("superstar",type==="game"?25:15);S.news.unshift("Won the "+label+".")}else S.news.unshift("Competed in the "+label+".");
