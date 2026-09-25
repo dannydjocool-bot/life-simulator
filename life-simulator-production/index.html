@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.15.0</title>
+<title>MYCAREER Basketball Sim v0.15.1</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -734,7 +734,7 @@ function ensureLeagueRosters(){
    if(!Array.isArray(S.leagueRosters[t.id]))S.leagueRosters[t.id]=t.stars.map(p=>({...p,source:"veteran",yearsPro:5}));
    let roster=S.leagueRosters[t.id];roster.forEach(p=>used.add(p.name));while(roster.length<15)roster.push(makeRosterDepthPlayer(t.id,roster.length,used));
    roster.forEach((p,i)=>{if(typeof p.yearsPro!=="number")p.yearsPro=5;if(typeof p.age!=="number")p.age=24+p.yearsPro;if(typeof p.ovr!=="number")p.ovr=Math.max(68,Math.min(95,Math.round(66+(p.ppg||10)*.75)));if(typeof p.potential!=="number")p.potential=Math.min(96,p.ovr+(p.yearsPro<=5?6:2));if(!p.personality)p.personality=["Loyal","Competitive","Money-Focused","Ring Chaser","Laid Back","Leader"][(i+t.id.length)%6];if(typeof p.contractYears!=="number")p.contractYears=1+((i+t.id.length)%4);if(typeof p.contractValue!=="number")p.contractValue=Math.round(realisticAnnualSalary(p.ovr)*Math.max(1,p.contractYears||1));normalizeContractValue(p);if(!p.career){const gp=p.yearsPro*76;p.career={gp,pts:Math.round((p.ppg||0)*gp),ast:Math.round((p.apg||0)*gp),reb:Math.round((p.rpg||0)*gp),allStars:0,mvps:0,titles:0}}});
-   roster.sort((x,y)=>(y.ovr||0)-(x.ovr||0)||(y.ppg||0)-(x.ppg||0));if(roster.length>15)S.leagueRosters[t.id]=roster.slice(0,15)
+   roster.sort((x,y)=>(y.ovr||0)-(x.ovr||0)||(y.ppg||0)-(x.ppg||0));if(roster.length>15)S.leagueRosters[t.id]=roster.slice(0,15);rebalanceRosterPayroll(S.leagueRosters[t.id])
  })
 }
 function rosterFor(id){ensureLeagueRosters();return S.leagueRosters[id]||[]}
@@ -1087,21 +1087,45 @@ function capStatusForPayroll(payroll){
 }
 function realisticAnnualSalary(ovrValue){
  const ov=Math.max(60,Math.min(110,Math.round(ovrValue||70)));
- if(ov>=99)return 60000000;
- if(ov>=95)return 50000000+(ov-95)*2500000;
- if(ov>=90)return 35000000+(ov-90)*3000000;
- if(ov>=85)return 24000000+(ov-85)*2200000;
- if(ov>=80)return 15000000+(ov-80)*1800000;
- if(ov>=75)return 8000000+(ov-75)*1400000;
- if(ov>=70)return 3500000+(ov-70)*900000;
- return 1800000+(ov-60)*170000
+ if(ov>=99)return 54000000;
+ if(ov>=95)return 44000000+(ov-95)*2500000;
+ if(ov>=90)return 32000000+(ov-90)*2400000;
+ if(ov>=85)return 22000000+(ov-85)*2000000;
+ if(ov>=80)return 14000000+(ov-80)*1600000;
+ if(ov>=75)return 7500000+(ov-75)*1300000;
+ if(ov>=70)return 3500000+(ov-70)*800000;
+ return 1600000+(ov-60)*190000
 }
 function normalizeContractValue(p){
  if(!p||typeof p.ovr!=="number")return;
  const yrs=Math.max(1,p.contractYears||1),annual=annualSalaryValue(p),target=realisticAnnualSalary(p.ovr);
- if(!annual||annual<1100000||annual>70000000)p.contractValue=Math.round(target*yrs)
+ if(!annual||annual<1100000||annual>65000000)p.contractValue=Math.round(target*yrs)
 }
-function canTeamAddAnnualSalary(teamId,annual){return teamPayrollAnnual(teamId,false)+Math.max(0,annual)<=leagueCapLine("hard")}
+function rebalanceRosterPayroll(roster){
+ if(!Array.isArray(roster)||!roster.length)return;
+ const target=Math.round(leagueCapLine("hard")*.92);
+ const annual=p=>Math.round((p.contractValue||0)/Math.max(1,p.contractYears||1));
+ let total=roster.reduce((s,p)=>s+annual(p),0);
+ if(total<=target)return;
+ const ordered=[...roster].sort((a,b)=>(b.ovr||0)-(a.ovr||0));
+ const protectedNames=new Set(ordered.slice(0,2).map(p=>p.name));
+ for(let pass=0;pass<4&&total>target;pass++){
+  const adjustable=roster.filter(p=>!protectedNames.has(p.name));
+  const adjustableTotal=adjustable.reduce((s,p)=>s+annual(p),0);
+  if(!adjustableTotal)break;
+  const protectedTotal=total-adjustableTotal;
+  const room=Math.max(0,target-protectedTotal);
+  const scale=Math.max(.55,Math.min(1,room/adjustableTotal));
+  adjustable.forEach(p=>{
+   const yrs=Math.max(1,p.contractYears||1);
+   const floor=Math.max(1200000,Math.round(realisticAnnualSalary(p.ovr)*.62));
+   const next=Math.max(floor,Math.round(annual(p)*scale));
+   p.contractValue=next*yrs
+  });
+  total=roster.reduce((s,p)=>s+annual(p),0)
+ }
+}
+function canTeamAddAnnualSalary(teamId,annual){return teamPayrollAnnual(teamId,false)+Math.max(0,annual)<=Math.round(leagueCapLine("hard")*.96)}
 function capPenaltyText(teamId){
  const payroll=teamPayrollAnnual(teamId),taxBill=taxBillForPayroll(payroll);
  if(payroll>leagueCapLine("hard"))return "Hard-cap violation • signings and salary-adding moves blocked";
@@ -1134,7 +1158,7 @@ function processLeagueFreeAgency(){
  });
  free.sort((a,b)=>(b.p.ovr||0)-(a.p.ovr||0));
  free.forEach(({p,from})=>{
-  const years=p.age>=33?2:2+Math.floor(Math.random()*3),annual=Math.round(realisticAnnualSalary(p.ovr)*(0.92+Math.random()*.16));
+  const years=p.age>=33?2:2+Math.floor(Math.random()*3),annual=Math.round(realisticAnnualSalary(p.ovr)*(0.88+Math.random()*.12));
   const preferred=freeAgentDestination(p,from).team.id;
   const choices=[preferred,...NBA_TEAMS.filter(t=>t.id!==preferred).sort((a,b)=>teamPayrollAnnual(a.id,false)-teamPayrollAnnual(b.id,false)).map(t=>t.id)];
   let to=choices.find(id=>canTeamAddAnnualSalary(id,annual));
