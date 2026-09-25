@@ -272,14 +272,59 @@ function seedRecordBook(){
 
 const TIERS=[["Locked",0],["Bronze",60],["Silver",70],["Gold",82],["Legend",94]];
 const BADGES=[
-["Posterizer","Finishing","Finishing",.72,"Athleticism",.28],["Fearless Finisher","Finishing","Finishing",.82,"IQ",.18],["Acrobat","Finishing","Finishing",.7,"Athleticism",.3],["Giant Slayer","Finishing","Finishing",.78,"IQ",.22],["Slithery Finisher","Finishing","Finishing",.68,"Playmaking",.32],["Float Game","Finishing","Finishing",.72,"Shooting",.28],
-["Catch & Shoot","Shooting","Shooting",1],["Deadeye","Shooting","Shooting",.8,"IQ",.2],["Limitless Range","Shooting","Shooting",.9,"Athleticism",.1],["Clutch Shooter","Shooting","Shooting",.7,"IQ",.3],["Green Machine","Shooting","Shooting",.82,"IQ",.18],["Agent 3","Shooting","Shooting",.72,"Playmaking",.28],["Middy Magician","Shooting","Shooting",.82,"Finishing",.18],["Heat Check","Shooting","Shooting",.68,"Athleticism",.32],
-["Dimer","Playmaking","Playmaking",.75,"IQ",.25],["Quick First Step","Playmaking","Playmaking",.65,"Athleticism",.35],["Needle Threader","Playmaking","Playmaking",.8,"IQ",.2],["Floor General","Playmaking","Playmaking",.55,"IQ",.45],["Handles for Days","Playmaking","Playmaking",.7,"Athleticism",.3],["Unpluckable","Playmaking","Playmaking",.82,"IQ",.18],["Ankle Breaker","Playmaking","Playmaking",.74,"Athleticism",.26],["Break Starter","Playmaking","Playmaking",.58,"IQ",.42],
-["Clamps","Defense","Defense",1],["Interceptor","Defense","Defense",.7,"IQ",.3],["Challenger","Defense","Defense",.85,"Athleticism",.15],["Pick Dodger","Defense","Defense",.72,"Athleticism",.28],["Anchor","Defense","Defense",.76,"IQ",.24],["Chase Down Artist","Defense","Defense",.58,"Athleticism",.42],["Glove","Defense","Defense",.74,"IQ",.26],
-["Boxout Beast","Rebounding","Defense",.48,"Athleticism",.52],["Rebound Chaser","Rebounding","Athleticism",.58,"Defense",.42],
+["Posterizer","Finishing","Finishing",.72,"Athleticism",.28],
+["Fearless Finisher","Finishing","Finishing",.82,"IQ",.18],
+["Acrobat","Finishing","Finishing",.7,"Athleticism",.3],
+["Slithery Finisher","Finishing","Finishing",.68,"Playmaking",.32],
+["Bulldozer","Finishing","Finishing",.62,"Athleticism",.38],
+["Contact Specialist","Finishing","Finishing",.76,"Defense",.24],
+["Aerial Finisher","Finishing","Finishing",.58,"Athleticism",.42],
+
+["Catch & Shoot","Shooting","Shooting",1],
+["Deadeye","Shooting","Shooting",.8,"IQ",.2],
+["Limitless Range","Shooting","Shooting",.9,"Athleticism",.1],
+["Clutch Shooter","Shooting","Shooting",.7,"IQ",.3],
+["Green Machine","Shooting","Shooting",.82,"IQ",.18],
+["Agent 3","Shooting","Shooting",.72,"Playmaking",.28],
+["Middy Magician","Shooting","Shooting",.82,"Finishing",.18],
+["Open Looks","Shooting","Shooting",.78,"IQ",.22],
+["Shifty Shooter","Shooting","Shooting",.66,"Playmaking",.34],
+
+["Dimer","Playmaking","Playmaking",.75,"IQ",.25],
+["Quick First Step","Playmaking","Playmaking",.65,"Athleticism",.35],
+["Needle Threader","Playmaking","Playmaking",.8,"IQ",.2],
+["Floor General","Playmaking","Playmaking",.55,"IQ",.45],
+["Handles for Days","Playmaking","Playmaking",.7,"Athleticism",.3],
+["Unpluckable","Playmaking","Playmaking",.82,"IQ",.18],
+["Ankle Breaker","Playmaking","Playmaking",.74,"Athleticism",.26],
+["Versatile Visionary","Playmaking","Playmaking",.62,"IQ",.38],
+["Bail Out","Playmaking","Playmaking",.7,"IQ",.3],
+
+["Clamps","Defense","Defense",1],
+["Interceptor","Defense","Defense",.7,"IQ",.3],
+["Challenger","Defense","Defense",.85,"Athleticism",.15],
+["Pick Dodger","Defense","Defense",.72,"Athleticism",.28],
+["Anchor","Defense","Defense",.76,"IQ",.24],
+["Chase Down Artist","Defense","Defense",.58,"Athleticism",.42],
+["Glove","Defense","Defense",.74,"IQ",.26],
+["On-Ball Menace","Defense","Defense",.82,"Athleticism",.18],
+["Paint Patroller","Defense","Defense",.72,"IQ",.28],
+["Immovable Enforcer","Defense","Defense",.68,"Athleticism",.32],
+
+["Boxout Beast","Rebounding","Defense",.48,"Athleticism",.52],
+["Rebound Chaser","Rebounding","Athleticism",.58,"Defense",.42],
+["Pogo Stick","Rebounding","Athleticism",.64,"Defense",.36],
+
 ["Relentless Motor","Athleticism","Athleticism",.72,"IQ",.28],
-["Killer Instinct","Mental / Clutch","IQ",.52,"Shooting",.48],["Ice in Veins","Mental / Clutch","IQ",.62,"Playmaking",.38],["Road Warrior","Mental / Clutch","IQ",.55,"Athleticism",.45],["Big Game Player","Mental / Clutch","IQ",.5,"Shooting",.5]
-];
+["Fast Twitch","Athleticism","Athleticism",.82,"Finishing",.18],
+["Tireless Engine","Athleticism","Athleticism",.7,"IQ",.3],
+
+["Killer Instinct","Mental / Clutch","IQ",.52,"Shooting",.48],
+["Ice in Veins","Mental / Clutch","IQ",.62,"Playmaking",.38],
+["Road Warrior","Mental / Clutch","IQ",.55,"Athleticism",.45],
+["Big Game Player","Mental / Clutch","IQ",.5,"Shooting",.5],
+["Comeback Kid","Mental / Clutch","IQ",.55,"Finishing",.45],
+["Lockdown Focus","Mental / Clutch","IQ",.58,"Defense",.42]
 const DRILLS=[
 {id:"shoot",name:"Shooting Workout",min:55,energy:15,gains:{Shooting:[1,2]},xp:50,desc:"Core jumper mechanics and repetition."},
 {id:"handle",name:"Ball Handling",min:55,energy:15,gains:{Playmaking:[1,2]},xp:50,desc:"Handle, passing reads and ball security."},
@@ -1361,9 +1406,9 @@ function answerBackFull(type){
  const g=S.fullGame;if(!g||!g.pendingAnswer)return;
  const challenge=g.pendingAnswer;g.pendingAnswer=null;
  const a=S.player.attrs;let skill=(a.Shooting+a.Finishing+a.IQ)/3;
- if(type==="three")skill=a.Shooting+badgeRank("Clutch Shooter")*3+badgeRank("Deadeye")*2+badgeRank("Killer Instinct")*2+badgeRank("Big Game Player")*2;
- if(type==="drive")skill=(a.Finishing+a.Athleticism)/2+badgeRank("Quick First Step")*3+badgeRank("Posterizer")*2+badgeRank("Fearless Finisher")*1.5+badgeRank("Killer Instinct")*2;
- if(type==="playmake")skill=(a.Playmaking+a.IQ)/2+badgeRank("Dimer")*2+badgeRank("Ice in Veins")*2+badgeRank("Floor General")*1.5;
+ if(type==="three")skill=a.Shooting+badgeRank("Clutch Shooter")*3+badgeRank("Deadeye")*2+badgeRank("Open Looks")*1.2+badgeRank("Killer Instinct")*2+badgeRank("Big Game Player")*2;
+ if(type==="drive")skill=(a.Finishing+a.Athleticism)/2+badgeRank("Quick First Step")*3+badgeRank("Posterizer")*2+badgeRank("Fearless Finisher")*1.5+badgeRank("Bulldozer")*1.5+badgeRank("Fast Twitch")*1.2+badgeRank("Killer Instinct")*2;
+ if(type==="playmake")skill=(a.Playmaking+a.IQ)/2+badgeRank("Dimer")*2+badgeRank("Versatile Visionary")*1.5+badgeRank("Bail Out")*1.1+badgeRank("Ice in Veins")*2+badgeRank("Floor General")*1.5;
  const success=Math.random()*100<Math.max(32,Math.min(92,skill+(g.hype||30)*.08));
  g.energy=Math.max(20,g.energy-8);
  if(success){
@@ -1489,23 +1534,23 @@ function bigGameBadgeBoost(g){
  const audience=(g.peakViewers||g.viewers||0);
  return (g.playoff?badgeRank("Big Game Player")*2:0)+(audience>=5000000?badgeRank("Big Game Player")*1.5:0)
 }
-function finishingBadgeBoost(){return ["Posterizer","Fearless Finisher","Acrobat","Giant Slayer","Slithery Finisher"].reduce((s,n)=>s+badgeRank(n)*1.35,0)}
+function finishingBadgeBoost(){return ["Posterizer","Fearless Finisher","Acrobat","Slithery Finisher","Bulldozer","Contact Specialist","Aerial Finisher"].reduce((s,n)=>s+badgeRank(n)*1.05,0)}
 function shootingStreakBoost(g,type){
  if(!g)return 0;
  const makes=g.stats&&g.stats.fgm||0,miss=g.stats&&g.stats.fga||0;
- let v=0;if(makes>=2)v+=badgeRank("Green Machine")*1.4;if(makes>=3)v+=badgeRank("Heat Check")*1.6;
- if(type==="three")v+=badgeRank("Agent 3")*1.4;
- if(type==="mid")v+=badgeRank("Middy Magician")*1.8;
+ let v=0;if(makes>=2)v+=badgeRank("Green Machine")*1.4;if(makes>=3)v+=badgeRank("Shifty Shooter")*1.35;
+ if(type==="three")v+=badgeRank("Agent 3")*1.4+badgeRank("Open Looks")*.75;
+ if(type==="mid")v+=badgeRank("Middy Magician")*1.8+badgeRank("Shifty Shooter")*.9;
  return v-Math.max(0,miss-makes)*.15
 }
 function fullOffense(type){
  const g=S.fullGame;if(!g||!g.active||!g.onCourt||g.turn!=="offense")return;
  const a=S.player.attrs,adj=g.adjustment,energyMod=(g.energy-50)*.12,venue=venueBadgeBoost(g),big=bigGameBadgeBoost(g);let chance=55,pts=0,assist=false,cost=5;
- if(type==="drive"){chance=(a.Finishing*.62+a.Athleticism*.28+a.IQ*.1)+energyMod+badgeRank("Quick First Step")*2+finishingBadgeBoost()+venue+big;pts=2;cost=Math.max(4,8-badgeRank("Relentless Motor"))}
- if(type==="mid"){chance=a.Shooting*.78+a.IQ*.22+energyMod+shootingStreakBoost(g,"mid")+venue+big;pts=2;cost=5}
- if(type==="three"){chance=a.Shooting*.82+a.IQ*.18+energyMod+badgeRank("Deadeye")*2+shootingStreakBoost(g,"three")+venue+big;pts=3;cost=6}
+ if(type==="drive"){chance=(a.Finishing*.62+a.Athleticism*.28+a.IQ*.1)+energyMod+badgeRank("Quick First Step")*2+badgeRank("Fast Twitch")*1.2+finishingBadgeBoost()+venue+big;pts=2;cost=Math.max(3,8-badgeRank("Relentless Motor")-badgeRank("Tireless Engine")*.45)}
+ if(type==="mid"){chance=a.Shooting*.78+a.IQ*.22+energyMod+shootingStreakBoost(g,"mid")+badgeRank("Open Looks")*.7+venue+big;pts=2;cost=Math.max(4,5-badgeRank("Tireless Engine")*.2)}
+ if(type==="three"){chance=a.Shooting*.82+a.IQ*.18+energyMod+badgeRank("Deadeye")*2+badgeRank("Open Looks")*1.1+shootingStreakBoost(g,"three")+venue+big;pts=3;cost=Math.max(4,6-badgeRank("Tireless Engine")*.25)}
  if(type==="pnr"){chance=a.Playmaking*.5+a.IQ*.35+a.Shooting*.15+badgeRank("Dimer")*2+badgeRank("Needle Threader")*1.2+venue;pts=2;assist=true;cost=Math.max(3,5-badgeRank("Handles for Days")*.4)}
- if(type==="pass"){chance=a.Playmaking*.55+a.IQ*.45+S.player.chemistry*.08+badgeRank("Floor General")*1.5+badgeRank("Break Starter")*.8;assist=true;pts=2;cost=3}
+ if(type==="pass"){chance=a.Playmaking*.55+a.IQ*.45+S.player.chemistry*.08+badgeRank("Floor General")*1.5+badgeRank("Versatile Visionary")*1.1+badgeRank("Bail Out")*.6;assist=true;pts=2;cost=3}
  if(adj==="aggressive"&&type!=="pass"&&type!=="pnr")chance+=5;
  if(adj==="team"&&(type==="pass"||type==="pnr"))chance+=7;
  const ballSecurity=badgeRank("Unpluckable")*3+badgeRank("Handles for Days")*1.4;
@@ -1520,15 +1565,15 @@ function fullOffense(type){
 function fullDefense(type){
  const g=S.fullGame;if(!g||!g.active||!g.onCourt||g.turn!=="defense")return;
  const a=S.player.attrs,adj=g.adjustment,venue=venueBadgeBoost(g),big=bigGameBadgeBoost(g);let stop=a.Defense*.55+a.IQ*.25+a.Athleticism*.2+venue+big,cost=4;
- if(type==="pressure"){stop+=5+badgeRank("Clamps")*2+badgeRank("Pick Dodger")*1.3;cost=7}
+ if(type==="pressure"){stop+=5+badgeRank("Clamps")*2+badgeRank("Pick Dodger")*1.1+badgeRank("On-Ball Menace")*1.8+badgeRank("Immovable Enforcer")*.9;cost=Math.max(5,7-badgeRank("Tireless Engine")*.35)}
  if(type==="steal"){stop-=5-badgeRank("Glove")*1.7;cost=6}
- if(type==="help"){stop+=a.IQ*.08+badgeRank("Anchor")*2+badgeRank("Chase Down Artist")*1.2;cost=4}
- if(type==="rebound"){stop+=a.Athleticism*.06+badgeRank("Rebound Chaser")*2+badgeRank("Boxout Beast")*1.5;cost=5}
+ if(type==="help"){stop+=a.IQ*.08+badgeRank("Anchor")*1.7+badgeRank("Paint Patroller")*1.8+badgeRank("Chase Down Artist")*1.1;cost=4}
+ if(type==="rebound"){stop+=a.Athleticism*.06+badgeRank("Rebound Chaser")*2+badgeRank("Boxout Beast")*1.5+badgeRank("Pogo Stick")*1.2;cost=Math.max(4,5-badgeRank("Tireless Engine")*.2)}
  if(adj==="defense")stop+=8;
  let foulChance=(type==="steal"?14:type==="pressure"?9:4)-badgeRank("Glove")*.6-badgeRank("Anchor")*.35;
  if(Math.random()*100<foulChance){g.stats.pf++;fullGrade(-1.5);g.oppScore+=Math.random()<.72?2:1;fullLog("Whistle — defensive foul.");if(g.stats.pf>=6){g.fouledOut=true;g.onCourt=false;fullLog("You fouled out. The rest of the game will be simulated.");}}
  else if(type==="steal"&&Math.random()*100<Math.max(8,(a.Defense+a.IQ)/5+badgeRank("Glove")*3)){g.stats.stl++;fullGrade(3);fullLog("You rip the ball loose for a steal.");}
- else if(Math.random()*100<Math.max(30,Math.min(92,stop))){if(type==="rebound"||Math.random()<.4+badgeRank("Rebound Chaser")*.025){g.stats.reb++;fullGrade(1.5);fullLog("Defensive stop and you secure the rebound.")}else{if(type==="help"&&Math.random()<.18+badgeRank("Anchor")*.03+badgeRank("Chase Down Artist")*.02){g.stats.blk++;fullGrade(2.5);fullLog("Perfect help defense — blocked shot.")}else{fullGrade(1);fullLog("Strong defense forces a miss.")}}}
+ else if(Math.random()*100<Math.max(30,Math.min(92,stop))){if(type==="rebound"||Math.random()<.4+badgeRank("Rebound Chaser")*.025+badgeRank("Pogo Stick")*.012){g.stats.reb++;fullGrade(1.5);fullLog("Defensive stop and you secure the rebound.")}else{if(type==="help"&&Math.random()<.18+badgeRank("Anchor")*.025+badgeRank("Paint Patroller")*.025+badgeRank("Chase Down Artist")*.02){g.stats.blk++;fullGrade(2.5);fullLog("Perfect help defense — blocked shot.")}else{fullGrade(1);fullLog("Strong defense forces a miss.")}}}
  else {const pts=Math.random()<.28?3:2;g.oppScore+=pts;fullGrade(-1);fullLog(g.opp+" scores "+pts+".")}
  g.energy=Math.max(20,g.energy-cost);g.stint+=.65;g.turn="offense";if(!maybeOpponentStarMoment())fullAdvance(34+Math.floor(Math.random()*22));save();render()
 }
@@ -1904,13 +1949,13 @@ function modal(h){$("modal").innerHTML=h;$("modalWrap").classList.remove("hidden
 function badgeRank(name){const b=BADGES.find(x=>x[0]===name);if(!b)return 0;const t=tier(badgeScore(b));return {Locked:0,Bronze:1,Silver:2,Gold:3,Legend:4}[t]||0}
 function clutchBadgeBoost(type){
  let names=[];
- if(type==="three")names=["Clutch Shooter","Deadeye","Limitless Range","Catch & Shoot","Killer Instinct","Ice in Veins","Big Game Player"];
- else if(type==="iso")names=["Quick First Step","Posterizer","Fearless Finisher","Slithery Finisher","Killer Instinct","Ice in Veins"];
- else if(type==="pnr")names=["Dimer","Needle Threader","Floor General","Ice in Veins"];
+ if(type==="three")names=["Clutch Shooter","Deadeye","Limitless Range","Catch & Shoot","Open Looks","Killer Instinct","Ice in Veins","Big Game Player"];
+ else if(type==="iso")names=["Quick First Step","Posterizer","Fearless Finisher","Slithery Finisher","Bulldozer","Fast Twitch","Killer Instinct","Ice in Veins","Comeback Kid"];
+ else if(type==="pnr")names=["Dimer","Needle Threader","Floor General","Versatile Visionary","Bail Out","Ice in Veins"];
  else names=["Floor General","Dimer","Needle Threader","Big Game Player"];
  return names.reduce((sum,n)=>sum+badgeRank(n)*2.5,0)
 }
-function defensiveClutchBoost(){return ["Clamps","Challenger","Interceptor","Anchor","Glove","Big Game Player"].reduce((sum,n)=>sum+badgeRank(n)*2,0)}
+function defensiveClutchBoost(){return ["Clamps","Challenger","Interceptor","Anchor","Glove","On-Ball Menace","Paint Patroller","Lockdown Focus","Big Game Player"].reduce((sum,n)=>sum+badgeRank(n)*1.65,0)}
 function clutchResponseChance(type){
  const a=S.player.attrs;
  const base=28+(ovr()-60)*1.15+(a.IQ-55)*.35+(S.player.energy-45)*.12+clutchBadgeBoost(type)+relationshipClutchBonus();
