@@ -1954,9 +1954,9 @@ function clutchBadgeBoost(type){
  else if(type==="iso")names=["Quick First Step","Posterizer","Fearless Finisher","Slithery Finisher","Bulldozer","Fast Twitch","Killer Instinct","Ice in Veins","Comeback Kid"];
  else if(type==="pnr")names=["Dimer","Needle Threader","Floor General","Versatile Visionary","Bail Out","Ice in Veins"];
  else names=["Floor General","Dimer","Needle Threader","Big Game Player"];
- return names.reduce((sum,n)=>sum+badgeRank(n)*2.5,0)
+ return Math.min(32,names.reduce((sum,n)=>sum+badgeRank(n)*2.15,0))
 }
-function defensiveClutchBoost(){return ["Clamps","Challenger","Interceptor","Anchor","Glove","On-Ball Menace","Paint Patroller","Lockdown Focus","Big Game Player"].reduce((sum,n)=>sum+badgeRank(n)*1.65,0)}
+function defensiveClutchBoost(){return Math.min(28,["Clamps","Challenger","Interceptor","Anchor","Glove","On-Ball Menace","Paint Patroller","Lockdown Focus","Big Game Player"].reduce((sum,n)=>sum+badgeRank(n)*1.35,0))}
 function clutchResponseChance(type){
  const a=S.player.attrs;
  const base=28+(ovr()-60)*1.15+(a.IQ-55)*.35+(S.player.energy-45)*.12+clutchBadgeBoost(type)+relationshipClutchBonus();
