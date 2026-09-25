@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.15.2</title>
+<title>MYCAREER Basketball Sim v0.15.3</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -2231,7 +2231,8 @@ function showQuickSimResult(g,payout){
  const score=(g.team||0)+" - "+(g.oppScore||0);
  const earnings=payout>0?'<div class="row"><span>Game earnings</span><strong>$'+Math.round(payout).toLocaleString()+'</strong></div>':'';
  const story=g.storyline?'<div class="item"><div><b>'+g.storyline+'</b><small>Game spotlight</small></div></div>':'';
- modal('<div class="row" style="align-items:flex-start"><div><span class="kicker">QUICK SIM RESULT</span><h2 style="margin:5px 0">'+result+' vs '+g.opp+'</h2><p class="muted" style="margin:0">Final score '+score+'</p></div><span class="pill '+cls+'">'+result+'</span></div><div class="rosterSummary" style="margin-top:14px"><div><small class="muted">PTS</small><b style="display:block;font-size:24px">'+g.pts+'</b></div><div><small class="muted">AST</small><b style="display:block;font-size:24px">'+g.ast+'</b></div><div><small class="muted">REB</small><b style="display:block;font-size:24px">'+g.reb+'</b></div><div><small class="muted">SCORE</small><b style="display:block;font-size:18px">'+score+'</b></div></div>'+earnings+story+'<div class="modalFoot"><button class="btn primary" id="quickResultDone">Continue</button><button class="btn" id="quickResultGames">View Games</button></div>');
+ modal('<div class="row" style="align-items:flex-start"><div><span class="kicker">QUICK SIM RESULT</span><h2 style="margin:5px 0">'+result+' vs '+g.opp+'</h2><p class="muted" style="margin:0">Final score '+score+'</p></div><span class="pill '+cls+'">'+result+'</span></div><div class="rosterSummary" style="margin-top:14px"><div><small class="muted">PTS</small><b style="display:block;font-size:24px">'+g.pts+'</b></div><div><small class="muted">AST</small><b style="display:block;font-size:24px">'+g.ast+'</b></div><div><small class="muted">REB</small><b style="display:block;font-size:24px">'+g.reb+'</b></div><div><small class="muted">SCORE</small><b style="display:block;font-size:18px">'+score+'</b></div></div>'+earnings+story+'<div class="modalFoot"><button class="btn good" id="quickResultNext">Quick Sim Next Game</button><button class="btn primary" id="quickResultDone">Continue</button><button class="btn" id="quickResultGames">View Games</button></div>');
+ if($("quickResultNext"))$("quickResultNext").onclick=()=>{closeModal();setTimeout(()=>quickSim(),80)};
  if($("quickResultDone"))$("quickResultDone").onclick=closeModal;
  if($("quickResultGames"))$("quickResultGames").onclick=()=>{closeModal();setScreen("games")}
 }
