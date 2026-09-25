@@ -713,7 +713,7 @@ function makeRosterDepthPlayer(teamId,index,used){
 }
 function ensureLeagueRosters(){
  if(!S.leagueRosters)S.leagueRosters={};
- const used=new Set([S.player?.name].filter(Boolean));NBA_TEAMS.forEach(t=>(S.leagueRosters[t.id]||[]).forEach(p=>used.add(p.name)));
+ const used=new Set([S.player?.name].filter(Boolean));NBA_TEAMS.forEach(t=>t.stars.forEach(p=>used.add(p.name)));NBA_TEAMS.forEach(t=>(S.leagueRosters[t.id]||[]).forEach(p=>used.add(p.name)));
  NBA_TEAMS.forEach(t=>{
    if(!Array.isArray(S.leagueRosters[t.id]))S.leagueRosters[t.id]=t.stars.map(p=>({...p,source:"veteran",yearsPro:5}));
    let roster=S.leagueRosters[t.id];roster.forEach(p=>used.add(p.name));while(roster.length<15)roster.push(makeRosterDepthPlayer(t.id,roster.length,used));
