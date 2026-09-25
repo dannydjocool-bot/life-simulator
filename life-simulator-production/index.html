@@ -148,6 +148,8 @@ html,body{min-height:100dvh;overflow-x:hidden}
 .heroBox h2{font-size:29px}
 .top h1{font-size:27px}
 }
+#keyMomentDecision{scroll-margin-top:92px}
+@media(max-width:700px){#keyMomentDecision{scroll-margin-top:110px}}
 </style>
 </head>
 <body>
@@ -1104,7 +1106,7 @@ function jerseyById(id,teamId=S.team){const st=ensureTeamJerseyState(teamId),bas
 function jerseyColors(j,teamId=S.team){const p=teamJerseyPalette(teamId);if(j?.colors)return j.colors;if(j?.id==="away")return {primary:p.secondary,secondary:p.primary,accent:p.accent};if(j?.id==="statement")return {primary:p.accent,secondary:p.secondary,accent:p.primary};if(j?.id==="city")return {primary:p.secondary,secondary:p.accent,accent:p.primary};if(j?.id==="classic")return {primary:p.primary,secondary:"#f6e7c4",accent:p.secondary};if(j?.id==="earned")return {primary:"#171717",secondary:p.accent,accent:p.primary};if(j?.id==="captain")return {primary:p.primary,secondary:"#ffffff",accent:"#d7b84a"};if(j?.id==="championship")return {primary:"#c69b2d",secondary:"#171717",accent:"#f7e3a1"};return {primary:p.primary,secondary:p.secondary,accent:p.accent}}
 function activeJersey(teamId=S.team){const st=ensureTeamJerseyState(teamId);updateJerseyUnlocks(teamId);return jerseyById(st?.active||"home",teamId)||jerseyById("home",teamId)}
 function jerseyPreviewHTML(j,teamId=S.team){const col=jerseyColors(j,teamId),abbr=nbaTeamById(teamId)?.abbr||"NBA";return '<div class="jerseyPreview" style="--jc1:'+col.primary+';--jc1b:'+col.accent+';--jc2:'+col.secondary+'"><div><small>'+abbr+'</small><b>'+S.player.number+'</b></div></div>'}
-function setActiveJersey(id){if(!(S.stage==="NBA"||S.stage==="Offseason"))return;const st=ensureTeamJerseyState(),j=jerseyById(id);if(!j)return;const available=j.custom||st.unlocked.includes(id);if(!available){toast("That jersey is still locked");return}st.active=id;save();render();toast(j.name+" equipped")}
+function setActiveJersey(id){if(!(S.stage==="NBA"||S.stage==="Offseason"))return;const st=ensureTeamJerseyState(),j=jerseyById(id);if(!j)return;const available=j.custom||st.unlocked.includes(id);if(!available){toast("That jersey is still locked");return}st.active=id;if(S.fullGame&&S.fullGame.active&&S.fullGame.intro&&S.stage==="NBA"){S.fullGame.jersey={id:j.id,name:j.name,colors:jerseyColors(j)}}save();render();toast(j.name+" equipped")}
 function designerTier(){const x=CONNECTIONS.find(c=>c.id===S.connections.activeDesigner);return x?.effects?.jerseyDesignTier||0}
 function jerseyMerchIncome(){if(!(S.stage==="NBA"||S.stage==="Offseason")||!S.team)return 0;const j=activeJersey();if(!j?.custom)return 0;return Math.round((j.merchPerGame||0)*(1+connectionEffect("merchBoost")))}
 function commissionJersey(){if(!(S.stage==="NBA"||S.stage==="Offseason")){toast("Locker Room unlocks in the NBA");return}const tier=designerTier();if(!tier){toast("Hire and activate a fashion designer first");return}const st=ensureTeamJerseyState(),cost=[0,50000,175000,400000,900000][tier];if(S.finance.cash<cost){toast("Not enough cash for this design");return}const labels=["","Custom Alternate","City Remix","Luxury Edition","Franchise Legacy"],palette=teamJerseyPalette(S.team),variants=[null,{primary:palette.accent,secondary:palette.secondary,accent:palette.primary},{primary:palette.secondary,secondary:"#ffffff",accent:palette.accent},{primary:"#161616",secondary:palette.accent,accent:palette.primary},{primary:"#c49a32",secondary:palette.secondary,accent:"#f6e2a2"}],n=st.designed.length+1,id="designer-"+S.year+"-"+n+"-"+tier,name=labels[tier]+" "+n;S.finance.cash-=cost;const merch=[0,800,1800,3500,6500][tier];st.designed.push({id,name,kind:"Designer",designer:S.connections.activeDesigner,designerTier:tier,colors:variants[tier],merchPerGame:merch,year:S.year});st.active=id;S.social.followers+=tier*2500;S.social.fame=Math.min(100,S.social.fame+tier);addCareerPathXP("business",10*tier);S.news.unshift(name+" unveiled for "+currentTeamName()+".");pushLeagueNews(currentTeamName()+" unveiled the "+name+".");save();render();toast(name+" created and equipped")}
@@ -1211,7 +1213,7 @@ function fullJumpToCrucialMoment(){
  const gap=1+Math.floor(Math.random()*4);
  S.player.energy=Math.max(35,Math.round(g.energy||S.player.energy));
  S.live={opp:g.opp,stage:g.stage,playoff:!!g.playoff,storyline:g.stage==="NBA"?currentGameSpotlight().title:null,homeAway:g.homeAway||nextGameLocation(),team,oppScore:team+gap,pts:(g.stats.pts||0)+extraPts,ast:(g.stats.ast||0)+extraAst,reb:(g.stats.reb||0)+extraReb,clutchPossessions:0,response:false,lastType:null,lastMessage:"Jumped ahead to the final crucial possessions."};
- S.fullGame=null;save();render();toast("Crucial moment ready")
+ S.fullGame=null;save();render();requestAnimationFrame(()=>{const el=document.getElementById("keyMomentDecision");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});else scrollTo({top:0,behavior:"smooth"})});toast("Crucial moment ready")
 }
 
 function fullLog(msg){const g=S.fullGame;g.lastMessage=msg;g.log.unshift("Q"+g.quarter+" "+fullClock(g.clock)+" • "+msg);g.log=g.log.slice(0,12)}
