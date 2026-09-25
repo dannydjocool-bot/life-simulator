@@ -1816,7 +1816,7 @@ function homeAction(action){
  if(d.id==="urban"){followers=Math.round(followers*1.7)+(action==="fit"?100:0)}
  if(d.id==="luxury"){morale+=2;if(["relax","unwind","pool","host"].includes(action))fame+=1}
  if(d.id==="celebrity"){followers=Math.round(followers*1.8);if(["fit","host"].includes(action))fame+=2}
- S.player.energy=Math.min(100,S.player.energy+energy);S.player.morale=Math.min(100,S.player.morale+morale);S.player.trust=Math.min(100,S.player.trust+trust);S.player.chemistry=Math.min(100,S.player.chemistry+chem);S.player.xp+=xp;S.social.followers+=followers;S.social.fame=Math.min(100,S.social.fame+fame);S.homeSpace.actionsUsed++;
+ S.player.energy=Math.min(100,S.player.energy+energy);S.player.morale=Math.min(100,S.player.morale+morale);S.player.trust=Math.min(100,S.player.trust+trust);S.player.chemistry=Math.min(100,S.player.chemistry+chem);S.player.xp+=xp;while(S.player.xp>=S.player.level*220){S.player.xp-=S.player.level*220;S.player.level++;S.player.attrs.IQ=Math.min(99,S.player.attrs.IQ+1);S.player.attrs.Athleticism=Math.min(99,S.player.attrs.Athleticism+1)}S.social.followers+=followers;S.social.fame=Math.min(100,S.social.fame+fame);S.homeSpace.actionsUsed++;
  if(currentPartner()&&["relax","unwind","pool"].includes(action)){S.relationships.happiness=Math.min(100,S.relationships.happiness+2)}
  S.homeSpace.history.unshift(label+" • "+d.name);S.homeSpace.history=S.homeSpace.history.slice(0,8);save();render();toast(label)
 }
