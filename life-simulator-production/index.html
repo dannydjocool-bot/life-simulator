@@ -716,7 +716,7 @@ function ensureLeagueRosters(){
  const used=new Set([S.player?.name].filter(Boolean));NBA_TEAMS.forEach(t=>(S.leagueRosters[t.id]||[]).forEach(p=>used.add(p.name)));
  NBA_TEAMS.forEach(t=>{
    if(!Array.isArray(S.leagueRosters[t.id]))S.leagueRosters[t.id]=t.stars.map(p=>({...p,source:"veteran",yearsPro:5}));
-   let roster=S.leagueRosters[t.id];while(roster.length<15)roster.push(makeRosterDepthPlayer(t.id,roster.length,used));
+   let roster=S.leagueRosters[t.id];roster.forEach(p=>used.add(p.name));while(roster.length<15)roster.push(makeRosterDepthPlayer(t.id,roster.length,used));
    roster.forEach((p,i)=>{if(typeof p.yearsPro!=="number")p.yearsPro=5;if(typeof p.age!=="number")p.age=24+p.yearsPro;if(typeof p.ovr!=="number")p.ovr=Math.max(68,Math.min(95,Math.round(66+(p.ppg||10)*.75)));if(typeof p.potential!=="number")p.potential=Math.min(96,p.ovr+(p.yearsPro<=5?6:2));if(!p.personality)p.personality=["Loyal","Competitive","Money-Focused","Ring Chaser","Laid Back","Leader"][(i+t.id.length)%6];if(typeof p.contractYears!=="number")p.contractYears=1+((i+t.id.length)%4);if(typeof p.contractValue!=="number")p.contractValue=Math.round(p.ovr*p.ovr*26000);if(!p.career){const gp=p.yearsPro*76;p.career={gp,pts:Math.round((p.ppg||0)*gp),ast:Math.round((p.apg||0)*gp),reb:Math.round((p.rpg||0)*gp),allStars:0,mvps:0,titles:0}}});
    roster.sort((x,y)=>(y.ovr||0)-(x.ovr||0)||(y.ppg||0)-(x.ppg||0));if(roster.length>15)S.leagueRosters[t.id]=roster.slice(0,15)
  })
