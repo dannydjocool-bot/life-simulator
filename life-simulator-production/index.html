@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.15.3</title>
+<title>MYCAREER Basketball Sim v0.15.4</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -734,7 +734,7 @@ function ensureLeagueRosters(){
    if(!Array.isArray(S.leagueRosters[t.id]))S.leagueRosters[t.id]=t.stars.map(p=>({...p,source:"veteran",yearsPro:5}));
    let roster=S.leagueRosters[t.id];roster.forEach(p=>used.add(p.name));while(roster.length<15)roster.push(makeRosterDepthPlayer(t.id,roster.length,used));
    roster.forEach((p,i)=>{if(typeof p.yearsPro!=="number")p.yearsPro=5;if(typeof p.age!=="number")p.age=24+p.yearsPro;if(typeof p.ovr!=="number")p.ovr=Math.max(68,Math.min(95,Math.round(66+(p.ppg||10)*.75)));if(typeof p.potential!=="number")p.potential=Math.min(96,p.ovr+(p.yearsPro<=5?6:2));if(!p.personality)p.personality=["Loyal","Competitive","Money-Focused","Ring Chaser","Laid Back","Leader"][(i+t.id.length)%6];if(typeof p.contractYears!=="number")p.contractYears=1+((i+t.id.length)%4);if(typeof p.contractValue!=="number")p.contractValue=Math.round(realisticAnnualSalary(p.ovr)*Math.max(1,p.contractYears||1));normalizeContractValue(p);if(!p.career){const gp=p.yearsPro*76;p.career={gp,pts:Math.round((p.ppg||0)*gp),ast:Math.round((p.apg||0)*gp),reb:Math.round((p.rpg||0)*gp),allStars:0,mvps:0,titles:0}}});
-   roster.sort((x,y)=>(y.ovr||0)-(x.ovr||0)||(y.ppg||0)-(x.ppg||0));if(roster.length>15)S.leagueRosters[t.id]=roster.slice(0,15);rebalanceRosterPayroll(S.leagueRosters[t.id])
+   roster.sort((x,y)=>(y.ovr||0)-(x.ovr||0)||(y.ppg||0)-(x.ppg||0));if(roster.length>15)S.leagueRosters[t.id]=roster.slice(0,15);rebalanceRosterPayroll(S.leagueRosters[t.id],t.id)
  })
 }
 function rosterFor(id){ensureLeagueRosters();return S.leagueRosters[id]||[]}
@@ -1101,9 +1101,10 @@ function normalizeContractValue(p){
  const yrs=Math.max(1,p.contractYears||1),annual=annualSalaryValue(p),target=realisticAnnualSalary(p.ovr);
  if(!annual||annual<1100000||annual>65000000)p.contractValue=Math.round(target*yrs)
 }
-function rebalanceRosterPayroll(roster){
+function rebalanceRosterPayroll(roster,teamId){
  if(!Array.isArray(roster)||!roster.length)return;
- const target=Math.round(leagueCapLine("hard")*.92);
+ const userAnnual=teamId===S.team&&["NBA","Offseason","Retired"].includes(S.stage)?annualSalaryValue({isUser:true}):0;
+ const target=Math.max(90000000,Math.round(leagueCapLine("hard")*.90)-userAnnual);
  const annual=p=>Math.round((p.contractValue||0)/Math.max(1,p.contractYears||1));
  let total=roster.reduce((s,p)=>s+annual(p),0);
  if(total<=target)return;
@@ -2226,17 +2227,29 @@ function normalizeFinalScore(g){
  if(g.win){g.team=winnerTarget;g.oppScore=loserTarget}else{g.oppScore=winnerTarget;g.team=loserTarget}
  g.scoreNormalized=true;return g
 }
+function quickSimBlockReason(){
+ if(S.stage==="Retired")return "Your playing career is complete.";
+ if(S.stage==="Draft Combine")return "Finish the Draft Combine before playing another game.";
+ if(S.stage==="Offseason")return "Finish offseason roster and contract decisions first.";
+ if(S.fullGame&&S.fullGame.active)return "Finish or exit the current full game first.";
+ if(S.live)return "Finish the current game first.";
+ if(S.stage==="NBA"&&S.nbaWorld.allStar&&S.nbaWorld.allStar.breakActive&&!S.nbaWorld.allStar.completed)return "Complete the All-Star break before the next game.";
+ if(S.stage==="NBA"&&isInjured())return "You are injured. Recover before playing the next game.";
+ return ""
+}
+function canQuickSimNow(){return !quickSimBlockReason()}
 function showQuickSimResult(g,payout){
  const result=g.win?"WIN":"LOSS",cls=g.win?"good":"bad";
- const score=(g.team||0)+" - "+(g.oppScore||0);
+ const score=(g.team||0)+" - "+(g.oppScore||0),blockReason=quickSimBlockReason();
  const earnings=payout>0?'<div class="row"><span>Game earnings</span><strong>$'+Math.round(payout).toLocaleString()+'</strong></div>':'';
  const story=g.storyline?'<div class="item"><div><b>'+g.storyline+'</b><small>Game spotlight</small></div></div>':'';
- modal('<div class="row" style="align-items:flex-start"><div><span class="kicker">QUICK SIM RESULT</span><h2 style="margin:5px 0">'+result+' vs '+g.opp+'</h2><p class="muted" style="margin:0">Final score '+score+'</p></div><span class="pill '+cls+'">'+result+'</span></div><div class="rosterSummary" style="margin-top:14px"><div><small class="muted">PTS</small><b style="display:block;font-size:24px">'+g.pts+'</b></div><div><small class="muted">AST</small><b style="display:block;font-size:24px">'+g.ast+'</b></div><div><small class="muted">REB</small><b style="display:block;font-size:24px">'+g.reb+'</b></div><div><small class="muted">SCORE</small><b style="display:block;font-size:18px">'+score+'</b></div></div>'+earnings+story+'<div class="modalFoot"><button class="btn good" id="quickResultNext">Quick Sim Next Game</button><button class="btn primary" id="quickResultDone">Continue</button><button class="btn" id="quickResultGames">View Games</button></div>');
+ const nextAction=blockReason?'<div class="item"><small>'+blockReason+'</small></div>':'<button class="btn good" id="quickResultNext">Quick Sim Next Game</button>';
+ modal('<div class="row" style="align-items:flex-start"><div><span class="kicker">QUICK SIM RESULT</span><h2 style="margin:5px 0">'+result+' vs '+g.opp+'</h2><p class="muted" style="margin:0">Final score '+score+'</p></div><span class="pill '+cls+'">'+result+'</span></div><div class="rosterSummary" style="margin-top:14px"><div><small class="muted">PTS</small><b style="display:block;font-size:24px">'+g.pts+'</b></div><div><small class="muted">AST</small><b style="display:block;font-size:24px">'+g.ast+'</b></div><div><small class="muted">REB</small><b style="display:block;font-size:24px">'+g.reb+'</b></div><div><small class="muted">SCORE</small><b style="display:block;font-size:18px">'+score+'</b></div></div>'+earnings+story+'<div class="modalFoot">'+nextAction+'<button class="btn primary" id="quickResultDone">Continue</button><button class="btn" id="quickResultGames">View Games</button></div>');
  if($("quickResultNext"))$("quickResultNext").onclick=()=>{closeModal();setTimeout(()=>quickSim(),80)};
  if($("quickResultDone"))$("quickResultDone").onclick=closeModal;
  if($("quickResultGames"))$("quickResultGames").onclick=()=>{closeModal();setScreen("games")}
 }
-function quickSim(){const p=S.player,spot=S.stage==="NBA"?currentGameSpotlight():null,g={quickSim:true,opp:nextOpp(),storyline:spot?spot.title:null,stage:S.stage,playoff:!!(S.playoffs&&S.playoffs.active),homeAway:S.playoffs&&S.playoffs.active?"PLAYOFF":nextGameLocation(),pts:Math.max(5,Math.round(ovr()/3+(Math.random()-.35)*14)),ast:Math.max(0,Math.round(p.attrs.Playmaking/16+Math.random()*4)),reb:Math.max(0,Math.round(p.attrs.Athleticism/20+Math.random()*4))};g.win=ovr()+relationshipClutchBonus()*.55+Math.random()*30>62+Math.random()*35;const base=g.playoff?104:110;const winner=base+Math.floor(Math.random()*(g.playoff?20:21)),margin=2+Math.floor(Math.random()*13);g.team=g.win?winner:winner-margin;g.oppScore=g.win?winner-margin:winner;recordGame(g)}
+function quickSim(){const reason=quickSimBlockReason();if(reason){toast(reason);render();return}if(S.stage==="NBA"&&!S.playoffs.active&&(S.record.w+S.record.l)>=82){startPlayoffs();render();toast("Regular season complete — playoffs are ready");return}const p=S.player,spot=S.stage==="NBA"?currentGameSpotlight():null,g={quickSim:true,opp:nextOpp(),storyline:spot?spot.title:null,stage:S.stage,playoff:!!(S.playoffs&&S.playoffs.active),homeAway:S.playoffs&&S.playoffs.active?"PLAYOFF":nextGameLocation(),pts:Math.max(5,Math.round(ovr()/3+(Math.random()-.35)*14)),ast:Math.max(0,Math.round(p.attrs.Playmaking/16+Math.random()*4)),reb:Math.max(0,Math.round(p.attrs.Athleticism/20+Math.random()*4))};g.win=ovr()+relationshipClutchBonus()*.55+Math.random()*30>62+Math.random()*35;const base=g.playoff?104:110;const winner=base+Math.floor(Math.random()*(g.playoff?20:21)),margin=2+Math.floor(Math.random()*13);g.team=g.win?winner:winner-margin;g.oppScore=g.win?winner-margin:winner;recordGame(g)}
 function finishGame(){
  closeModal();const g=S.live;if(!g)return;
  if(g.team===g.oppScore){
