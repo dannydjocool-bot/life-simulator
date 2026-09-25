@@ -1652,21 +1652,22 @@ function relationshipAction(action){
    if(r.status!=="Exclusive"||r.chemistry<78||r.trust<70){toast("A serious relationship needs 78 Chemistry and 70 Trust");return}
    r.status="Serious";trust=7;happy=9;label="Took the relationship seriously"
  }
+ let nextStatus=null,addMarriedAccolade=false;
  if(action==="movein"){
    if(r.status!=="Serious"||r.chemistry<86||r.trust<82){toast("Living together needs 86 Chemistry and 82 Trust");return}
    const hasHome=S.finance.owned.includes("apartment")||S.finance.owned.includes("house");
-   cost=hasHome?0:(S.stage==="NBA"?12000:1800);r.status="Living Together";trust=8;happy=10;attention=-25;label=hasHome?"Moved in together":"Moved into a place together"
+   cost=hasHome?0:(S.stage==="NBA"?12000:1800);nextStatus="Living Together";trust=8;happy=10;attention=-25;label=hasHome?"Moved in together":"Moved into a place together"
  }
  if(action==="engage"){
    if(!(S.stage==="NBA"||S.stage==="Offseason")||r.status!=="Living Together"||r.chemistry<90||r.trust<90){toast("Engagement unlocks in the NBA at 90 Chemistry and 90 Trust");return}
-   cost=25000;r.status="Engaged";trust=10;happy=12;attention=-30;label="Got engaged"
+   cost=25000;nextStatus="Engaged";trust=10;happy=12;attention=-30;label="Got engaged"
  }
  if(action==="marry"){
    if(!(S.stage==="NBA"||S.stage==="Offseason")||r.status!=="Engaged"||r.chemistry<94||r.trust<94||r.happiness<85){toast("Marriage needs 94 Chemistry, 94 Trust and 85 Happiness");return}
-   cost=60000;r.status="Married";trust=10;happy=14;attention=-35;label="Got married";if(!S.accolades.includes("Married"))S.accolades.push("Married")
+   cost=60000;nextStatus="Married";addMarriedAccolade=true;trust=10;happy=14;attention=-35;label="Got married"
  }
  if(cost>S.finance.cash){toast("Not enough cash for that");return}
- S.finance.cash-=cost;r.chemistry=Math.min(100,r.chemistry+chem);r.trust=Math.min(100,r.trust+trust);r.happiness=Math.min(100,r.happiness+happy);r.attention=Math.max(0,r.attention+attention);r.actionsThisCycle=(r.actionsThisCycle||0)+1;
+ S.finance.cash-=cost;if(nextStatus)r.status=nextStatus;if(addMarriedAccolade&&!S.accolades.includes("Married"))S.accolades.push("Married");r.chemistry=Math.min(100,r.chemistry+chem);r.trust=Math.min(100,r.trust+trust);r.happiness=Math.min(100,r.happiness+happy);r.attention=Math.max(0,r.attention+attention);r.actionsThisCycle=(r.actionsThisCycle||0)+1;
  if(r.status==="Talking"&&r.chemistry>=45){r.status="Dating";r.happiness=Math.min(100,r.happiness+5);label+=" • You are now dating"}
  r.history=(r.history||[]);r.history.unshift(label+(cost?" • $"+cost.toLocaleString():""));r.history=r.history.slice(0,12);save();render();toast(label)
 }
