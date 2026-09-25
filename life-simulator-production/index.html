@@ -132,7 +132,7 @@ linear-gradient(145deg,var(--jc1),var(--jc1b))}
 .storeCard .btn{width:100%;margin-top:10px}
 }
 @media(max-width:900px){
-.bottom{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-rows:minmax(52px,auto);gap:6px}.bottom button{font-size:13px!important;padding:12px 5px!important;min-height:52px;line-height:1.1;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.bottom{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-rows:minmax(54px,auto);gap:6px}.bottom button{font-size:12.5px!important;padding:10px 4px!important;min-height:54px;line-height:1.15;display:flex;align-items:center;justify-content:center;white-space:normal;overflow-wrap:anywhere;word-break:normal;text-align:center}
 html,body{min-height:100dvh;overflow-x:hidden}
 .app{display:block;min-height:100dvh}
 .side{display:none}
@@ -141,7 +141,7 @@ html,body{min-height:100dvh;overflow-x:hidden}
 .top h1{font-size:28px;line-height:1.05}
 .profile{flex:0 0 auto}
 .profile div{display:none}
-.content{padding:12px 12px calc(205px + env(safe-area-inset-bottom))}
+.content{padding:12px 12px calc(245px + env(safe-area-inset-bottom))}
 .hero{grid-template-columns:1fr}
 .heroBox{padding:19px;min-height:205px}
 .heroBox h2{font-size:31px}
@@ -151,15 +151,15 @@ html,body{min-height:100dvh;overflow-x:hidden}
 .card h3{font-size:17px}
 .item{padding:12px}
 .badgeGrid{grid-template-columns:1fr 1fr}
-.bottom{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:minmax(52px,auto);gap:6px;position:fixed;z-index:60;left:10px;right:10px;bottom:calc(12px + env(safe-area-inset-bottom));background:rgba(13,19,29,.96);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid #2a3950;border-radius:20px;padding:8px;box-shadow:0 12px 35px rgba(0,0,0,.38)}
-.bottom button{text-align:center;padding:12px 5px;font-size:13px;min-width:0;min-height:52px;line-height:1.1;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.bottom{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:minmax(54px,auto);gap:6px;position:fixed;z-index:60;left:10px;right:10px;bottom:calc(12px + env(safe-area-inset-bottom));background:#0d131d;border:1px solid #2a3950;border-radius:20px;padding:8px;box-shadow:0 12px 35px rgba(0,0,0,.48);overflow:hidden;isolation:isolate}
+.bottom button{text-align:center;padding:10px 4px;font-size:12.5px;min-width:0;min-height:54px;line-height:1.15;display:flex;align-items:center;justify-content:center;white-space:normal;overflow-wrap:anywhere;word-break:normal}
 .form,.choiceGrid{grid-template-columns:1fr}
 .modalWrap{align-items:end;padding:0}
 .modal{border-radius:24px 24px 0 0;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
 }
 @supports (-webkit-touch-callout:none){
 @media(max-width:900px){
-.content{padding-bottom:calc(285px + env(safe-area-inset-bottom))}
+.content{padding-bottom:calc(335px + env(safe-area-inset-bottom))}
 .bottom{bottom:calc(58px + env(safe-area-inset-bottom))}
 }
 }
@@ -168,6 +168,8 @@ html,body{min-height:100dvh;overflow-x:hidden}
 .badgeGrid{grid-template-columns:1fr}
 .heroBox h2{font-size:29px}
 .top h1{font-size:27px}
+.bottom{left:6px;right:6px;gap:4px;padding:6px}
+.bottom button{font-size:12px!important;padding:9px 2px!important;min-height:52px}
 }
 .orgGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.orgCard{border:1px solid var(--line);border-radius:15px;padding:13px;background:#0e1621}.orgCard.active{border-color:#4d6f9d;box-shadow:0 0 0 1px rgba(77,111,157,.35)}.rosterTable{width:100%;border-collapse:collapse;font-size:12px}.rosterTable th,.rosterTable td{padding:9px 8px;border-bottom:1px solid #1f2d40;text-align:right;white-space:nowrap}.rosterTable th:first-child,.rosterTable td:first-child{text-align:left}.rosterTable tr.myPlayerRow{background:rgba(255,139,50,.08)}.rosterScroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid #223248;border-radius:15px;background:#0a111b;max-width:100%}.depthTag{font-size:9px;padding:2px 6px;border-radius:999px;background:#17243a;color:#b7c8df}.rosterSummary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}.rosterSummary>div{background:#0d151f;border:1px solid #213149;border-radius:12px;padding:10px;text-align:center}@media(max-width:760px){.orgGrid{grid-template-columns:1fr 1fr}.rosterSummary{grid-template-columns:1fr 1fr}.rosterTable{font-size:11px}}@media(max-width:430px){.orgGrid{grid-template-columns:1fr}}
 .mainMenuShell{max-width:1180px;margin:0 auto;padding:18px 0 36px}
