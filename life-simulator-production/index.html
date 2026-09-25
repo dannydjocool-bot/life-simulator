@@ -132,7 +132,7 @@ linear-gradient(145deg,var(--jc1),var(--jc1b))}
 .storeCard .btn{width:100%;margin-top:10px}
 }
 @media(max-width:900px){
-.bottom{grid-template-columns:repeat(9,1fr)!important}.bottom button{font-size:8px;padding:10px 1px}
+.bottom{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-rows:minmax(52px,auto);gap:6px}.bottom button{font-size:13px!important;padding:12px 5px!important;min-height:52px;line-height:1.1;display:flex;align-items:center;justify-content:center;white-space:nowrap}
 html,body{min-height:100dvh;overflow-x:hidden}
 .app{display:block;min-height:100dvh}
 .side{display:none}
@@ -141,7 +141,7 @@ html,body{min-height:100dvh;overflow-x:hidden}
 .top h1{font-size:28px;line-height:1.05}
 .profile{flex:0 0 auto}
 .profile div{display:none}
-.content{padding:12px 12px calc(150px + env(safe-area-inset-bottom))}
+.content{padding:12px 12px calc(205px + env(safe-area-inset-bottom))}
 .hero{grid-template-columns:1fr}
 .heroBox{padding:19px;min-height:205px}
 .heroBox h2{font-size:31px}
@@ -151,15 +151,15 @@ html,body{min-height:100dvh;overflow-x:hidden}
 .card h3{font-size:17px}
 .item{padding:12px}
 .badgeGrid{grid-template-columns:1fr 1fr}
-.bottom{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;z-index:60;left:10px;right:10px;bottom:calc(12px + env(safe-area-inset-bottom));background:rgba(13,19,29,.96);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid #2a3950;border-radius:18px;padding:6px;box-shadow:0 12px 35px rgba(0,0,0,.38)}
-.bottom button{text-align:center;padding:10px 2px;font-size:10px;min-width:0}
+.bottom{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:minmax(52px,auto);gap:6px;position:fixed;z-index:60;left:10px;right:10px;bottom:calc(12px + env(safe-area-inset-bottom));background:rgba(13,19,29,.96);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid #2a3950;border-radius:20px;padding:8px;box-shadow:0 12px 35px rgba(0,0,0,.38)}
+.bottom button{text-align:center;padding:12px 5px;font-size:13px;min-width:0;min-height:52px;line-height:1.1;display:flex;align-items:center;justify-content:center;white-space:nowrap}
 .form,.choiceGrid{grid-template-columns:1fr}
 .modalWrap{align-items:end;padding:0}
 .modal{border-radius:24px 24px 0 0;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
 }
 @supports (-webkit-touch-callout:none){
 @media(max-width:900px){
-.content{padding-bottom:calc(240px + env(safe-area-inset-bottom))}
+.content{padding-bottom:calc(285px + env(safe-area-inset-bottom))}
 .bottom{bottom:calc(58px + env(safe-area-inset-bottom))}
 }
 }
