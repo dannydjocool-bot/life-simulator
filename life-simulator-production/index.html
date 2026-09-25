@@ -802,7 +802,20 @@ function freeAgentDestination(player,currentTeamId){
 }
 function processLeagueFreeAgency(){
  if(S.nbaWorld.leagueFAProcessedYear===S.year)return;ensureLeagueRosters();ensureLeagueStandings();const free=[];
- NBA_TEAMS.forEach(t=>rosterFor(t.id).forEach(p=>{p.contractYears=Math.max(0,(p.contractYears||1)-1);p.age=(p.age||27)+1;if(p.contractYears===0)free.push({p,from:t.id})}));
+ NBA_TEAMS.forEach(t=>{
+   const roster=rosterFor(t.id);
+   for(let i=roster.length-1;i>=0;i--){
+     const p=roster[i];p.age=(p.age||27)+1;
+     const retireChance=p.age>=40?1:p.age>=38?.72:p.age>=36?Math.max(.08,.3-((p.ovr||75)-75)*.012):0;
+     if(roster.length>5&&Math.random()<retireChance){
+       roster.splice(i,1);
+       const msg=p.name+" retired from the NBA at age "+p.age+".";
+       S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg);continue
+     }
+     p.contractYears=Math.max(0,(p.contractYears||1)-1);
+     if(p.contractYears===0)free.push({p,from:t.id})
+   }
+ });
  free.sort((a,b)=>(b.p.ovr||0)-(a.p.ovr||0));
  free.forEach(({p,from})=>{const pick=freeAgentDestination(p,from),to=pick.team.id,years=p.age>=33?2:2+Math.floor(Math.random()*3);p.contractYears=years;p.contractValue=Math.round((p.ovr||75)*(p.ovr||75)*26000*years);
   if(to!==from){const src=rosterFor(from),idx=src.indexOf(p);if(idx>=0)src.splice(idx,1);rosterFor(to).push(p);const msg=p.name+" signed with "+teamNameById(to)+" after leaving "+teamNameById(from)+" • "+years+" years • "+pick.dir;S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg)}
