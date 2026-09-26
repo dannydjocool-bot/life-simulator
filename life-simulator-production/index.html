@@ -234,33 +234,75 @@ body.menuReducedMotion *{scroll-behavior:auto!important;transition:none!importan
 @media(max-width:760px){.menuCourtArt{opacity:.28;right:-120px;bottom:-55px}.relationshipGrid{grid-template-columns:1fr}.relMeters{grid-template-columns:1fr 1fr 1fr}}
 #keyMomentDecision{scroll-margin-top:92px}
 @media(max-width:700px){#keyMomentDecision{scroll-margin-top:110px}}
-.phoneAppGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}.phoneApp{border:1px solid #2a3b54;background:#0d1623;color:#fff;border-radius:20px;padding:16px 10px;min-height:104px;text-align:center;display:grid;place-items:center;align-content:center;gap:8px;font-weight:850}.phoneApp:hover{border-color:#4a6385;transform:translateY(-1px)}.phoneAppIcon{width:52px;height:52px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(145deg,#1f3048,#111a28);border:1px solid #334862;font-size:25px;box-shadow:0 8px 18px rgba(0,0,0,.28)}.phoneApp small{color:#aab7c9;font-size:10px;font-weight:700}.floatingPhone{display:none}.mobileNavIcon{display:block;font-size:21px;line-height:1;margin-bottom:5px}.mobileNavLabel{display:block;font-size:10px;line-height:1}
+.phoneAppGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+.phoneApp{border:1px solid #2a3b54;background:#0d1623;color:#fff;border-radius:22px;padding:15px 9px;min-height:112px;text-align:center;display:grid;place-items:center;align-content:center;gap:8px;font-weight:850;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;min-width:0}
+.phoneApp:hover,.phoneApp:focus-visible{border-color:#4a6385;transform:translateY(-2px);box-shadow:0 12px 24px rgba(0,0,0,.22)}
+.phoneAppIcon{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.13);box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 9px 20px rgba(0,0,0,.3)}
+.phoneApp:nth-child(1) .phoneAppIcon{background:linear-gradient(145deg,#2878d7,#154273)}
+.phoneApp:nth-child(2) .phoneAppIcon{background:linear-gradient(145deg,#2a9d69,#15553a)}
+.phoneApp:nth-child(3) .phoneAppIcon{background:linear-gradient(145deg,#8759e7,#472991)}
+.phoneApp:nth-child(4) .phoneAppIcon{background:linear-gradient(145deg,#e05275,#7d2941)}
+.phoneApp:nth-child(5) .phoneAppIcon{background:linear-gradient(145deg,#e39a3d,#805222)}
+.phoneApp:nth-child(6) .phoneAppIcon{background:linear-gradient(145deg,#397eae,#214762)}
+.phoneApp:nth-child(7) .phoneAppIcon{background:linear-gradient(145deg,#3b8aa6,#214c5d)}
+.phoneApp:nth-child(8) .phoneAppIcon{background:linear-gradient(145deg,#d48929,#704313)}
+.phoneAppIcon svg{width:30px;height:30px;display:block}
+.phoneApp b{font-size:13px;line-height:1.1;overflow-wrap:anywhere}
+.phoneApp small{color:#aab7c9;font-size:10px;font-weight:700;line-height:1.2}
+.uiIcon{width:24px;height:24px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.floatingPhone{display:none}
+.mobileNavIcon{height:28px;display:grid;place-items:center;margin-bottom:3px}
+.mobileNavIcon .uiIcon{width:25px;height:25px}
+.mobileNavLabel{display:block;font-size:10px;line-height:1;font-weight:850}
 @media(max-width:900px){
  .phoneAppGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
- .content{padding-bottom:calc(118px + env(safe-area-inset-bottom))!important}
- .bottom{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-rows:64px!important;left:8px!important;right:8px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;padding:7px!important;gap:4px!important;border-radius:22px!important;overflow:visible!important}
- .bottom button{min-height:60px!important;padding:7px 2px!important;display:block!important;font-size:10px!important;border-radius:15px!important}
- .floatingPhone{display:grid;position:fixed;z-index:72;right:18px;bottom:calc(92px + env(safe-area-inset-bottom));width:70px;height:70px;border-radius:24px;border:1px solid #536b8d;background:linear-gradient(145deg,#1b2d46,#0d1522);color:#fff;place-items:center;align-content:center;gap:1px;box-shadow:0 16px 38px rgba(0,0,0,.52);font-weight:900}
+ .content{padding-bottom:calc(124px + env(safe-area-inset-bottom))!important}
+ .bottom{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-rows:64px!important;left:8px!important;right:8px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;padding:7px!important;gap:4px!important;border-radius:24px!important;overflow:visible!important;background:rgba(10,16,26,.97)!important;box-shadow:0 18px 42px rgba(0,0,0,.52)!important}
+ .bottom button{min-height:60px!important;padding:7px 2px!important;display:block!important;font-size:10px!important;border-radius:16px!important}
+ .bottom button.active{background:linear-gradient(145deg,#1d2c43,#121c2b)!important;box-shadow:inset 0 0 0 1px #31445e}
+ .floatingPhone{display:grid;position:fixed;z-index:72;left:50%;right:auto;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom));width:74px;height:74px;border-radius:26px;border:1px solid #60799c;background:linear-gradient(145deg,#244265,#101d2d);color:#fff;place-items:center;align-content:center;gap:2px;box-shadow:0 18px 42px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12);font-weight:900}
+ .floatingPhone:active{transform:translateX(-50%) scale(.96)}
  .floatingPhone.hidden{display:none!important}
- .floatingPhoneIcon{font-size:34px;line-height:.85;transform:rotate(180deg)}
- .floatingPhone small{font-size:9px;color:#dce6f4}
- .floatingPhone i{position:absolute;right:7px;top:7px;width:11px;height:11px;border-radius:50%;background:#ff6b14;border:2px solid #101722;display:none}
+ .floatingPhoneIcon{width:35px;height:35px;display:grid;place-items:center}
+ .floatingPhoneIcon .uiIcon{width:33px;height:33px}
+ .floatingPhone small{font-size:9px;color:#eef5ff;letter-spacing:.2px}
+ .floatingPhone i{position:absolute;right:8px;top:8px;width:12px;height:12px;border-radius:50%;background:#ff6b14;border:2px solid #132238;display:none;box-shadow:0 0 0 2px rgba(255,107,20,.12)}
  .floatingPhone.hasAlert i{display:block}
 }
-@media(max-width:520px){.phoneAppGrid{grid-template-columns:repeat(3,minmax(0,1fr))}.phoneApp{min-height:94px;padding:12px 6px}.phoneAppIcon{width:46px;height:46px;border-radius:15px}.floatingPhone{right:12px}}
-</style>
+@media(max-width:520px){
+ .phoneAppGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .phoneApp{min-height:98px;padding:11px 5px;border-radius:18px}
+ .phoneAppIcon{width:48px;height:48px;border-radius:15px}
+ .phoneAppIcon svg{width:26px;height:26px}
+ .floatingPhone{width:70px;height:70px;bottom:calc(84px + env(safe-area-inset-bottom))}
+}</style>
 </head>
 <body>
 <div class="app">
 <aside class="side"><div class="brand">MY<span>HALL</span>OFFAME<small>BASKETBALL CAREER SIMULATOR</small></div><div class="nav" id="deskNav"></div><div class="mini" id="mini"></div></aside>
 <main class="main"><header class="top"><div><p id="eyebrow">MYCAREER</p><h1 id="title">Start</h1></div><div class="topActions"><button class="btn topMainMenuBtn" id="topMainMenuBtn">Main Menu</button><button class="profile" id="profileBtn"><span id="profileAvatar" class="profileAvatar"></span><div><b id="pname">Rookie</b><small id="povr">60 OVR</small></div></button></div></header><section class="content" id="content"></section></main>
 <nav class="bottom" id="bottomNav"></nav>
-<button class="floatingPhone hidden" id="floatingPhoneBtn" aria-label="Open Phone"><span class="floatingPhoneIcon">▯</span><small>Phone</small><i id="phoneNotifyDot"></i></button>
+<button class="floatingPhone hidden" id="floatingPhoneBtn" aria-label="Open Phone"><span class="floatingPhoneIcon"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"></rect><path d="M9.5 5h5"></path><path d="M11 18.5h2"></path></svg></span><small>Phone</small><i id="phoneNotifyDot"></i></button>
 </div>
 <div class="modalWrap hidden" id="modalWrap"><div class="modal" id="modal"></div></div><div class="toast hidden" id="toast"></div>
 <script>
 const NAV=[["home","Hub"],["career","Career"],["games","Games"],["player","Player"],["life","Life"],["social","Social"],["phone","Phone"],["dating","Dating"],["residence","Home"],["rosters","Roster"],["league","League"]];
-const MOBILE_NAV=[["home","⌂","Hub"],["career","▣","Career"],["games","●","Games"],["player","♙","Player"],["life","$","Life"]];
+const MOBILE_NAV=[["home","home","Hub"],["career","briefcase","Career"],["games","basketball","Games"],["player","user","Player"],["life","wallet","Life"]];
+const UI_ICON_PATHS={
+ home:'<path d="M3 10.5 12 3l9 7.5"></path><path d="M5.5 9.5V21h13V9.5"></path><path d="M9.5 21v-7h5v7"></path>',
+ briefcase:'<rect x="3" y="7" width="18" height="13" rx="2.5"></rect><path d="M8.5 7V5.5A2.5 2.5 0 0 1 11 3h2a2.5 2.5 0 0 1 2.5 2.5V7"></path><path d="M3 12h18"></path><path d="M10 12v2h4v-2"></path>',
+ basketball:'<circle cx="12" cy="12" r="9"></circle><path d="M5.2 6.2c3.2 1.9 5 5 5.1 9.8"></path><path d="M13.7 4.1c-2 4.8-1.9 10.1.3 15.8"></path><path d="M4 13.6c5.2-1.8 10.4-1.7 16 .3"></path>',
+ user:'<circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 21c.6-4.3 3-6.5 6.5-6.5s5.9 2.2 6.5 6.5"></path>',
+ wallet:'<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H19v16H6.5A2.5 2.5 0 0 1 4 17.5z"></path><path d="M4 8h15"></path><path d="M14 11h7v5h-7a2.5 2.5 0 0 1 0-5Z"></path><circle cx="17.5" cy="13.5" r=".7" fill="currentColor" stroke="none"></circle>',
+ message:'<path d="M4 5.5h16v11H9l-5 4v-15Z"></path><path d="M8 9h8"></path><path d="M8 12.5h5"></path>',
+ bank:'<path d="M3 9h18"></path><path d="M5 9V20"></path><path d="M9.5 9V20"></path><path d="M14.5 9V20"></path><path d="M19 9V20"></path><path d="M2.5 20h19"></path><path d="m3 8 9-5 9 5"></path>',
+ camera:'<rect x="3" y="6.5" width="18" height="13" rx="3"></rect><circle cx="12" cy="13" r="4"></circle><path d="m8 6.5 1.5-2h5l1.5 2"></path>',
+ heart:'<path d="M20.5 8.8c0 5-8.5 10-8.5 10s-8.5-5-8.5-10A4.8 4.8 0 0 1 12 5.6a4.8 4.8 0 0 1 8.5 3.2Z"></path>',
+ users:'<circle cx="9" cy="9" r="3"></circle><circle cx="17" cy="10" r="2.4"></circle><path d="M3.5 20c.4-3.8 2.3-5.7 5.5-5.7s5.1 1.9 5.5 5.7"></path><path d="M14.5 15.4c3.3-.5 5.2 1 6 4.6"></path>',
+ globe:'<circle cx="12" cy="12" r="9"></circle><path d="M3.5 12h17"></path><path d="M12 3c2.4 2.5 3.5 5.5 3.5 9S14.4 18.5 12 21"></path><path d="M12 3C9.6 5.5 8.5 8.5 8.5 12s1.1 6.5 3.5 9"></path>',
+ star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9Z"></path>'
+};
+function uiIcon(name){return '<svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true">'+(UI_ICON_PATHS[name]||UI_ICON_PATHS.star)+'</svg>'}
 const HS_TEAMS=["Westfield Prep","Central Academy","North Ridge","Eastview","Bay State Tech","Riverside Prep","Metro Catholic","Pioneer High"];
 const COLLEGES=["UConn","Duke","Kentucky","Kansas","Michigan State","Villanova","Arizona","North Carolina"];
 const NBA_TEAMS=[
@@ -605,7 +647,7 @@ function nav(){
    return
  }
  const desk=()=>NAV.map(([id,n])=>'<button class="'+(S.screen===id?"active":"")+'" data-screen="'+id+'">'+n+"</button>").join("");
- const mobile=()=>MOBILE_NAV.map(([id,icon,n])=>'<button class="'+(S.screen===id?"active":"")+'" data-screen="'+id+'"><span class="mobileNavIcon">'+icon+'</span><span class="mobileNavLabel">'+n+'</span></button>').join("");
+ const mobile=()=>MOBILE_NAV.map(([id,icon,n])=>'<button class="'+(S.screen===id?"active":"")+'" data-screen="'+id+'"><span class="mobileNavIcon">'+uiIcon(icon)+'</span><span class="mobileNavLabel">'+n+'</span></button>').join("");
  $("deskNav").innerHTML=desk();
  $("bottomNav").innerHTML=mobile();
  if(fp){fp.classList.remove("hidden");fp.classList.toggle("hasAlert",phoneHasAlerts());fp.onclick=()=>setScreen("phone")}
@@ -2599,7 +2641,7 @@ function social(){
  return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">LEAGUE SOCIAL</span><h2 style="margin:6px 0">Around The League</h2><p class="muted">Breaking offseason moves, trades, free-agent signings, extensions, retirements, draft headlines and major award news appear here automatically.</p><div class="row"><span>League buzz</span><strong>'+(S.nbaWorld.socialFeed||[]).length+' posts</strong></div></section><section class="card s12"><div class="row"><div><h3 style="margin:0">Offseason Feed</h3><small class="muted">Newest moves appear first.</small></div><span class="pill good">LIVE FEED</span></div><div class="list" style="margin-top:12px">'+(posts||'<div class="item"><div><b>No major moves yet</b><small>Big league transactions will appear here when the offseason begins.</small></div></div>')+'</div></section></div>'
 }
 function phone(){
- const phoneApps='<section class="card s12"><div class="row"><div><span class="kicker">MY PHONE</span><h2 style="margin:5px 0">Apps</h2><small class="muted">Everything that used to crowd the bottom navigation now lives here.</small></div><span class="pill good">CONNECTED</span></div><div class="phoneAppGrid"><button class="phoneApp" data-phone-jump="messages"><span class="phoneAppIcon">✉</span><b>Messages</b><small>League contacts</small></button><button class="phoneApp" data-phone-jump="bank"><span class="phoneAppIcon">$</span><b>Bank</b><small>Cash & transfers</small></button><button class="phoneApp" data-go="social"><span class="phoneAppIcon">◎</span><b>Social</b><small>League feed</small></button><button class="phoneApp" data-go="dating"><span class="phoneAppIcon">♥</span><b>Dating</b><small>Relationships</small></button><button class="phoneApp" data-go="residence"><span class="phoneAppIcon">⌂</span><b>Home</b><small>Residence</small></button><button class="phoneApp" data-go="rosters"><span class="phoneAppIcon">♟</span><b>Roster</b><small>Organizations</small></button><button class="phoneApp" data-go="league"><span class="phoneAppIcon">◉</span><b>League</b><small>Standings & news</small></button><button class="phoneApp" data-phone-jump="recruit"><span class="phoneAppIcon">★</span><b>Recruiting</b><small>Star trades</small></button></div></section>';
+ const phoneApps='<section class="card s12"><div class="row"><div><span class="kicker">MY PHONE</span><h2 style="margin:5px 0">Apps</h2><small class="muted">Your off-court tools are organized like apps instead of crowding the navigation.</small></div><span class="pill good">CONNECTED</span></div><div class="phoneAppGrid"><button class="phoneApp" data-phone-jump="messages"><span class="phoneAppIcon">'+uiIcon("message")+'</span><b>Messages</b><small>League contacts</small></button><button class="phoneApp" data-phone-jump="bank"><span class="phoneAppIcon">'+uiIcon("bank")+'</span><b>Bank</b><small>Cash & transfers</small></button><button class="phoneApp" data-go="social"><span class="phoneAppIcon">'+uiIcon("camera")+'</span><b>Social</b><small>League feed</small></button><button class="phoneApp" data-go="dating"><span class="phoneAppIcon">'+uiIcon("heart")+'</span><b>Dating</b><small>Relationships</small></button><button class="phoneApp" data-go="residence"><span class="phoneAppIcon">'+uiIcon("home")+'</span><b>Home</b><small>Residence</small></button><button class="phoneApp" data-go="rosters"><span class="phoneAppIcon">'+uiIcon("users")+'</span><b>Roster</b><small>Organizations</small></button><button class="phoneApp" data-go="league"><span class="phoneAppIcon">'+uiIcon("globe")+'</span><b>League</b><small>Standings & news</small></button><button class="phoneApp" data-phone-jump="recruit"><span class="phoneAppIcon">'+uiIcon("star")+'</span><b>Recruiting</b><small>Star trades</small></button></div></section>';
  const state=ensurePhoneState(),eligible=S.stage==="Offseason"&&careerPathLevel("dynasty")>=3,candidates=starPhoneCandidates(),leagueCandidates=leagueContactCandidates();
  if(!state.active&&candidates[0])state.active=starThreadKey(candidates[0].team.id,candidates[0].player.name);
  if(!state.leagueActive&&leagueCandidates[0])state.leagueActive=leagueThreadKey(leagueCandidates[0].team.id,leagueCandidates[0].player.name);
