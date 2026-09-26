@@ -1939,12 +1939,89 @@ function signSignatureShoe(i){
  addCareerPathXP("business",40);addCareerPathXP("media",30);S.news.unshift("Launched a signature shoe with "+b[0]+".");save();render();toast("Signature shoe signed")
 }
 function shoeIncome(){return S.nbaWorld.signatureShoe?S.nbaWorld.signatureShoe.perGame:0}
+function ensurePhoneState(){
+ S.nbaWorld.phone=S.nbaWorld.phone||{threads:{},active:null};
+ S.nbaWorld.phone.threads=S.nbaWorld.phone.threads||{};
+ return S.nbaWorld.phone
+}
+function starPhoneCandidates(){
+ ensureLeagueRosters();
+ return NBA_TEAMS.filter(t=>t.id!==S.team).map(t=>({team:t,player:[...rosterFor(t.id)].sort((a,b)=>(b.ovr||0)-(a.ovr||0))[0]})).filter(x=>x.player&&(x.player.ovr||0)>=82).sort((a,b)=>(b.player.ovr||0)-(a.player.ovr||0)).slice(0,18)
+}
+function starThreadKey(teamId,name){return teamId+"::"+name}
+function getStarThread(teamId,player){
+ const phone=ensurePhoneState(),key=starThreadKey(teamId,player.name);
+ if(!phone.threads[key])phone.threads[key]={key,teamId,playerName:player.name,interest:18,lastYear:S.year||1,messages:[{from:"them",text:"Yo, what's good? Saw your message.",year:S.year||1}],tradeRequested:false,completed:false};
+ return phone.threads[key]
+}
+function phoneTarget(thread){
+ const team=nbaTeamById(thread.teamId),player=team?rosterFor(thread.teamId).find(p=>p.name===thread.playerName):null;
+ return team&&player?{team,player}:null
+}
+function phoneReplyFor(action,thread,target){
+ const p=target.player,person=p.personality||"Competitive",interest=thread.interest||0;
+ if(action==="respect")return interest>=35?"Respect. I see what you're building over there.":"Appreciate it. I'm focused on my team right now.";
+ if(action==="fit")return interest>=48?"I can see the basketball fit. We'd be tough together.":"Maybe. I'd need to know how the touches and role would work.";
+ if(action==="ring")return person==="Ring Chaser"||championshipCount()>0?"Winning matters. If the situation is right, I'd listen.":"I hear you, but I'm not moving just for ring talk.";
+ if(action==="role")return (p.ovr||0)>=90?"I'm not coming anywhere to be a second option.":"A real role matters. Keep talking.";
+ if(action==="trade")return interest>=72?"Alright. If your front office can make it work, I'll tell my people I'm open to the move.":"Not yet. I'm not asking out unless I'm really sold on it.";
+ return "We'll see."
+}
+function starMessage(action){
+ const phone=ensurePhoneState(),thread=phone.threads[phone.active];if(!thread)return;
+ const target=phoneTarget(thread);if(!target){toast("That player is no longer available");return}
+ if(thread.completed){toast("This recruitment is already complete");return}
+ if(thread.lastYear!==S.year){thread.interest=Math.max(12,(thread.interest||18)-12);thread.tradeRequested=false;thread.lastYear=S.year}
+ let delta=0,text="";
+ if(action==="respect"){text="Been watching your game. You'd fit with what we're building.";delta=8+Math.round((S.social.fame||0)/25)}
+ if(action==="fit"){text="Basketball-wise, we'd make each other better. You'd have room to cook.";delta=(target.player.personality==="Leader"?7:10)}
+ if(action==="ring"){text="Come chase a championship with me. We can make a real run.";delta=6+Math.min(12,championshipCount()*3)+(target.player.personality==="Ring Chaser"?6:0)}
+ if(action==="role"){text="You'd have a major role here. I'm not asking you to stand in a corner.";delta=target.player.personality==="Leader"?10:7}
+ if(action==="trade"){text="If you're serious, tell your team you're open to a trade."}
+ const prior=thread.messages.filter(m=>m.from==="me"&&m.action===action).length;
+ if(prior>0&&action!=="trade")delta=Math.max(2,Math.round(delta*.45));
+ thread.messages.push({from:"me",text,action,year:S.year||1});
+ if(action==="trade"){
+   if((thread.interest||0)>=72)thread.tradeRequested=true;
+   thread.messages.push({from:"them",text:phoneReplyFor(action,thread,target),year:S.year||1});
+   save();render();return
+ }
+ thread.interest=Math.max(0,Math.min(100,(thread.interest||0)+delta));
+ thread.messages.push({from:"them",text:phoneReplyFor(action,thread,target),year:S.year||1});
+ save();render()
+}
+function tradePackageForStar(target){
+ const ours=[...rosterFor(S.team)].sort((a,b)=>(b.ovr||0)-(a.ovr||0)),star=target.player,out=[];
+ if(ours[0])out.push(ours[0]);
+ if((star.ovr||85)>=90&&ours[1])out.push(ours[1]);
+ return out
+}
+function completeStarTrade(){
+ const phone=ensurePhoneState(),thread=phone.threads[phone.active];if(!thread||!thread.tradeRequested)return;
+ if(S.stage!=="Offseason"){toast("Star trades can only be completed in the offseason");return}
+ if(careerPathLevel("dynasty")<3){toast("Requires Dynasty Builder Level 3");return}
+ if(S.nbaWorld.recruitedYear===S.year){toast("You already completed a star recruitment this offseason");return}
+ const target=phoneTarget(thread);if(!target){toast("Player no longer available");return}
+ const pkg=tradePackageForStar(target);if(!pkg.length){toast("Your team has no trade package available");return}
+ const starAnnual=annualSalaryValue(target.player),outAnnual=pkg.reduce((sum,p)=>sum+annualSalaryValue(p),0);
+ const projected=teamPayrollAnnual(S.team)-outAnnual+starAnnual;
+ if(projected>leagueCapLine("hard")){toast("Trade cannot be completed — projected payroll exceeds hard cap");return}
+ const src=rosterFor(target.team.id),starIdx=src.findIndex(p=>p.name===target.player.name);if(starIdx<0){toast("Player no longer available");return}
+ src.splice(starIdx,1);
+ const ours=rosterFor(S.team);
+ pkg.forEach(p=>{const idx=ours.findIndex(x=>x.name===p.name);if(idx>=0)ours.splice(idx,1);src.push(p)});
+ ours.push(target.player);
+ rebalanceRosterPayroll(ours,S.team);rebalanceRosterPayroll(src,target.team.id);
+ thread.completed=true;S.nbaWorld.recruitedYear=S.year;addCareerPathXP("dynasty",55);
+ const pkgNames=pkg.map(p=>p.name).join(" + "),msg=currentTeamName()+" acquired "+target.player.name+" from "+teamNameById(target.team.id)+" for "+pkgNames+".";
+ S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg);pushSocialHeadline(msg,"TRADE");S.news.unshift("Your phone recruitment helped complete the trade for "+target.player.name+".");
+ save();render();toast(target.player.name+" traded to "+currentTeamName())
+}
 function recruitStar(){
  if(!(S.stage==="Offseason"&&careerPathLevel("dynasty")>=3)){toast("Requires Dynasty Builder Level 3 during the offseason");return}
  if(S.nbaWorld.recruitedYear===S.year){toast("You already recruited a player this offseason");return}
- const candidates=NBA_TEAMS.filter(t=>t.id!==S.team).slice(0,8).map(t=>({team:t,player:rosterFor(t.id)[0]})).filter(x=>x.player);
- modal('<h2>Recruit a Star</h2><p class="muted">Use your influence to convince a star to join '+currentTeamName()+'.</p><div class="list">'+candidates.map((x,i)=>'<button class="btn" data-recruit="'+i+'">'+x.player.name+' • '+x.team.city+' '+x.team.name+' • '+x.player.ppg.toFixed(1)+' PPG</button>').join("")+'</div>');
- document.querySelectorAll("[data-recruit]").forEach(b=>b.onclick=()=>{const x=candidates[+b.dataset.recruit],chance=Math.min(88,35+pathBonus("rosterInfluence")+S.social.fame*.25+S.player.trust*.2);S.nbaWorld.recruitedYear=S.year;if(Math.random()*100<chance){const src=rosterFor(x.team.id),idx=src.findIndex(p=>p.name===x.player.name);if(idx>=0)src.splice(idx,1);rosterFor(S.team).push(x.player);addCareerPathXP("dynasty",45);pushLeagueNews(S.player.name+" helped recruit "+x.player.name+" to "+currentTeamName()+".");closeModal();save();render();toast("Recruitment successful")}else{closeModal();save();render();toast("Recruitment failed")}})}
+ setScreen("phone")
+}
 function negotiateContract(idx){
  if(!S.offseason?.active||S.nbaWorld.negotiatedYear===S.year){toast("No more negotiations this offseason");return}
  const o=S.offseason.contractOffers[idx];if(!o)return;
@@ -2193,6 +2270,20 @@ function social(){
  const source=offseason.length?offseason:feed;
  const posts=source.map((x,i)=>'<div class="item" style="align-items:flex-start"><div style="min-width:0"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><span class="pill '+(i<3?'good':'')+'">'+x.type+'</span><small class="muted">Year '+x.year+'</small></div><b style="display:block;font-size:16px;line-height:1.35">'+x.text+'</b></div></div>').join("");
  return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">LEAGUE SOCIAL</span><h2 style="margin:6px 0">Around The League</h2><p class="muted">Breaking offseason moves, trades, free-agent signings, extensions, retirements, draft headlines and major award news appear here automatically.</p><div class="row"><span>League buzz</span><strong>'+(S.nbaWorld.socialFeed||[]).length+' posts</strong></div></section><section class="card s12"><div class="row"><div><h3 style="margin:0">Offseason Feed</h3><small class="muted">Newest moves appear first.</small></div><span class="pill good">LIVE FEED</span></div><div class="list" style="margin-top:12px">'+(posts||'<div class="item"><div><b>No major moves yet</b><small>Big league transactions will appear here when the offseason begins.</small></div></div>')+'</div></section></div>'
+}
+function phone(){
+ const state=ensurePhoneState(),eligible=S.stage==="Offseason"&&careerPathLevel("dynasty")>=3,candidates=starPhoneCandidates();
+ if(!state.active&&candidates[0])state.active=starThreadKey(candidates[0].team.id,candidates[0].player.name);
+ let target=null,thread=null;
+ const candidate=candidates.find(x=>starThreadKey(x.team.id,x.player.name)===state.active);
+ if(candidate){thread=getStarThread(candidate.team.id,candidate.player);target=candidate}
+ else if(state.active&&state.threads[state.active]){thread=state.threads[state.active];target=phoneTarget(thread)}
+ const contacts=candidates.map(x=>{const key=starThreadKey(x.team.id,x.player.name),th=getStarThread(x.team.id,x.player);return '<button class="phoneContact '+(state.active===key?'active':'')+'" data-phone-contact="'+key+'"><b>'+x.player.name+'</b><small>'+x.team.abbr+' • '+x.player.pos+' • '+x.player.ovr+' OVR • Interest '+Math.round(th.interest||0)+'%</small></button>'}).join("");
+ if(!target||!thread)return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">PLAYER PHONE</span><h2>Messages</h2><p class="muted">No star contacts are available right now.</p></section></div>';
+ const msgs=(thread.messages||[]).map(m=>'<div class="phoneBubble '+(m.from==="me"?'me':'them')+'">'+m.text+'<small>'+(m.from==="me"?"You":target.player.name)+'</small></div>').join("");
+ const pkg=tradePackageForStar(target),pkgText=pkg.length?pkg.map(p=>p.name+" ("+(p.ovr||0)+" OVR)").join(" + "):"No package available";
+ const controls=eligible?'<div class="phoneActions"><button class="btn" data-star-message="respect">Show Respect</button><button class="btn" data-star-message="fit">Talk Basketball Fit</button><button class="btn" data-star-message="ring">Pitch a Title Run</button><button class="btn" data-star-message="role">Promise a Major Role</button><button class="btn good" data-star-message="trade" '+((thread.interest||0)<72?'disabled':'')+'>Ask Him to Request Trade • 72% Interest</button><button class="btn primary" id="completeStarTradeBtn" '+(!thread.tradeRequested||thread.completed?'disabled':'')+'>Work Out Trade</button></div>':'<div class="item"><small>Star recruiting conversations unlock during the offseason at Dynasty Builder Level 3.</small></div>';
+ return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">PLAYER PHONE</span><h2 style="margin:6px 0">Messages</h2><p class="muted">Text star players, build interest, and convince them to request a trade. Conversation history stays with your career.</p></section><section class="card s12"><div class="phoneShell"><div class="phoneContacts"><h3>Star Contacts</h3>'+contacts+'</div><div class="phoneThread"><div class="row"><div><b>'+target.player.name+'</b><small class="muted" style="display:block">'+target.team.city+' '+target.team.name+' • '+target.player.pos+' • '+target.player.ovr+' OVR</small></div><span class="pill '+((thread.interest||0)>=72?'good':'')+'">'+Math.round(thread.interest||0)+'% INTEREST</span></div><div class="phoneMessages">'+msgs+'</div>'+controls+'<div class="item" style="margin-top:12px"><div><b>Potential trade package</b><small>'+pkgText+'</small></div><span class="pill">$'+Math.round(annualSalaryValue(target.player)/1000000)+'M/yr</span></div></div></div></section></div>'
 }
 function dating(){
  return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">LOVE & LEGACY</span><h2 style="margin:6px 0">Dating & Relationships</h2><p class="muted">Meet people, build Chemistry, Trust and Happiness, manage relationship events, and unlock game-day boosts as your relationship grows.</p></section>'+relationshipsHTML()+'</div>'
