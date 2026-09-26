@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.14</title>
+<title>MYCAREER Basketball Sim v0.16.15</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -396,6 +396,15 @@ body.phoneDraggingNow .bottom{
  body.phoneTapPlaceMode .floatingPhone{pointer-events:none!important}
  body.phoneTapPlaceMode .phoneEditToggle{pointer-events:auto!important}
 }
+
+.phonePlaceShield{display:none}
+@media(max-width:900px){
+ .phonePlaceShield{
+   position:fixed;z-index:71;inset:0;background:transparent;
+   touch-action:manipulation;overscroll-behavior:none;
+ }
+ .phonePlaceShield:not(.hidden){display:block}
+}
 </style>
 </head>
 <body>
@@ -403,7 +412,7 @@ body.phoneDraggingNow .bottom{
 <aside class="side"><div class="brand">MY<span>HALL</span>OFFAME<small>BASKETBALL CAREER SIMULATOR</small></div><div class="nav" id="deskNav"></div><div class="mini" id="mini"></div></aside>
 <main class="main"><header class="top"><div><p id="eyebrow">MYCAREER</p><h1 id="title">Start</h1></div><div class="topActions"><button class="btn topMainMenuBtn" id="topMainMenuBtn">Main Menu</button><button class="profile" id="profileBtn"><span id="profileAvatar" class="profileAvatar"></span><div><b id="pname">Rookie</b><small id="povr">60 OVR</small></div></button></div></header><section class="content" id="content"><section class="card s12 bootCard"><span class="kicker">MYCAREER</span><h2 style="margin:8px 0">Loading your career…</h2><p class="muted">Your save stays on this device. MYCAREER is starting now.</p></section></section></main>
 <nav class="bottom" id="bottomNav"></nav>
-<button class="floatingPhone hidden" id="floatingPhoneBtn" aria-label="Open Phone"><span class="floatingPhoneIcon"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"></rect><path d="M9.5 5h5"></path><path d="M11 18.5h2"></path></svg></span><small id="floatingPhoneLabel">Phone</small><i id="phoneNotifyDot"></i></button><button class="phoneEditToggle hidden" id="phoneEditToggle" aria-label="Edit Phone position"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.2-1 10.9-10.9a2.2 2.2 0 0 0-3.1-3.1L5.1 15.9 4 20Z"></path><path d="m14.8 6.2 3 3"></path></svg><span id="phoneEditText">Edit</span></button><div class="phonePlaceHint hidden" id="phonePlaceHint">Tap anywhere to place Phone</div>
+<button class="floatingPhone hidden" id="floatingPhoneBtn" aria-label="Open Phone"><span class="floatingPhoneIcon"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"></rect><path d="M9.5 5h5"></path><path d="M11 18.5h2"></path></svg></span><small id="floatingPhoneLabel">Phone</small><i id="phoneNotifyDot"></i></button><button class="phoneEditToggle hidden" id="phoneEditToggle" aria-label="Edit Phone position"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.2-1 10.9-10.9a2.2 2.2 0 0 0-3.1-3.1L5.1 15.9 4 20Z"></path><path d="m14.8 6.2 3 3"></path></svg><span id="phoneEditText">Edit</span></button><div class="phonePlaceHint hidden" id="phonePlaceHint">Tap anywhere to place Phone</div><div class="phonePlaceShield hidden" id="phonePlaceShield" aria-hidden="true"></div>
 </div>
 <div class="modalWrap hidden" id="modalWrap"><div class="modal" id="modal"></div></div><div class="toast hidden" id="toast"></div>
 <script>
@@ -801,12 +810,13 @@ function applyPhonePosition(){
 function phoneUsesTapPlacement(){return window.matchMedia&&window.matchMedia("(pointer: coarse)").matches}
 function setPhoneEditMode(on){
  phoneEditMode=!!on;phoneDragging=false;phoneDragMoved=false;
- const fp=$("floatingPhoneBtn"),edit=$("phoneEditToggle"),label=$("floatingPhoneLabel"),hint=$("phonePlaceHint"),tapMode=phoneUsesTapPlacement();
+ const fp=$("floatingPhoneBtn"),edit=$("phoneEditToggle"),label=$("floatingPhoneLabel"),hint=$("phonePlaceHint"),shield=$("phonePlaceShield"),tapMode=phoneUsesTapPlacement();
  if(fp)fp.classList.toggle("phoneEditMode",phoneEditMode);
  if(edit){edit.classList.toggle("editing",phoneEditMode);const t=$("phoneEditText");if(t)t.textContent=phoneEditMode?"Done":"Edit"}
  if(label)label.textContent=phoneEditMode?(tapMode?"Tap Spot":"Drag Me"):"Phone";
  document.body.classList.toggle("phoneTapPlaceMode",phoneEditMode&&tapMode);
  if(hint)hint.classList.toggle("hidden",!(phoneEditMode&&tapMode));
+ if(shield)shield.classList.toggle("hidden",!(phoneEditMode&&tapMode));
  if(phoneEditMode)toast(tapMode?"Tap anywhere to place the Phone, then tap Done":"Drag the Phone anywhere, then tap Done");
  applyPhonePosition()
 }
@@ -848,15 +858,20 @@ function bindPhoneDrag(){
  };
  fp.addEventListener("pointerup",finish);fp.addEventListener("pointercancel",finish);
  fp.addEventListener("click",e=>{if(phoneEditMode||phoneDragMoved){e.preventDefault();e.stopPropagation();phoneDragMoved=false}});
- document.addEventListener("pointerup",e=>{
-   if(!phoneEditMode||!phoneUsesTapPlacement())return;
-   if(e.target.closest&&e.target.closest("#phoneEditToggle"))return;
-   const fpNow=$("floatingPhoneBtn");if(!fpNow)return;
-   const p=phoneSafePosition(e.clientX-fpNow.offsetWidth/2,e.clientY-fpNow.offsetHeight/2,fpNow);
-   localStorage.setItem(PHONE_POS_KEY,JSON.stringify(p));
-   applyPhonePosition();
-   toast("Phone moved");
- },true);
+ const shield=$("phonePlaceShield");
+ if(shield&&!shield.dataset.bound){
+   shield.dataset.bound="1";
+   shield.addEventListener("pointerup",e=>{
+     if(!phoneEditMode||!phoneUsesTapPlacement())return;
+     e.preventDefault();e.stopPropagation();
+     const fpNow=$("floatingPhoneBtn");if(!fpNow)return;
+     const p=phoneSafePosition(e.clientX-fpNow.offsetWidth/2,e.clientY-fpNow.offsetHeight/2,fpNow);
+     localStorage.setItem(PHONE_POS_KEY,JSON.stringify(p));
+     applyPhonePosition();
+     toast("Phone moved");
+   },{passive:false});
+   shield.addEventListener("click",e=>{if(phoneEditMode){e.preventDefault();e.stopPropagation()}},{capture:true});
+ }
  if(edit){
    edit.onclick=e=>{e.preventDefault();e.stopPropagation();setPhoneEditMode(!phoneEditMode)};
    let hold=null;
@@ -866,7 +881,7 @@ function bindPhoneDrag(){
 }
 function syncPhoneLauncher(){
  const fp=$("floatingPhoneBtn"),edit=$("phoneEditToggle");if(!fp)return;
- if(frontMode!=="career"){fp.classList.add("hidden");if(edit)edit.classList.add("hidden");const hint=$("phonePlaceHint");if(hint)hint.classList.add("hidden");document.body.classList.remove("phoneTapPlaceMode");return}
+ if(frontMode!=="career"){fp.classList.add("hidden");if(edit)edit.classList.add("hidden");const hint=$("phonePlaceHint"),shield=$("phonePlaceShield");if(hint)hint.classList.add("hidden");if(shield)shield.classList.add("hidden");document.body.classList.remove("phoneTapPlaceMode");phoneEditMode=false;return}
  fp.classList.remove("hidden");if(edit)edit.classList.remove("hidden");
  bindPhoneDrag();requestAnimationFrame(applyPhonePosition)
 }
