@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.11</title>
+<title>MYCAREER Basketball Sim v0.16.12</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -345,6 +345,31 @@ body.menuReducedMotion *{scroll-behavior:auto!important;transition:none!importan
  .cityPrivilegeCard{grid-column:1!important}
  .cityPrice{font-size:22px}
 }
+
+/* v0.16.12 draggable Phone launcher */
+.phoneEditToggle{display:none}
+@media(max-width:900px){
+ .floatingPhone.phoneCustomPosition{
+   left:0!important;right:auto!important;top:0!important;bottom:auto!important;
+   transform:none!important;touch-action:none;user-select:none;-webkit-user-select:none;
+ }
+ .floatingPhone.phoneEditMode{
+   border-color:#ff9b52!important;
+   box-shadow:0 0 0 3px rgba(255,139,50,.18),0 18px 42px rgba(0,0,0,.6)!important;
+   cursor:grab;
+ }
+ .floatingPhone.phoneEditMode:active{transform:none!important;cursor:grabbing}
+ .floatingPhone.phoneEditMode small{color:#ffbf8b}
+ .phoneEditToggle{
+   display:flex;position:fixed;z-index:73;align-items:center;gap:4px;
+   border:1px solid #4a6080;background:#111d2d;color:#dce9fa;
+   border-radius:999px;padding:7px 9px;font-size:9px;font-weight:900;
+   box-shadow:0 10px 24px rgba(0,0,0,.42);touch-action:manipulation;
+ }
+ .phoneEditToggle.hidden{display:none!important}
+ .phoneEditToggle .uiIcon{width:14px;height:14px}
+ .phoneEditToggle.editing{border-color:#ff9b52;background:#2b1a0e;color:#ffbd87}
+}
 </style>
 </head>
 <body>
@@ -352,7 +377,7 @@ body.menuReducedMotion *{scroll-behavior:auto!important;transition:none!importan
 <aside class="side"><div class="brand">MY<span>HALL</span>OFFAME<small>BASKETBALL CAREER SIMULATOR</small></div><div class="nav" id="deskNav"></div><div class="mini" id="mini"></div></aside>
 <main class="main"><header class="top"><div><p id="eyebrow">MYCAREER</p><h1 id="title">Start</h1></div><div class="topActions"><button class="btn topMainMenuBtn" id="topMainMenuBtn">Main Menu</button><button class="profile" id="profileBtn"><span id="profileAvatar" class="profileAvatar"></span><div><b id="pname">Rookie</b><small id="povr">60 OVR</small></div></button></div></header><section class="content" id="content"><section class="card s12 bootCard"><span class="kicker">MYCAREER</span><h2 style="margin:8px 0">Loading your career…</h2><p class="muted">Your save stays on this device. MYCAREER is starting now.</p></section></section></main>
 <nav class="bottom" id="bottomNav"></nav>
-<button class="floatingPhone hidden" id="floatingPhoneBtn" aria-label="Open Phone"><span class="floatingPhoneIcon"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"></rect><path d="M9.5 5h5"></path><path d="M11 18.5h2"></path></svg></span><small>Phone</small><i id="phoneNotifyDot"></i></button>
+<button class="floatingPhone hidden" id="floatingPhoneBtn" aria-label="Open Phone"><span class="floatingPhoneIcon"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"></rect><path d="M9.5 5h5"></path><path d="M11 18.5h2"></path></svg></span><small id="floatingPhoneLabel">Phone</small><i id="phoneNotifyDot"></i></button><button class="phoneEditToggle hidden" id="phoneEditToggle" aria-label="Edit Phone position"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.2-1 10.9-10.9a2.2 2.2 0 0 0-3.1-3.1L5.1 15.9 4 20Z"></path><path d="m14.8 6.2 3 3"></path></svg><span id="phoneEditText">Edit</span></button>
 </div>
 <div class="modalWrap hidden" id="modalWrap"><div class="modal" id="modal"></div></div><div class="toast hidden" id="toast"></div>
 <script>
@@ -709,6 +734,103 @@ function manualSave(){S.saveMeta=S.saveMeta||{lastSaved:null,manualSaves:0};S.sa
 function lastSavedText(){if(!S.saveMeta||!S.saveMeta.lastSaved)return "Not saved yet";const d=new Date(S.saveMeta.lastSaved);return Number.isNaN(d.getTime())?"Saved":d.toLocaleString()}
 function toast(t){$("toast").textContent=t;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),1300)}
 function setScreen(s){S.screen=s;save();render();scrollTo({top:0})}
+
+const PHONE_POS_KEY="mycareer-phone-position-v1";
+let phoneEditMode=false,phoneDragging=false,phoneDragMoved=false,phoneDragOffset={x:0,y:0};
+
+function savedPhonePosition(){
+ try{
+   const p=JSON.parse(localStorage.getItem(PHONE_POS_KEY)||"null");
+   return p&&Number.isFinite(p.x)&&Number.isFinite(p.y)?p:null
+ }catch(e){return null}
+}
+function phoneSafePosition(x,y,el){
+ const pad=8,w=el?.offsetWidth||70,h=el?.offsetHeight||70;
+ const maxX=Math.max(pad,window.innerWidth-w-pad);
+ const maxY=Math.max(pad,window.innerHeight-h-pad);
+ return {x:Math.max(pad,Math.min(maxX,x)),y:Math.max(pad,Math.min(maxY,y))}
+}
+function defaultPhonePosition(el){
+ const w=el?.offsetWidth||70,h=el?.offsetHeight||70;
+ const dockGap=88+(window.visualViewport?Math.max(0,window.innerHeight-window.visualViewport.height):0);
+ return phoneSafePosition((window.innerWidth-w)/2,window.innerHeight-h-dockGap,el)
+}
+function applyPhonePosition(){
+ const fp=$("floatingPhoneBtn"),edit=$("phoneEditToggle");if(!fp)return;
+ const saved=savedPhonePosition(),p=phoneSafePosition(saved?saved.x:defaultPhonePosition(fp).x,saved?saved.y:defaultPhonePosition(fp).y,fp);
+ fp.classList.add("phoneCustomPosition");
+ fp.style.setProperty("left",p.x+"px","important");
+ fp.style.setProperty("top",p.y+"px","important");
+ fp.style.setProperty("right","auto","important");
+ fp.style.setProperty("bottom","auto","important");
+ fp.style.setProperty("transform","none","important");
+ if(saved&&(saved.x!==p.x||saved.y!==p.y))localStorage.setItem(PHONE_POS_KEY,JSON.stringify(p));
+ if(edit){
+   const ew=edit.offsetWidth||54,eh=edit.offsetHeight||30;
+   const ex=Math.max(6,Math.min(window.innerWidth-ew-6,p.x+(fp.offsetWidth||70)-12));
+   const ey=Math.max(6,Math.min(window.innerHeight-eh-6,p.y-eh-5));
+   edit.style.left=ex+"px";edit.style.top=ey+"px";edit.style.right="auto";edit.style.bottom="auto"
+ }
+}
+function setPhoneEditMode(on){
+ phoneEditMode=!!on;phoneDragging=false;phoneDragMoved=false;
+ const fp=$("floatingPhoneBtn"),edit=$("phoneEditToggle"),label=$("floatingPhoneLabel");
+ if(fp)fp.classList.toggle("phoneEditMode",phoneEditMode);
+ if(edit){edit.classList.toggle("editing",phoneEditMode);const t=$("phoneEditText");if(t)t.textContent=phoneEditMode?"Done":"Edit"}
+ if(label)label.textContent=phoneEditMode?"Drag Me":"Phone";
+ if(phoneEditMode)toast("Drag the Phone anywhere, then tap Done");
+ applyPhonePosition()
+}
+function resetPhonePosition(){
+ localStorage.removeItem(PHONE_POS_KEY);
+ applyPhonePosition();
+ toast("Phone position reset")
+}
+function bindPhoneDrag(){
+ const fp=$("floatingPhoneBtn"),edit=$("phoneEditToggle");if(!fp||fp.dataset.dragBound==="1")return;
+ fp.dataset.dragBound="1";
+ fp.addEventListener("pointerdown",e=>{
+   if(!phoneEditMode)return;
+   e.preventDefault();phoneDragging=true;phoneDragMoved=false;
+   const r=fp.getBoundingClientRect();phoneDragOffset={x:e.clientX-r.left,y:e.clientY-r.top};
+   try{fp.setPointerCapture(e.pointerId)}catch(_){}
+ });
+ fp.addEventListener("pointermove",e=>{
+   if(!phoneDragging||!phoneEditMode)return;
+   e.preventDefault();phoneDragMoved=true;
+   const p=phoneSafePosition(e.clientX-phoneDragOffset.x,e.clientY-phoneDragOffset.y,fp);
+   fp.style.setProperty("left",p.x+"px","important");fp.style.setProperty("top",p.y+"px","important");
+   if(edit){
+     const ew=edit.offsetWidth||54,eh=edit.offsetHeight||30;
+     edit.style.left=Math.max(6,Math.min(window.innerWidth-ew-6,p.x+fp.offsetWidth-12))+"px";
+     edit.style.top=Math.max(6,Math.min(window.innerHeight-eh-6,p.y-eh-5))+"px"
+   }
+ });
+ const finish=e=>{
+   if(!phoneDragging)return;phoneDragging=false;
+   const r=fp.getBoundingClientRect(),p=phoneSafePosition(r.left,r.top,fp);
+   localStorage.setItem(PHONE_POS_KEY,JSON.stringify(p));applyPhonePosition();
+   try{fp.releasePointerCapture(e.pointerId)}catch(_){}
+ };
+ fp.addEventListener("pointerup",finish);fp.addEventListener("pointercancel",finish);
+ fp.addEventListener("click",e=>{if(phoneEditMode||phoneDragMoved){e.preventDefault();e.stopPropagation();phoneDragMoved=false}});
+ if(edit){
+   edit.onclick=e=>{e.preventDefault();e.stopPropagation();setPhoneEditMode(!phoneEditMode)};
+   let hold=null;
+   edit.addEventListener("pointerdown",()=>{hold=setTimeout(()=>{if(phoneEditMode)resetPhonePosition()},900)});
+   ["pointerup","pointercancel","pointerleave"].forEach(ev=>edit.addEventListener(ev,()=>{if(hold){clearTimeout(hold);hold=null}}))
+ }
+}
+function syncPhoneLauncher(){
+ const fp=$("floatingPhoneBtn"),edit=$("phoneEditToggle");if(!fp)return;
+ if(frontMode!=="career"){fp.classList.add("hidden");if(edit)edit.classList.add("hidden");return}
+ fp.classList.remove("hidden");if(edit)edit.classList.remove("hidden");
+ bindPhoneDrag();requestAnimationFrame(applyPhonePosition)
+}
+window.addEventListener("resize",()=>requestAnimationFrame(applyPhonePosition));
+window.addEventListener("orientationchange",()=>setTimeout(applyPhonePosition,180));
+if(window.visualViewport)window.visualViewport.addEventListener("resize",()=>requestAnimationFrame(applyPhonePosition));
+
 function nav(){
  const fp=$("floatingPhoneBtn");
  if(frontMode!=="career"){
@@ -720,7 +842,7 @@ function nav(){
  const mobile=()=>MOBILE_NAV.map(([id,icon,n])=>'<button class="'+(S.screen===id?"active":"")+'" data-screen="'+id+'"><span class="mobileNavIcon">'+uiIcon(icon)+'</span><span class="mobileNavLabel">'+n+'</span></button>').join("");
  $("deskNav").innerHTML=desk();
  $("bottomNav").innerHTML=mobile();
- if(fp){fp.classList.remove("hidden");fp.classList.toggle("hasAlert",phoneHasAlerts());fp.onclick=()=>setScreen("phone")}
+ if(fp){fp.classList.toggle("hasAlert",phoneHasAlerts());fp.onclick=e=>{if(phoneEditMode||phoneDragMoved){e.preventDefault();phoneDragMoved=false;return}setScreen("phone")};syncPhoneLauncher()}
  document.querySelectorAll("[data-screen]").forEach(b=>b.onclick=()=>setScreen(b.dataset.screen))
 }
 
@@ -859,7 +981,7 @@ function bindMainMenu(){
  if($("menuHelpBtn"))$("menuHelpBtn").onclick=menuHelpModal
 }
 function renderFrontEnd(){
- applyMenuSettings();$("deskNav").innerHTML="";$("bottomNav").innerHTML="";$("mini").innerHTML="";
+ applyMenuSettings();$("deskNav").innerHTML="";$("bottomNav").innerHTML="";$("mini").innerHTML="";if($("floatingPhoneBtn"))$("floatingPhoneBtn").classList.add("hidden");if($("phoneEditToggle"))$("phoneEditToggle").classList.add("hidden");
  const selecting=frontMode==="select"||frontMode==="new";$("eyebrow").textContent=selecting?(frontMode==="new"?"NEW CAREER":"CAREER SELECT"):"MYCAREER";$("title").textContent=selecting?(frontMode==="new"?"Choose Save Slot":"Choose Career"):"Main Menu";
  $("pname").textContent="MyCareer";$("povr").textContent="Basketball Simulator";$("profileAvatar").innerHTML="";
  $("profileBtn").style.visibility="hidden";$("topMainMenuBtn").style.display="none";
