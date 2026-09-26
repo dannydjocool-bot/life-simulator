@@ -1968,6 +1968,7 @@ function ensurePhoneState(){
  return S.nbaWorld.phone
 }
 function starPhoneCandidates(){
+ if(!["NBA","Offseason"].includes(S.stage))return [];
  ensureLeagueRosters();
  return NBA_TEAMS.filter(t=>t.id!==S.team).map(t=>({team:t,player:[...rosterFor(t.id)].sort((a,b)=>(b.ovr||0)-(a.ovr||0))[0]})).filter(x=>x.player&&(x.player.ovr||0)>=82).sort((a,b)=>(b.player.ovr||0)-(a.player.ovr||0)).slice(0,18)
 }
