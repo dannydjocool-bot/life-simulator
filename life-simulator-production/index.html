@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.10</title>
+<title>MYCAREER Basketball Sim v0.16.11</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -168,7 +168,7 @@ html,body{min-height:100dvh;overflow-x:hidden}
 .orgGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.orgCard{border:1px solid var(--line);border-radius:15px;padding:13px;background:#0e1621}.orgCard.active{border-color:#4d6f9d;box-shadow:0 0 0 1px rgba(77,111,157,.35)}.rosterTable{width:100%;border-collapse:collapse;font-size:12px}.rosterTable th,.rosterTable td{padding:9px 8px;border-bottom:1px solid #1f2d40;text-align:right;white-space:nowrap}.rosterTable th:first-child,.rosterTable td:first-child{text-align:left}.rosterTable tr.myPlayerRow{background:rgba(255,139,50,.08)}.rosterScroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid #223248;border-radius:15px;background:#0a111b;max-width:100%}.depthTag{font-size:9px;padding:2px 6px;border-radius:999px;background:#17243a;color:#b7c8df}.rosterSummary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}.rosterSummary>div{background:#0d151f;border:1px solid #213149;border-radius:12px;padding:10px;text-align:center}@media(max-width:760px){.orgGrid{grid-template-columns:1fr 1fr}.rosterSummary{grid-template-columns:1fr 1fr}.rosterTable{font-size:11px}}@media(max-width:430px){.orgGrid{grid-template-columns:1fr}}
 .mainMenuShell{max-width:1180px;margin:0 auto;padding:18px 0 36px}
 .mainMenuHero{position:relative;overflow:hidden;isolation:isolate;min-height:390px;border:1px solid #293a54;border-radius:30px;padding:38px;background:#0c131e;box-shadow:0 28px 70px rgba(0,0,0,.32)}
-.mainMenuHero:before{content:"";position:absolute;inset:0;z-index:-2;background-image:linear-gradient(90deg,rgba(6,10,17,.97) 0%,rgba(6,10,17,.93) 36%,rgba(6,10,17,.74) 62%,rgba(6,10,17,.45) 100%),url("https://images.unsplash.com/photo-1649570731979-f0496fc3dda1?auto=format&fit=crop&fm=jpg&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.1.0&q=60&w=3000");background-size:cover;background-position:center 42%;background-repeat:no-repeat;transform:scale(1.015)}
+.mainMenuHero:before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(circle at 78% 28%,rgba(255,122,28,.20),transparent 29%),linear-gradient(135deg,#15243a 0%,#0c1522 48%,#070b12 100%);transform:scale(1.015)}
 .mainMenuHero:after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 76% 32%,rgba(255,122,28,.22),transparent 34%),linear-gradient(180deg,transparent 58%,rgba(6,10,17,.6));pointer-events:none}
 .mainMenuTitle{font-size:clamp(42px,8vw,88px);line-height:.9;letter-spacing:-.055em;margin:12px 0 18px;max-width:760px}
 .mainMenuTitle span{color:#ff8b32}
@@ -331,12 +331,14 @@ body.menuReducedMotion *{scroll-behavior:auto!important;transition:none!importan
   .card,.card.s6,.card.s8,.card.s12{padding-left:13px!important;padding-right:13px!important}
 }
 
+.bootCard{max-width:760px;margin:18px auto;min-height:180px;display:flex;flex-direction:column;justify-content:center}
 .cityPrivilegeGrid{grid-template-columns:repeat(12,minmax(0,1fr))}
 .cityPrivilegeCard{grid-column:span 4;min-width:0}
-.cityPrice{display:block;font-size:20px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.cityPrice{display:block;font-size:20px;line-height:1.1;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media(max-width:760px){
  .cityPrivilegeGrid{grid-template-columns:1fr 1fr!important}
  .cityPrivilegeCard{grid-column:auto!important}
+ .bootCard{margin:8px 0;min-height:150px}
 }
 @media(max-width:520px){
  .cityPrivilegeGrid{grid-template-columns:1fr!important}
@@ -348,7 +350,7 @@ body.menuReducedMotion *{scroll-behavior:auto!important;transition:none!importan
 <body>
 <div class="app">
 <aside class="side"><div class="brand">MY<span>HALL</span>OFFAME<small>BASKETBALL CAREER SIMULATOR</small></div><div class="nav" id="deskNav"></div><div class="mini" id="mini"></div></aside>
-<main class="main"><header class="top"><div><p id="eyebrow">MYCAREER</p><h1 id="title">Start</h1></div><div class="topActions"><button class="btn topMainMenuBtn" id="topMainMenuBtn">Main Menu</button><button class="profile" id="profileBtn"><span id="profileAvatar" class="profileAvatar"></span><div><b id="pname">Rookie</b><small id="povr">60 OVR</small></div></button></div></header><section class="content" id="content"></section></main>
+<main class="main"><header class="top"><div><p id="eyebrow">MYCAREER</p><h1 id="title">Start</h1></div><div class="topActions"><button class="btn topMainMenuBtn" id="topMainMenuBtn">Main Menu</button><button class="profile" id="profileBtn"><span id="profileAvatar" class="profileAvatar"></span><div><b id="pname">Rookie</b><small id="povr">60 OVR</small></div></button></div></header><section class="content" id="content"><section class="card s12 bootCard"><span class="kicker">MYCAREER</span><h2 style="margin:8px 0">Loading your career…</h2><p class="muted">Your save stays on this device. MYCAREER is starting now.</p></section></section></main>
 <nav class="bottom" id="bottomNav"></nav>
 <button class="floatingPhone hidden" id="floatingPhoneBtn" aria-label="Open Phone"><span class="floatingPhoneIcon"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"></rect><path d="M9.5 5h5"></path><path d="M11 18.5h2"></path></svg></span><small>Phone</small><i id="phoneNotifyDot"></i></button>
 </div>
@@ -2465,502 +2467,17 @@ function philanthropyHTML(){
 }
 function compactMoney(v){
  const n=Math.round(v||0);
- if(n>=1000000000)return "$"+(Math.round(n/100000000)/10).toString().replace(/\.0$/,"")+"B";
- if(n>=1000000)return "$"+(Math.round(n/100000)/10).toString().replace(/\.0$/,"")+"M";
- if(n>=1000)return "$"+(Math.round(n/100)/10).toString().replace(/\.0$/,"")+"K";
+ if(n>=1000000000){const x=Math.round(n/100000000)/10;return "$"+(Number.isInteger(x)?x.toFixed(0):x.toFixed(1))+"B"}
+ if(n>=1000000){const x=Math.round(n/100000)/10;return "$"+(Number.isInteger(x)?x.toFixed(0):x.toFixed(1))+"M"}
+ if(n>=1000){const x=Math.round(n/100)/10;return "$"+(Number.isInteger(x)?x.toFixed(0):x.toFixed(1))+"K"}
  return "$"+n.toLocaleString()
 }
 function cityPrivilegesHTML(){
- ensureWealthState();return '<section class="card s12"><span class="kicker">KEYS TO THE CITY</span><h3>Civic Access & Legacy Purchases</h3><p class="muted">Keys are permanent status unlocks earned through lifetime charitable giving. They are not spent; they unlock exclusive places and projects where superstar money can actually go.</p><div class="grid cityPrivilegeGrid" style="margin-top:10px">'+CITY_PRIVILEGES.map(x=>{const owned=S.civic.purchases.includes(x.id),locked=(S.civic.keys||0)<x.keys;return '<div class="card cityPrivilegeCard"><div class="row"><b>'+x.name+'</b><span class="pill">'+x.keys+' KEY'+(x.keys===1?'':'S')+'</span></div><p class="muted">'+x.desc+'</p><strong class="cityPrice" title="
-function passiveIncome(){ensureWealthState();const base=S.finance.owned.reduce((sum,id)=>{const x=STORE_ITEMS.find(i=>i.id===id);return sum+(x?x.income:0)},0);return Math.round(base*(1+connectionEffect("passiveIncome")+pathBonus("passiveIncome")))+realEstateNetIncome()+shoeIncome()+jerseyMerchIncome()}
-function endorsementSlots(){return (S.social.fame>=80?4:S.social.fame>=60?3:S.social.fame>=35?2:1)+Math.round(connectionEffect("endorsementSlots"))}
-function endorsementStageOK(s){return s.stage===S.stage||(S.stage==="NBA"&&s.stage==="College")}
-function sponsorEligible(s){return endorsementStageOK(s)&&ovr()>=s.ovr&&S.social.followers>=s.followers&&S.social.fame>=s.fame}
-function activeSponsors(){return Array.isArray(S.finance.sponsors)?S.finance.sponsors:[]}
-function sponsorIncome(){return activeSponsors().reduce((sum,s)=>sum+(s.perGame||0),0)}
-function nextEndorsementGoal(){const locked=SPONSORS.filter(s=>endorsementStageOK(s)&&!activeSponsors().some(a=>a.id===s.id)&&!sponsorEligible(s)).sort((a,b)=>(a.ovr+b.fame+a.followers/10000)-(b.ovr+a.fame+b.followers/10000));return locked[0]||null}
-function currentPartner(){return S.relationships&&S.relationships.partner?relationshipProfile(S.relationships.partner):null}
-function relationshipActionLimit(){
- const status=S.relationships?.status||"Single";
- if(["Living Together","Engaged","Married"].includes(status))return 6;
- if(["Exclusive","Serious"].includes(status))return 5;
- if(["Talking","Dating"].includes(status))return 4;
- return 0
-}
-function relationshipStrength(){const r=S.relationships||{};return Math.max(0,Math.min(100,((r.chemistry||0)+(r.trust||0)+(r.happiness||0))/3))}
-function relationshipStageMultiplier(){const s=S.relationships?.status||"Single";return s==="Married"?1.7:s==="Engaged"?1.55:s==="Living Together"?1.45:s==="Serious"?1.35:s==="Exclusive"?1.18:s==="Dating"?1:s==="Talking"?.78:0}
-function relationshipClutchBonus(){
- const p=currentPartner(),m=relationshipStageMultiplier(),str=relationshipStrength();if(!p||!m)return 0;
- let b=0;if(p.type==="Supportive")b=4;if(p.type==="Childhood")b=3;if(p.type==="Dramatic")b=5;if(p.type==="Lowkey")b=2;
- return Math.round(b*m*(.65+str/180))
-}
-function relationshipFollowerMultiplier(){
- const p=currentPartner(),m=relationshipStageMultiplier(),str=relationshipStrength();if(!p||!m)return 1;
- if(p.type==="Influencer")return 1+.12*m+.0012*str;
- if(p.type==="Luxury")return 1+.05*m+.0005*str;
- return 1
-}
-function relationshipCoachTrustBonus(){const p=currentPartner(),m=relationshipStageMultiplier();return p&&p.type==="Ambitious"?Math.max(1,Math.round(1.5*m)):0}
-function relationshipInjuryReduction(){const p=currentPartner(),m=relationshipStageMultiplier(),str=relationshipStrength();return p&&p.type==="Athlete"?Math.min(.35,.12*m+.001*str):0}
-function relationshipInjuryDayReduction(){const p=currentPartner();return p&&p.type==="Athlete"&&relationshipStrength()>=72?1:0}
-function relationshipBoostText(){
- const p=currentPartner();if(!p)return "No active relationship boost.";
- const str=Math.round(relationshipStrength()),status=S.relationships.status;
- if(p.type==="Supportive")return status+" • +"+relationshipClutchBonus()+" clutch edge • stronger morale after games";
- if(p.type==="Athlete")return status+" • "+Math.round(relationshipInjuryReduction()*100)+"% lower injury risk • stronger recovery";
- if(p.type==="Influencer")return status+" • +"+Math.round((relationshipFollowerMultiplier()-1)*100)+"% follower growth";
- if(p.type==="Ambitious")return status+" • +"+relationshipCoachTrustBonus()+" coach-trust bonus on NBA games";
- if(p.type==="Luxury")return status+" • fame/public-image boost after wins";
- if(p.type==="Lowkey")return status+" • chemistry stability • low drama";
- if(p.type==="Childhood")return status+" • balanced morale, trust and chemistry support";
- if(p.type==="Dramatic")return status+" • +"+relationshipClutchBonus()+" clutch edge • high drama risk";
- return status+" • Relationship strength "+str
-}
-function meetPartner(id){
- const p=relationshipProfile(id);if(!p)return;
- if(relationshipUnlockRank(S.stage)<relationshipUnlockRank(p.unlock)){toast("You have not reached that stage yet");return}
- if(currentPartner()){toast("End your current relationship first");return}
- S.relationships={partner:id,status:"Talking",chemistry:34,trust:28,happiness:48,attention:8,actionsThisCycle:0,lastActionGame:S.game||0,pendingEvent:null,history:["Met "+p.name+"."],exclusive:false};
- S.news.unshift("You met "+p.name+" • "+p.type+".");save();render();toast("Started talking to "+p.name)
-}
-function relationshipAction(action){
- const r=S.relationships,p=currentPartner();if(!p)return;
- if(action==="breakup"){const name=p.name;S.relationships={partner:null,status:"Single",chemistry:0,trust:0,happiness:0,attention:0,actionsThisCycle:0,lastActionGame:S.game||0,pendingEvent:null,history:(r.history||[]).concat("Ended relationship with "+name+".").slice(-12),exclusive:false};S.player.morale=Math.max(20,S.player.morale-4);S.news.unshift("You and "+name+" ended the relationship.");save();render();toast("Relationship ended");return}
- const actionLimit=relationshipActionLimit();if((r.actionsThisCycle||0)>=actionLimit){toast("You used all "+actionLimit+" relationship actions this game cycle");return}
- let cost=0,chem=0,trust=0,happy=0,attention=-10,label="";
- if(action==="text"){chem=3;trust=2;happy=2;attention=-7;label="Had a good conversation"}
- if(action==="date"){cost=S.stage==="NBA"?900:S.stage==="College"?180:60;chem=7;trust=3;happy=8;attention=-18;label="Went on a date"}
- if(action==="quality"){chem=4;trust=6;happy=7;attention=-20;label="Spent quality time together"}
- if(action==="gift"){cost=S.stage==="NBA"?3500:S.stage==="College"?500:120;chem=2;trust=2;happy=10;attention=-10;label="Bought a thoughtful gift"}
- if(action==="post"){chem=2;trust=1;happy=p.type==="Lowkey"?-2:6;attention=-6;label="Posted together";const gain=Math.round((120+S.social.fame*9)*relationshipFollowerMultiplier());S.social.followers+=gain;if(p.type==="Influencer"||p.type==="Luxury")S.social.fame=Math.min(100,S.social.fame+2)}
- if(action==="exclusive"){
-   if(r.status!=="Dating"||r.chemistry<60||r.trust<50){toast("Build at least 60 Chemistry and 50 Trust first");return}
-   r.status="Exclusive";r.exclusive=true;trust=8;happy=8;label="Became exclusive"
- }
- if(action==="serious"){
-   if(r.status!=="Exclusive"||r.chemistry<78||r.trust<70){toast("A serious relationship needs 78 Chemistry and 70 Trust");return}
-   r.status="Serious";trust=7;happy=9;label="Took the relationship seriously"
- }
- let nextStatus=null,addMarriedAccolade=false;
- if(action==="movein"){
-   if(r.status!=="Serious"||r.chemistry<86||r.trust<82){toast("Living together needs 86 Chemistry and 82 Trust");return}
-   const hasHome=S.finance.owned.includes("apartment")||S.finance.owned.includes("house");
-   cost=hasHome?0:(S.stage==="NBA"?12000:1800);nextStatus="Living Together";trust=8;happy=10;attention=-25;label=hasHome?"Moved in together":"Moved into a place together"
- }
- if(action==="engage"){
-   if(!(S.stage==="NBA"||S.stage==="Offseason")||r.status!=="Living Together"||r.chemistry<90||r.trust<90){toast("Engagement unlocks in the NBA at 90 Chemistry and 90 Trust");return}
-   cost=25000;nextStatus="Engaged";trust=10;happy=12;attention=-30;label="Got engaged"
- }
- if(action==="marry"){
-   if(!(S.stage==="NBA"||S.stage==="Offseason")||r.status!=="Engaged"||r.chemistry<94||r.trust<94||r.happiness<85){toast("Marriage needs 94 Chemistry, 94 Trust and 85 Happiness");return}
-   cost=60000;nextStatus="Married";addMarriedAccolade=true;trust=10;happy=14;attention=-35;label="Got married"
- }
- if(cost>S.finance.cash){toast("Not enough cash for that");return}
- S.finance.cash-=cost;if(nextStatus)r.status=nextStatus;if(addMarriedAccolade&&!S.accolades.includes("Married"))S.accolades.push("Married");r.chemistry=Math.min(100,r.chemistry+chem);r.trust=Math.min(100,r.trust+trust);r.happiness=Math.min(100,r.happiness+happy);r.attention=Math.max(0,r.attention+attention);r.actionsThisCycle=(r.actionsThisCycle||0)+1;
- if(r.status==="Talking"&&r.chemistry>=45){r.status="Dating";r.happiness=Math.min(100,r.happiness+5);label+=" • You are now dating"}
- r.history=(r.history||[]);r.history.unshift(label+(cost?" • $"+cost.toLocaleString():""));r.history=r.history.slice(0,12);save();render();toast(label)
-}
-function maybeRelationshipEvent(){
- const r=S.relationships,p=currentPartner();if(!p||r.pendingEvent||Math.random()>.2)return;
- let kind="support";
- if(r.attention>=55)kind="attention";else if(p.type==="Dramatic"&&Math.random()<.55)kind="drama";else if((p.type==="Influencer"||p.type==="Luxury")&&Math.random()<.45)kind="spotlight";else if(Math.random()<.4)kind="support";
- const map={
-  support:{title:p.name+" checks in after the game",body:"She wants to help you reset and stay confident.",a:"Open up",b:"Keep it brief"},
-  attention:{title:p.name+" feels ignored",body:"Basketball has taken most of your time lately.",a:"Make time",b:"Stay focused"},
-  drama:{title:"Relationship tension before the next game",body:"A disagreement is starting to spill into your basketball focus.",a:"Talk it out",b:"Walk away"},
-  spotlight:{title:"Couple spotlight opportunity",body:"A popular sports page wants to feature you together.",a:"Do the feature",b:"Keep it private"}
- };
- r.pendingEvent={kind,...map[kind]}
-}
-function resolveRelationshipEvent(choice){
- const r=S.relationships,p=currentPartner(),e=r&&r.pendingEvent;if(!p||!e)return;
- if(e.kind==="support"){if(choice==="a"){r.trust+=5;r.happiness+=4;S.player.morale=Math.min(100,S.player.morale+5)}else r.attention+=6}
- if(e.kind==="attention"){if(choice==="a"){r.happiness+=8;r.trust+=4;r.attention=Math.max(0,r.attention-25);S.player.energy=Math.max(35,S.player.energy-3)}else{r.happiness-=10;r.trust-=5;r.attention+=10}}
- if(e.kind==="drama"){if(choice==="a"){r.trust+=4;r.happiness+=3;r.attention=Math.max(0,r.attention-15)}else{r.happiness-=9;S.player.morale=Math.max(20,S.player.morale-5)}}
- if(e.kind==="spotlight"){if(choice==="a"){const gain=Math.round((700+S.social.fame*40)*relationshipFollowerMultiplier());S.social.followers+=gain;S.social.fame=Math.min(100,S.social.fame+3);r.happiness+=4}else{r.trust+=3;if(p.type==="Lowkey")r.happiness+=4}}
- r.chemistry=Math.max(0,Math.min(100,r.chemistry));r.trust=Math.max(0,Math.min(100,r.trust));r.happiness=Math.max(0,Math.min(100,r.happiness));r.attention=Math.max(0,Math.min(100,r.attention));r.history.unshift(e.title+" • "+(choice==="a"?e.a:e.b));r.pendingEvent=null;save();render();toast("Relationship updated")
-}
-function processRelationshipAfterGame(g){
- const r=S.relationships,p=currentPartner();if(!p)return;
- const m=relationshipStageMultiplier(),str=relationshipStrength();r.actionsThisCycle=0;r.attention=Math.min(100,(r.attention||0)+(p.type==="Luxury"||p.type==="Dramatic"?10:7));
- if(p.type==="Supportive"){S.player.morale=Math.min(100,S.player.morale+(g.win?3:6))}
- if(p.type==="Athlete"){S.player.energy=Math.min(100,S.player.energy+Math.round(4*m))}
- if(p.type==="Influencer"){S.social.followers+=Math.round((80+(g.pts||0)*12)*m)}
- if(p.type==="Luxury"&&g.win){S.social.fame=Math.min(100,S.social.fame+.7*m)}
- if(p.type==="Lowkey"){S.player.chemistry=Math.min(100,S.player.chemistry+1);r.trust=Math.min(100,r.trust+1)}
- if(p.type==="Childhood"){S.player.morale=Math.min(100,S.player.morale+2);S.player.chemistry=Math.min(100,S.player.chemistry+1)}
- if(p.type==="Dramatic"){if(Math.random()<.22){S.social.fame=Math.min(100,S.social.fame+2);S.news.unshift(p.name+" relationship buzz is trending after the game.")}else if(Math.random()<.2){S.player.morale=Math.max(20,S.player.morale-4);r.happiness=Math.max(0,r.happiness-5)}}
- if(r.attention>65){r.happiness=Math.max(0,r.happiness-4);r.trust=Math.max(0,r.trust-2)}
- if(str>=72&&g.win){r.happiness=Math.min(100,r.happiness+2);r.chemistry=Math.min(100,r.chemistry+1)}
- maybeRelationshipEvent()
-}
-function processRelationshipMissedGame(reason){
- const r=S.relationships,p=currentPartner();if(!p)return;
- r.actionsThisCycle=0;r.attention=Math.min(100,(r.attention||0)+(p.type==="Luxury"||p.type==="Dramatic"?8:5));
- if(p.type==="Supportive"&&reason==="injury")S.player.morale=Math.min(100,S.player.morale+2);
- if(p.type==="Athlete"&&reason==="injury")S.player.energy=Math.min(100,S.player.energy+3);
- if(r.attention>65){r.happiness=Math.max(0,r.happiness-3);r.trust=Math.max(0,r.trust-1)}
- maybeRelationshipEvent()
-}
-function relationshipEventHTML(){
- const e=S.relationships?.pendingEvent;if(!e)return "";
- return '<section class="card s12" style="border-color:#b65cff"><span class="kicker">RELATIONSHIP MOMENT</span><h3>'+e.title+'</h3><p class="muted">'+e.body+'</p><div class="actions"><button class="btn primary" data-rel-event="a">'+e.a+'</button><button class="btn" data-rel-event="b">'+e.b+'</button></div></section>'
-}
-function relationshipsHTML(){
- const r=S.relationships,p=currentPartner(),rank=relationshipUnlockRank(S.stage);
- if(p){
-  const canExclusive=r.status==="Dating"&&r.chemistry>=60&&r.trust>=50,canSerious=r.status==="Exclusive"&&r.chemistry>=78&&r.trust>=70,canMove=r.status==="Serious"&&r.chemistry>=86&&r.trust>=82,canEngage=(S.stage==="NBA"||S.stage==="Offseason")&&r.status==="Living Together"&&r.chemistry>=90&&r.trust>=90,canMarry=(S.stage==="NBA"||S.stage==="Offseason")&&r.status==="Engaged"&&r.chemistry>=94&&r.trust>=94&&r.happiness>=85;
-  return relationshipEventHTML()+'<section class="card s12"><span class="kicker">RELATIONSHIPS • '+r.status.toUpperCase()+'</span><div class="relationshipCard current" style="margin-top:10px"><div style="display:flex;gap:12px;align-items:center"><div class="relationshipAvatar">♥</div><div><h3 style="margin:0">'+p.name+'</h3><small class="muted">'+p.type+' • '+p.bio+'</small></div></div><div class="relMeters"><div><b>'+Math.round(r.chemistry)+'</b><small>Chemistry</small></div><div><b>'+Math.round(r.trust)+'</b><small>Trust</small></div><div><b>'+Math.round(r.happiness)+'</b><small>Happiness</small></div></div><p class="muted"><b>Active boost:</b> '+relationshipBoostText()+'</p><p class="muted">Attention needed: '+Math.round(r.attention)+'/100 • Actions this game cycle: '+r.actionsThisCycle+'/'+relationshipActionLimit()+'</p><div class="actions"><button class="btn" data-rel-action="text">Text / Call</button><button class="btn" data-rel-action="date">Go on Date</button><button class="btn" data-rel-action="quality">Quality Time</button><button class="btn" data-rel-action="gift">Buy Gift</button><button class="btn" data-rel-action="post">Post Together</button>'+(canExclusive?'<button class="btn good" data-rel-action="exclusive">Become Exclusive</button>':'')+(canSerious?'<button class="btn good" data-rel-action="serious">Get Serious</button>':'')+(canMove?'<button class="btn good" data-rel-action="movein">Move In Together</button>':'')+(canEngage?'<button class="btn good" data-rel-action="engage">Propose • $25,000</button>':'')+(canMarry?'<button class="btn good" data-rel-action="marry">Get Married • $60,000</button>':'')+'<button class="btn danger" data-rel-action="breakup">Break Up</button></div></div><div class="list" style="margin-top:12px">'+(r.history||[]).slice(0,5).map(x=>'<div class="item"><small>'+x+'</small></div>').join("")+'</div></section>'
- }
- const pool=RELATIONSHIP_PROFILES.filter(x=>relationshipUnlockRank(x.unlock)<=rank);
- return '<section class="card s12"><span class="kicker">DATING & RELATIONSHIPS</span><h2 style="margin:6px 0">Meet Someone</h2><p class="muted">Different personalities bring different boosts, upkeep and drama. Strong relationships improve as Chemistry, Trust and Happiness grow.</p><div class="relationshipGrid">'+pool.map(x=>'<div class="relationshipCard"><div style="display:flex;gap:10px;align-items:center"><div class="relationshipAvatar">♥</div><div><b>'+x.name+'</b><small class="muted" style="display:block">'+x.type+'</small></div></div><p class="muted">'+x.bio+'</p><small><b>Boost:</b> '+x.boost+'</small><button class="btn primary" style="width:100%;margin-top:12px" data-meet="'+x.id+'">Meet '+x.name.split(" ")[0]+'</button></div>').join("")+'</div></section>'
-}
-function homeTier(){
- ensureHomeSpace();
- ensureWealthState();const owned=S.finance?.owned||[],properties=S.finance.realEstate||[],rank={family:1,campus:2,apartment:3,penthouse:4,mansion:5},nba=S.stage==="NBA"||S.stage==="Offseason"||S.stage==="Retired";
- let earned="family";
- if(S.stage==="College"||S.stage==="Draft Combine")earned="campus";
- if(nba)earned="apartment";
- if(nba&&(S.social?.fame>=65||totalLiquid()>=750000||properties.some(id=>REAL_ESTATE.find(x=>x.id===id)?.tier==="penthouse")))earned="penthouse";
- if(owned.includes("house")||properties.some(id=>REAL_ESTATE.find(x=>x.id===id)?.tier==="mansion"))earned="mansion";
- const current=S.homeSpace.tier&&rank[S.homeSpace.tier]?S.homeSpace.tier:"family";
- if(rank[earned]>rank[current])S.homeSpace.tier=earned;else if(!S.homeSpace.tier)S.homeSpace.tier=current;
- const id=rank[S.homeSpace.tier]>=rank[earned]?S.homeSpace.tier:earned;
- const tiers={
-  family:{id:"family",name:"Family Home",subtitle:"Where the journey starts",rooms:["bedroom","living","kitchen"]},
-  campus:{id:"campus",name:"Campus Apartment",subtitle:"College life",rooms:["bedroom","living","kitchen","study"]},
-  apartment:{id:"apartment",name:"Pro Apartment",subtitle:"Your own city space",rooms:["bedroom","living","kitchen","closet","film"]},
-  penthouse:{id:"penthouse",name:"Skyline Penthouse",subtitle:"High-rise NBA living",rooms:["bedroom","living","kitchen","closet","trophy","gym","balcony"]},
-  mansion:{id:"mansion",name:"Luxury Residence",subtitle:"Private estate",rooms:["bedroom","living","kitchen","closet","trophy","gym","pool","theater"]}
- };
- return tiers[id]||tiers.family
-}
-const HOME_ROOMS={
- bedroom:{name:"Bedroom",icon:"🛏️",desc:"Sleep, reset and recover.",actions:[["sleep","Sleep / Nap"]]},
- living:{name:"Living Room",icon:"🛋️",desc:"Relax, host people and reset mentally.",actions:[["relax","Relax"],["host","Host Teammates"]]},
- kitchen:{name:"Kitchen",icon:"🍽️",desc:"Fuel up before the next game.",actions:[["meal","Recovery Meal"]]},
- closet:{name:"Closet",icon:"👟",desc:"Build your game-day style and image.",actions:[["fit","Plan Game-Day Fit"]]},
- trophy:{name:"Trophy Room",icon:"🏆",desc:"Your career history lives here.",actions:[["reflect","Reflect on Legacy"]]},
- gym:{name:"Home Gym",icon:"🏋️",desc:"Mobility, light work and recovery.",actions:[["mobility","Mobility Session"]]},
- balcony:{name:"Balcony",icon:"🌆",desc:"Step away from the noise.",actions:[["unwind","Unwind"]]},
- pool:{name:"Pool & Backyard",icon:"🏊",desc:"Recovery and private downtime.",actions:[["pool","Pool Recovery"]]},
- theater:{name:"Theater",icon:"🎬",desc:"Film study or entertainment.",actions:[["film","Watch Game Film"]]},
- film:{name:"Film Corner",icon:"📺",desc:"Break down your last matchup.",actions:[["film","Watch Game Film"]]},
- study:{name:"Study Area",icon:"📚",desc:"Stay disciplined off the court.",actions:[["study","Focus Session"]]}
-};
-function ensureHomeSpace(){if(!S.homeSpace)S.homeSpace={designer:"classic",ownedDesigners:["classic"],actionsUsed:0,history:[],tier:"family"};if(!Array.isArray(S.homeSpace.ownedDesigners))S.homeSpace.ownedDesigners=["classic"];if(!S.homeSpace.ownedDesigners.includes("classic"))S.homeSpace.ownedDesigners.unshift("classic");if(!Array.isArray(S.homeSpace.history))S.homeSpace.history=[];if(typeof S.homeSpace.actionsUsed!=="number")S.homeSpace.actionsUsed=0;if(!["family","campus","apartment","penthouse","mansion"].includes(S.homeSpace.tier))S.homeSpace.tier="family";return S.homeSpace}
-function homeDesignerVars(){const d=homeDesigner();return '--homeAccent:'+d.accent+';--homeWall:'+d.wall+';--homeFloor:'+d.floor}
-function homeDesignerBoost(){const d=homeDesigner();return d.id==="athlete"?"Recovery actions are stronger.":d.id==="minimal"?"Focus and morale actions are stronger.":d.id==="urban"?"Style actions generate more followers.":d.id==="luxury"?"Home downtime builds more happiness and Fame.":d.id==="celebrity"?"Hosting and style actions create more Fame and followers.":"Balanced home comfort."}
-function chooseHomeDesigner(id){
- ensureHomeSpace();const d=HOME_DESIGNERS.find(x=>x.id===id);if(!d)return;if(homeStageRank()<d.unlock){toast("That designer unlocks later in your career");return}
- if(!S.homeSpace.ownedDesigners.includes(id)){if(S.finance.cash<d.price){toast("Not enough cash for "+d.name);return}S.finance.cash-=d.price;S.homeSpace.ownedDesigners.push(id);S.news.unshift("Hired "+d.name+" to redesign your home.")}
- S.homeSpace.designer=id;S.homeSpace.history.unshift("Interior updated: "+d.name);S.homeSpace.history=S.homeSpace.history.slice(0,8);save();render();toast(d.name+" is now active")
-}
-function homeAction(action){
- ensureHomeSpace();if(S.homeSpace.actionsUsed>=2){toast("Home actions reset after your next game");return}
- const d=homeDesigner();let label="",energy=0,morale=0,followers=0,fame=0,trust=0,chem=0,xp=0;
- if(action==="sleep"){label="Got quality rest";energy=22;morale=3}
- if(action==="relax"){label="Relaxed at home";energy=8;morale=5}
- if(action==="host"){label="Hosted teammates";chem=3;morale=2;followers=40}
- if(action==="meal"){label="Had a recovery meal";energy=14;morale=2}
- if(action==="fit"){label="Planned a game-day fit";followers=120;fame=1}
- if(action==="reflect"){label="Reflected on your career";morale=6;xp=30}
- if(action==="mobility"){label="Completed a mobility session";energy=12;xp=20}
- if(action==="unwind"){label="Unwound at home";morale=5;energy=6}
- if(action==="pool"){label="Used the pool for recovery";energy=16;morale=3}
- if(action==="film"){label="Studied game film";trust=2;xp=35}
- if(action==="study"){label="Locked in on school and basketball";morale=2;xp=25;trust=1}
- if(d.id==="athlete"){energy=Math.round(energy*1.35);if(action==="mobility"||action==="meal")xp+=15}
- if(d.id==="minimal"){morale+=2;if(action==="film"||action==="study")trust+=1}
- if(d.id==="urban"){followers=Math.round(followers*1.7)+(action==="fit"?100:0)}
- if(d.id==="luxury"){morale+=2;if(["relax","unwind","pool","host"].includes(action))fame+=1}
- if(d.id==="celebrity"){followers=Math.round(followers*1.8);if(["fit","host"].includes(action))fame+=2}
- S.player.energy=Math.min(100,S.player.energy+energy);S.player.morale=Math.min(100,S.player.morale+morale);S.player.trust=Math.min(100,S.player.trust+trust);S.player.chemistry=Math.min(100,S.player.chemistry+chem);S.player.xp+=xp;processPlayerLevelUps();S.social.followers+=followers;S.social.fame=Math.min(100,S.social.fame+fame);S.homeSpace.actionsUsed++;
- if(currentPartner()&&["relax","unwind","pool"].includes(action)){S.relationships.happiness=Math.min(100,S.relationships.happiness+2)}
- S.homeSpace.history.unshift(label+" • "+d.name);S.homeSpace.history=S.homeSpace.history.slice(0,8);save();render();toast(label)
-}
-function resetHomeCycle(){ensureHomeSpace();S.homeSpace.actionsUsed=0}
-function homeShowcaseHTML(){
- const d=homeDesigner(),tier=homeTier();
- const details={
-  classic:"Warm wood, layered lighting and comfortable traditional furniture.",
-  minimal:"Clean stone surfaces, neutral furniture and uncluttered architecture.",
-  athlete:"Performance lounge with recovery tech, film screens and training accents.",
-  urban:"Neon city loft with sneaker-display energy and bold creative decor.",
-  luxury:"Marble finishes, tailored furniture and warm architectural lighting.",
-  celebrity:"Camera-ready statement room with dramatic lighting and showcase pieces."
- };
- return '<div class="homeShowcase '+d.id+'"><div class="homeWindow"></div><div class="homeArt"></div><div class="homeRug"></div><div class="homeSofa"></div><div class="homeLamp"></div><div class="homeTable"></div><div class="homeShowcaseLabel"><b>'+d.name+' • '+tier.name+'</b><small>'+details[d.id]+'</small></div></div>'
-}
-function residence(){
- ensureHomeSpace();
- const tier=homeTier(),d=homeDesigner(),owned=new Set(S.homeSpace.ownedDesigners);
- const roomHTML=tier.rooms.map((id,i)=>{
-  const r=HOME_ROOMS[id],cls=i===0?"large":i===1?"wide":"";
-  return '<div class="homeRoom '+cls+'"><div class="homeRoomIcon">'+r.icon+'</div><b>'+r.name+'</b><small>'+r.desc+'</small><div class="homeActionBar">'+r.actions.map(a=>'<button class="btn" data-home-action="'+a[0]+'" '+(S.homeSpace.actionsUsed>=2?'disabled':'')+'>'+a[1]+'</button>').join("")+'</div></div>'
- }).join("");
- const designers=HOME_DESIGNERS.map(x=>{
-  const locked=homeStageRank()<x.unlock,have=owned.has(x.id),active=d.id===x.id;
-  let label=active?"ACTIVE":locked?"Unlocks Later":have?"Use Design":"Hire Designer";
-  if(!active&&!locked&&!have&&x.price>0)label+=" • $"+x.price.toLocaleString();
-  return '<div class="homeDesignerCard '+(active?'active':'')+'"><b>'+x.name+'</b><small class="muted" style="display:block;margin:5px 0">'+x.desc+'</small><small>'+x.boost+'</small><button class="btn '+(active?'good':'')+'" style="width:100%;margin-top:10px" data-home-designer="'+x.id+'" '+(locked||active?'disabled':'')+'>'+label+'</button></div>'
- }).join("");
- return '<div class="grid" style="margin-top:0;'+homeDesignerVars()+'"><section class="card s12 homeHero"><span class="kicker">MY HOME • '+tier.id.toUpperCase()+'</span><h2 style="margin:6px 0">'+tier.name+'</h2><p class="muted">'+tier.subtitle+' • Interior by '+d.name+' • '+homeDesignerBoost()+'</p><div class="row"><span>Home actions</span><strong>'+S.homeSpace.actionsUsed+'/2 used this game cycle</strong></div>'+homeShowcaseHTML()+'</section><section class="card s12"><h3>Enter Your Home</h3><p class="muted">Your layout changes as your career, property and lifestyle grow.</p><div class="homePlan">'+roomHTML+'</div></section><section class="card s12"><div class="row"><div><span class="kicker">REAL ESTATE</span><h3 style="margin:5px 0">Property Portfolio</h3></div><span class="pill good">'+(S.finance.realEstate||[]).length+' OWNED</span></div><p class="muted">Buy homes and investment properties with cash or bank funds. Properties can upgrade your residence, create passive income and carry upkeep.</p><div class="grid" style="margin-top:10px">'+REAL_ESTATE.map(p=>{const have=S.finance.realEstate.includes(p.id),locked=(p.keys||0)>(S.civic.keys||0),net=(p.income||0)-(p.upkeep||0);return '<div class="card" style="grid-column:span 4"><div class="row"><b>'+p.name+'</b>'+(p.keys?'<span class="pill">'+p.keys+' KEY'+(p.keys===1?'':'S')+'</span>':'')+'</div><p class="muted">'+p.desc+'</p><div class="row"><span>Price</span><strong>$'+p.price.toLocaleString()+'</strong></div><div class="row"><span>Net / game</span><strong>$'+net.toLocaleString()+'</strong></div><button class="btn '+(have?'good':'')+'" style="width:100%;margin-top:10px" data-property-buy="'+p.id+'" '+(have||locked?'disabled':'')+'>'+(have?'Owned':locked?'Key Required':'Purchase Property')+'</button></div>'}).join("")+'</div></section><section class="card s12"><h3>Interior Designers</h3><p class="muted">Hire a designer once, then switch between owned styles anytime.</p><div class="homeDesignerGrid">'+designers+'</div></section><section class="card s12"><h3>Home History</h3><div class="list">'+(S.homeSpace.history.length?S.homeSpace.history.slice(0,6).map(x=>'<div class="item"><small>'+x+'</small></div>').join(""):'<p class="muted">Your home story starts here.</p>')+'</div></section></div>'
-}
-function social(){
- const feed=(S.nbaWorld.socialFeed||[]).slice(0,40);
- const offseason=feed.filter(x=>x.stage==="Offseason"||["FREE AGENCY","TRADE","DRAFT","RETIREMENT"].includes(x.type));
- const source=offseason.length?offseason:feed;
- const posts=source.map((x,i)=>'<div class="item" style="align-items:flex-start"><div style="min-width:0"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><span class="pill '+(i<3?'good':'')+'">'+x.type+'</span><small class="muted">Year '+x.year+'</small></div><b style="display:block;font-size:16px;line-height:1.35">'+x.text+'</b></div></div>').join("");
- return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">LEAGUE SOCIAL</span><h2 style="margin:6px 0">Around The League</h2><p class="muted">Breaking offseason moves, trades, free-agent signings, extensions, retirements, draft headlines and major award news appear here automatically.</p><div class="row"><span>League buzz</span><strong>'+(S.nbaWorld.socialFeed||[]).length+' posts</strong></div></section><section class="card s12"><div class="row"><div><h3 style="margin:0">Offseason Feed</h3><small class="muted">Newest moves appear first.</small></div><span class="pill good">LIVE FEED</span></div><div class="list" style="margin-top:12px">'+(posts||'<div class="item"><div><b>No major moves yet</b><small>Big league transactions will appear here when the offseason begins.</small></div></div>')+'</div></section></div>'
-}
-function phone(){
- const phoneApps='<section class="card s12"><div class="row"><div><span class="kicker">MY PHONE</span><h2 style="margin:5px 0">Apps</h2><small class="muted">Your off-court tools are organized like apps instead of crowding the navigation.</small></div><span class="pill good">CONNECTED</span></div><div class="phoneAppGrid"><button class="phoneApp" data-phone-jump="messages"><span class="phoneAppIcon">'+uiIcon("message")+'</span><b>Messages</b><small>League contacts</small></button><button class="phoneApp" data-phone-jump="bank"><span class="phoneAppIcon">'+uiIcon("bank")+'</span><b>Bank</b><small>Cash & transfers</small></button><button class="phoneApp" data-go="social"><span class="phoneAppIcon">'+uiIcon("camera")+'</span><b>Social</b><small>League feed</small></button><button class="phoneApp" data-go="dating"><span class="phoneAppIcon">'+uiIcon("heart")+'</span><b>Dating</b><small>Relationships</small></button><button class="phoneApp" data-go="residence"><span class="phoneAppIcon">'+uiIcon("home")+'</span><b>Home</b><small>Residence</small></button><button class="phoneApp" data-go="rosters"><span class="phoneAppIcon">'+uiIcon("users")+'</span><b>Roster</b><small>Organizations</small></button><button class="phoneApp" data-go="league"><span class="phoneAppIcon">'+uiIcon("globe")+'</span><b>League</b><small>Standings & news</small></button><button class="phoneApp" data-phone-jump="recruit"><span class="phoneAppIcon">'+uiIcon("star")+'</span><b>Recruiting</b><small>Star trades</small></button></div></section>';
- const state=ensurePhoneState(),eligible=S.stage==="Offseason"&&careerPathLevel("dynasty")>=3,candidates=starPhoneCandidates(),leagueCandidates=leagueContactCandidates();
- if(!state.active&&candidates[0])state.active=starThreadKey(candidates[0].team.id,candidates[0].player.name);
- if(!state.leagueActive&&leagueCandidates[0])state.leagueActive=leagueThreadKey(leagueCandidates[0].team.id,leagueCandidates[0].player.name);
-
- let leagueTarget=null,leagueThread=null;
- const lc=leagueCandidates.find(x=>leagueThreadKey(x.team.id,x.player.name)===state.leagueActive);
- if(lc){leagueThread=getLeagueThread(lc.team.id,lc.player);leagueTarget=lc}
- else if(state.leagueActive&&state.leagueThreads[state.leagueActive]){leagueThread=state.leagueThreads[state.leagueActive];leagueTarget=leaguePhoneTarget(leagueThread)}
-
- const leagueContacts=leagueCandidates.map(x=>{
-   const key=leagueThreadKey(x.team.id,x.player.name),th=getLeagueThread(x.team.id,x.player),rel=th.relationship||0;
-   return '<button class="phoneContact '+(state.leagueActive===key?'active':'')+'" data-league-contact="'+key+'"><b>'+x.player.name+'</b><small>'+x.team.abbr+' • '+x.player.pos+' • '+x.player.ovr+' OVR • '+leagueRelationshipLabel(rel)+' '+(rel>0?'+':'')+Math.round(rel)+'</small></button>'
- }).join("");
-
- const leaguePanel=leagueTarget&&leagueThread?(()=>{
-   const rel=leagueThread.relationship||0,msgs=(leagueThread.messages||[]).map(m=>'<div class="phoneBubble '+(m.from==="me"?'me':'them')+'">'+m.text+'<small>'+(m.from==="me"?"You":leagueTarget.player.name)+'</small></div>').join("");
-   return '<div class="phoneThread"><div class="row"><div><b>'+leagueTarget.player.name+'</b><small class="muted" style="display:block">'+leagueTarget.team.city+' '+leagueTarget.team.name+' • '+leagueTarget.player.pos+' • '+leagueTarget.player.ovr+' OVR</small></div><span class="pill '+leagueRelationshipClass(rel)+'">'+leagueRelationshipLabel(rel)+' • '+(rel>0?'+':'')+Math.round(rel)+'</span></div><div class="phoneMessages">'+msgs+'</div><div class="phoneActions"><button class="btn good" data-league-message="respect">Show Respect</button><button class="btn good" data-league-message="hang">Ask to Hang Out</button><button class="btn" data-league-message="congrats">Congratulate Him</button><button class="btn" data-league-message="teamup">Talk About Teaming Up</button><button class="btn danger" data-league-message="challenge">Challenge Him</button><button class="btn danger" data-league-message="trash">Trash Talk</button>'+(rel<0?'<button class="btn" data-league-message="apology">Squash the Beef</button>':'')+'</div><div class="item" style="margin-top:12px"><div><b>Connection</b><small>Friendly choices move the relationship toward Friend. Competitive or disrespectful choices can create a Rival or Enemy.</small></div><span class="pill '+leagueRelationshipClass(rel)+'">'+Math.round(Math.abs(rel))+'/100</span></div></div>'
- })():'<div class="phoneThread"><div class="item"><small>League contacts unlock once you reach the NBA.</small></div></div>';
-
- let target=null,thread=null;
- const candidate=candidates.find(x=>starThreadKey(x.team.id,x.player.name)===state.active);
- if(candidate){thread=getStarThread(candidate.team.id,candidate.player);target=candidate}
- else if(state.active&&state.threads[state.active]){thread=state.threads[state.active];target=phoneTarget(thread)}
- const contacts=candidates.map(x=>{const key=starThreadKey(x.team.id,x.player.name),th=getStarThread(x.team.id,x.player);return '<button class="phoneContact '+(state.active===key?'active':'')+'" data-phone-contact="'+key+'"><b>'+x.player.name+'</b><small>'+x.team.abbr+' • '+x.player.pos+' • '+x.player.ovr+' OVR • Interest '+Math.round(th.interest||0)+'%</small></button>'}).join("");
- let starPanel='<div class="phoneThread"><div class="item"><small>No star recruiting contacts are available right now.</small></div></div>';
- if(target&&thread){
-   const msgs=(thread.messages||[]).map(m=>'<div class="phoneBubble '+(m.from==="me"?'me':'them')+'">'+m.text+'<small>'+(m.from==="me"?"You":target.player.name)+'</small></div>').join("");
-   const pkg=tradePackageForStar(target),pkgText=pkg.length?pkg.map(p=>p.name+" ("+(p.ovr||0)+" OVR)").join(" + "):"No package available",tradeStatus=starTradeStatus(thread,target);
-   const controls=eligible?(thread.declinedYear===S.year?'<div class="item"><div><b>Recruitment closed this offseason</b><small>You told '+target.player.name+' the asset cost was too high and chose another direction.</small></div></div>':'<div class="phoneActions"><button class="btn" data-star-message="respect">Show Respect</button><button class="btn" data-star-message="fit">Talk Basketball Fit</button><button class="btn" data-star-message="ring">Pitch a Title Run</button><button class="btn" data-star-message="role">Promise a Major Role</button><button class="btn" id="compareStarBtn">Compare Player</button><button class="btn good" data-star-message="trade" '+((thread.interest||0)<72?'disabled':'')+'>Ask Him to Request Trade • 72% Interest</button><button class="btn primary" id="completeStarTradeBtn" '+(!thread.tradeRequested||thread.completed?'disabled':'')+'>Work Out Trade</button></div>'):'<div class="item"><small>Star recruiting conversations unlock during the offseason at Dynasty Builder Level 3.</small></div>';
-   starPanel='<div class="phoneThread"><div class="row"><div><b>'+target.player.name+'</b><small class="muted" style="display:block">'+target.team.city+' '+target.team.name+' • '+target.player.pos+' • '+target.player.ovr+' OVR</small></div><span class="pill '+((thread.interest||0)>=72?'good':'')+'">'+Math.round(thread.interest||0)+'% INTEREST</span></div><div class="phoneMessages">'+msgs+'</div>'+controls+'<div class="item" style="margin-top:12px"><div><b>Trade Status</b><small>'+tradeStatus+'</small></div><span class="pill '+(tradeStatus==="Trade package ready."?"good":"")+'">'+(thread.tradeRequested?"REQUESTED":"PENDING")+'</span></div><div class="item"><div><b>Potential trade package</b><small>'+pkgText+'</small></div><span class="pill">$'+Math.round(annualSalaryValue(target.player)/1000000)+'M/yr</span></div></div>'
- }
- return '<div class="grid" style="margin-top:0">'+phoneApps+'<div id="phoneBankAnchor" style="grid-column:1/-1">'+bankPhoneHTML()+'</div>'+
- '<section class="card s12" id="phoneMessagesAnchor"><span class="kicker">PLAYER PHONE</span><h2 style="margin:6px 0">Contacts & Messages</h2><p class="muted">Build real relationships around the league. Become friends, create rivalries, squash beef, or recruit stars during the offseason. Every conversation stays with your career.</p></section>'+
- '<section class="card s12"><div class="row"><div><h3 style="margin:0">League Contacts</h3><small class="muted">Text players from across the NBA and shape the relationship.</small></div><span class="pill good">'+leagueCandidates.length+' CONTACTS</span></div><div class="phoneShell" style="margin-top:12px"><div class="phoneContacts"><h3>Players</h3>'+leagueContacts+'</div>'+leaguePanel+'</div></section>'+
- '<section class="card s12" id="phoneRecruitAnchor"><div class="row"><div><h3 style="margin:0">Star Recruiting</h3><small class="muted">Separate trade-recruiting conversations for elite players.</small></div><span class="pill">OFFSEASON</span></div><div class="phoneShell" style="margin-top:12px"><div class="phoneContacts"><h3>Star Contacts</h3>'+contacts+'</div>'+starPanel+'</div></section></div>'
-}
-function dating(){
- return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">LOVE & LEGACY</span><h2 style="margin:6px 0">Dating & Relationships</h2><p class="muted">Meet people, build Chemistry, Trust and Happiness, manage relationship events, and unlock game-day boosts as your relationship grows.</p></section>'+relationshipsHTML()+'</div>'
-}
-function life(){const eligible=SPONSORS.filter(s=>sponsorEligible(s)&&!activeSponsors().some(a=>a.id===s.id));const owned=STORE_ITEMS.filter(x=>S.finance.owned.includes(x.id));const active=activeSponsors(),goal=nextEndorsementGoal(),slots=endorsementSlots();return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">OFF-COURT EMPIRE</span><div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:end"><div><div class="big">$'+Math.round(S.finance.cash).toLocaleString()+'</div><p class="muted">Cash</p></div><div><b>$'+Math.round(S.finance.bank||0).toLocaleString()+'</b><small class="muted" style="display:block">Bank</small></div><div><b>'+Math.round(S.social.followers).toLocaleString()+'</b><small class="muted" style="display:block">Followers</small></div><div><b>'+Math.round(S.social.fame)+'</b><small class="muted" style="display:block">Fame</small></div><div><b>$'+(passiveIncome()+sponsorIncome()).toLocaleString()+'</b><small class="muted" style="display:block">Off-court income/game</small></div></div></section><section class="card s12"><div class="row"><span><b>Dating & Relationships</b><small class="muted" style="display:block">'+(currentPartner()?currentPartner().name+' • '+S.relationships.status+' • '+Math.round(relationshipStrength())+' Bond':'Meet someone and build a relationship with real gameplay boosts.')+'</small></span><button class="btn" data-go="dating">Open Dating</button></div></section><section class="card s12"><div class="row"><span><b>Your Home</b><small class="muted" style="display:block">'+homeTier().name+' • '+homeDesigner().name+' • '+(S.finance.realEstate||[]).length+' properties</small></span><button class="btn" data-go="residence">Enter Home</button></div></section><section class="card s12"><div class="row"><span><b>Private Banking</b><small class="muted" style="display:block">Bank balance $'+Math.round(S.finance.bank||0).toLocaleString()+' • Transfer funds from your Phone.</small></span><button class="btn" data-go="phone">Open Phone Bank</button></div></section>'+philanthropyHTML()+cityPrivilegesHTML()+'<section class="card s6"><h3>Social Media '+(S.social.posted?'<span class="pill bad" style="float:right">POSTED</span>':'<span class="pill good" style="float:right">READY</span>')+'</h3><p class="muted">Build followers and fame to unlock stronger endorsement tiers.</p><div class="list"><button class="btn" data-post="highlights" '+(S.social.posted?'disabled':'')+'>Post Game Highlights</button><button class="btn" data-post="training" '+(S.social.posted?'disabled':'')+'>Upload Training Clip</button><button class="btn" data-post="interview" '+(S.social.posted?'disabled':'')+'>Do Player Interview</button><button class="btn" data-post="lifestyle" '+(S.social.posted?'disabled':'')+'>Lifestyle Post</button></div></section><section class="card s6"><h3>Endorsement Portfolio</h3><p class="muted">Active deals: '+active.length+'/'+slots+' • More slots unlock at 35, 60 and 80 Fame.</p><div class="list">'+(active.length?active.map(s=>'<div class="item"><div><b>'+s.name+'</b><small>'+s.tier+' • '+s.category+' • $'+s.perGame.toLocaleString()+'/game</small></div><span class="pill good">ACTIVE</span></div>').join(""):'<div class="item"><div><b>No active endorsements</b><small>Sign your first deal below.</small></div></div>')+'</div>'+(goal?'<div class="item" style="margin-top:10px"><div><b>Next Target: '+goal.name+'</b><small>Needs '+goal.ovr+' OVR • '+goal.followers.toLocaleString()+' followers • '+goal.fame+' Fame</small></div><span class="pill">'+goal.tier+'</span></div>':'')+'</section><section class="card s12"><h3>Available Endorsements</h3><p class="muted">Low-end local deals appear early. Higher-end opportunities unlock as your performance, OVR, fame and audience grow.</p><div class="list">'+(eligible.length?eligible.map(s=>'<div class="item"><div><b>'+s.name+' <span class="pill">'+s.tier+'</span></b><small>'+s.category+' • $'+s.bonus.toLocaleString()+' signing • $'+s.perGame.toLocaleString()+'/game</small></div><button class="btn" data-sponsor="'+s.id+'" '+(active.length>=slots?'disabled':'')+'>Sign</button></div>').join(""):'<div class="item"><div><b>No new offers right now</b><small>Keep playing, posting, and improving your OVR.</small></div></div>')+'</div></section>'+connectionsHTML()+signatureShoeHTML()+'<section class="card s12"><h3>Store & Assets</h3><div class="grid storeGrid" style="margin-top:0">'+STORE_ITEMS.map(x=>'<div class="card storeCard"><b>'+x.name+'</b><p class="muted">'+x.desc+'</p><div class="row storeRow"><span>'+x.type+'</span><strong>$'+x.price.toLocaleString()+'</strong></div>'+(x.income?'<div class="row storeRow"><span>Income/game</span><strong>$'+x.income.toLocaleString()+'</strong></div>':'')+'<button class="btn '+(S.finance.owned.includes(x.id)?'good':'')+'" data-buy="'+x.id+'" '+(S.finance.owned.includes(x.id)?'disabled':'')+'>'+(S.finance.owned.includes(x.id)?'Owned':'Buy')+'</button></div>').join("")+'</div></section><section class="card s12"><h3>Owned Assets</h3>'+(owned.length?owned.map(x=>'<div class="row"><span>'+x.name+'</span><strong>'+(x.income?'$'+x.income.toLocaleString()+'/game':x.type)+'</strong></div>').join(""):'<p class="muted">No assets purchased yet.</p>')+'</section></div>'}
-function socialPost(type){if(S.social.posted){toast("Post again after your next game");return}const base={highlights:[160,5],training:[100,3],interview:[220,7],lifestyle:[130,4]}[type]||[100,3];const perf=Math.round((S.player.stats.ppg||0)*8+S.player.fans*.015);const gain=Math.max(50,Math.round((base[0]+perf+Math.random()*180)*followerConnectionMultiplier()));const fameGain=base[1]+(gain>500?2:0);S.social.followers+=gain;S.social.fame=Math.min(100,S.social.fame+fameGain);S.social.posts++;S.social.posted=true;if(S.stage==="NBA")addCareerPathXP("media",6);S.player.fans+=Math.round(gain*.15);S.news.unshift("Social media post gained "+gain.toLocaleString()+" followers. Fame +"+fameGain+".");save();render();toast("+"+gain.toLocaleString()+" followers")}
-function signSponsor(id){const s=SPONSORS.find(x=>x.id===id);if(!s)return;if(!sponsorEligible(s)){toast("You no longer meet this deal");return}if(activeSponsors().some(a=>a.id===id)){toast("Deal already active");return}if(activeSponsors().length>=endorsementSlots()){toast("No endorsement slots available yet");return}const mult=endorsementMoneyMultiplier(),deal={...s,bonus:Math.round(s.bonus*mult),perGame:Math.round(s.perGame*mult)};S.finance.sponsors.push(deal);S.finance.sponsor=S.finance.sponsors[0]||null;S.finance.cash+=deal.bonus;S.finance.earnings+=deal.bonus;S.news.unshift("Signed "+s.name+" ("+s.tier+") for $"+deal.bonus.toLocaleString()+" up front.");S.social.fame=Math.min(100,S.social.fame+1);if(S.stage==="NBA"){addCareerPathXP("media",5);addCareerPathXP("business",Math.max(5,Math.min(20,Math.round(deal.bonus/50000))))}save();render();toast(s.name+" signed")}
-function buyAsset(id){const x=STORE_ITEMS.find(a=>a.id===id);if(!x||S.finance.owned.includes(id))return;if(S.finance.cash<x.price){toast("Not enough cash");return}S.finance.cash-=x.price;S.finance.owned.push(id);if(S.stage==="NBA")addCareerPathXP("business",Math.max(5,Math.min(30,Math.round(x.price/15000))));if(x.morale)S.player.morale=Math.min(100,S.player.morale+x.morale);S.news.unshift("Purchased "+x.name+" for $"+x.price.toLocaleString()+".");save();render();toast("Asset purchased")}
-function drillTrain(id){const d=DRILLS.find(x=>x.id===id);if(!d)return;if(ovr()<d.min){toast("Requires "+d.min+" OVR");return}if(S.training.used>=S.training.max){toast("Training locked — play a game to reset");return}if(S.player.energy<d.energy){toast("Not enough energy");return}S.training.used++;S.player.energy-=d.energy;const gains=[];for(const [k,r] of Object.entries(d.gains)){const gain=r[0]+Math.floor(Math.random()*(r[1]-r[0]+1));if(gain>0){let finalGain=gain;if(Math.random()<trainingBonusChance(k))finalGain++;const actual=naturalAttributeGain(k,finalGain);if(actual>0)gains.push(k+" +"+actual)}}S.player.xp+=Math.round(d.xp*(1+connectionEffect("trainingXP")+pathBonus("trainingXP")));if(S.stage==="NBA"&&(S.year||1)>=5)addCareerPathXP("veteran",3);S.player.draft=Math.min(99,S.player.draft+1);const levelResult=processPlayerLevelUps();save();render();toast(levelResult.levels.length?("Level "+S.player.level+" reached!"+(levelResult.capBreakers?" • +"+levelResult.capBreakers+" Cap Breaker":"")):(gains.join(" • ")||"Training complete"))}
-function rosterSelectedTeam(){ensureLeagueRosters();const id=S.nbaWorld?.rosterViewTeam;return id&&nbaTeamById(id)?id:(S.team&&nbaTeamById(S.team)?S.team:NBA_TEAMS[0].id)}
-function setRosterTeam(id){
- if(!nbaTeamById(id))return;
- S.nbaWorld.rosterViewTeam=id;
- save();
- render();
- requestAnimationFrame(()=>{
-   const panel=document.getElementById("selectedRosterPanel");
-   if(panel)panel.scrollIntoView({behavior:"smooth",block:"start"})
- })
-}
-function rosterContractText(p){const yrs=Math.max(1,p.contractYears||1),total=Math.round(p.contractValue||0),annual=annualSalaryValue(p);return yrs+" yr • $"+Math.round(total/1000000)+"M total • $"+Math.round(annual/1000000)+"M/yr"}
-function rosterRole(index,p){if(p.isUser)return S.player.role||"MyPlayer";return index<5?"Starter":index<10?"Rotation":p.source==="rookie"?"Development":"Reserve"}
-function organizationRosterPlayers(teamId){
- const base=rosterFor(teamId).map(p=>({...p,isUser:false}));
- if(teamId===S.team&&["NBA","Offseason","Retired"].includes(S.stage))base.push({name:S.player.name,pos:S.player.position||"G",age:S.player.age||19,ovr:ovr(),potential:Math.min(110,Math.max(ovr(),99)),ppg:S.player.stats.ppg||0,apg:S.player.stats.apg||0,rpg:S.player.stats.rpg||0,contractYears:contractYearsRemaining(),contractValue:S.finance.contract?.total||0,source:"user",isUser:true});
- return base.sort((x,y)=>(y.isUser?1:0)-(x.isUser?1:0)||(y.ovr||0)-(x.ovr||0))
-}
-function rosters(){
- ensureLeagueStandings();
- ensureLeagueRosters();
- const selected=rosterSelectedTeam(),team=nbaTeamById(selected),players=organizationRosterPlayers(selected),rec=S.leagueStandings[selected]||{w:0,l:0};
- const orgs=NBA_TEAMS.map(t=>{
-   const r=S.leagueStandings[t.id]||{w:0,l:0};
-   return '<button class="orgCard '+(t.id===selected?'active':'')+'" data-roster-team="'+t.id+'" style="text-align:left;color:inherit"><div class="row"><span><b>'+(t.id===S.team?'★ ':'')+t.city+' '+t.name+'</b><small class="muted" style="display:block">'+t.conf+' • '+teamDivision(t)+' • '+t.coach+'</small></span><span class="pill">'+r.w+'-'+r.l+'</span></div></button>'
- }).join("");
- const rows=players.map((p,i)=>{
-   return '<tr class="'+(p.isUser?'myPlayerRow':'')+'"><td><b>'+p.name+(p.isUser?' ★':'')+'</b><br><span class="depthTag">'+rosterRole(i,p)+'</span></td><td>'+p.pos+'</td><td>'+Math.round(p.ovr||0)+'</td><td>'+Math.round(p.potential||p.ovr||0)+'</td><td>'+Math.round(p.age||0)+'</td><td>'+(p.ppg||0).toFixed(1)+'</td><td>'+(p.apg||0).toFixed(1)+'</td><td>'+(p.rpg||0).toFixed(1)+'</td><td>'+rosterContractText(p)+'</td></tr>'
- }).join("");
- const ai=players.filter(p=>!p.isUser);
- const avg=Math.round(ai.reduce((s,p)=>s+(p.ovr||0),0)/Math.max(1,ai.length));
- const payroll=teamPayrollAnnual(selected),capStatus=capStatusForPayroll(payroll),taxBill=taxBillForPayroll(payroll);
- const top=[...players].sort((x,y)=>(y.ppg||0)-(x.ppg||0))[0];
- return '<div class="grid" style="margin-top:0">'+
- '<section class="card s12"><span class="kicker">NBA ORGANIZATIONS</span><h2 style="margin:6px 0">League Rosters</h2><p class="muted">The selected team roster is shown first. Tap any organization below to instantly load its players.</p></section>'+
- '<section class="card s12" id="selectedRosterPanel">'+
- '<div class="row"><div><span class="kicker">'+team.conf.toUpperCase()+' • '+teamDivision(team).toUpperCase()+'</span><h2 style="margin:5px 0">'+team.city+' '+team.name+'</h2><small class="muted">'+team.coach+' • '+rec.w+'-'+rec.l+'</small></div><span class="pill '+(team.id===S.team?'good':'')+'">'+players.length+' PLAYERS</span></div>'+
- '<div class="rosterSummary"><div><small class="muted">AVG OVR</small><b style="display:block;font-size:22px">'+avg+'</b></div><div><small class="muted">ANNUAL PAYROLL</small><b style="display:block;font-size:18px">$'+Math.round(payroll/1000000)+'M</b></div><div><small class="muted">CAP STATUS</small><b style="display:block">'+capStatus.label+'</b></div><div><small class="muted">TEAM</small><b style="display:block">'+team.abbr+'</b></div></div>'+
- '<div class="item" style="margin-top:12px"><div><b>Salary Cap $'+Math.round(leagueCapLine("salary")/1000000)+'M • Tax $'+Math.round(leagueCapLine("tax")/1000000)+'M • Hard Cap $'+Math.round(leagueCapLine("hard")/1000000)+'M</b><small>'+capPenaltyText(selected)+(taxBill?' • Tax owed $'+Math.round(taxBill/1000000)+'M':'')+'</small></div><span class="pill '+capStatus.cls+'">'+capStatus.label+'</span></div>'+
- '<div class="rosterScroll" style="margin-top:14px"><table class="rosterTable"><thead><tr><th>PLAYER</th><th>POS</th><th>OVR</th><th>POT</th><th>AGE</th><th>PPG</th><th>APG</th><th>RPG</th><th>CONTRACT</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
- '</section>'+
- '<section class="card s12"><div class="row"><div><h3 style="margin:0">Organizations</h3><small class="muted">Tap a team to load its roster above.</small></div><span class="pill">30 TEAMS</span></div><div class="orgGrid" style="margin-top:12px">'+orgs+'</div></section>'+
- '</div>'
-}
-function league(){ensureLeagueStandings();ensureLeagueRosters();const mine=nbaTeamById(S.team),east=conferenceSeeds("East"),west=conferenceSeeds("West");const table=(arr,title)=>'<section class="card s6"><h3>'+title+'</h3>'+arr.map(t=>{const lead=teamLeader(t);return '<div class="row"><span><b>#'+t.seed+' '+t.city+' '+t.name+'</b><small class="muted" style="display:block">'+(lead?lead.name+' • '+lead.ppg.toFixed(1)+' PPG':'No leader')+'</small></span><strong>'+t.rec.w+'-'+t.rec.l+'</strong></div>'}).join("")+'</section>';const economy='<section class="card s12"><span class="kicker">LEAGUE ECONOMY</span><h3 style="margin:6px 0">Salary Cap System</h3><div class="rosterSummary"><div><small class="muted">SALARY CAP</small><b style="display:block">$'+Math.round(leagueCapLine("salary")/1000000)+'M</b></div><div><small class="muted">TAX LINE</small><b style="display:block">$'+Math.round(leagueCapLine("tax")/1000000)+'M</b></div><div><small class="muted">HARD CAP</small><b style="display:block">$'+Math.round(leagueCapLine("hard")/1000000)+'M</b></div><div><small class="muted">CAP GROWTH</small><b style="display:block">4% / yr</b></div></div><p class="muted">Teams above the tax line pay escalating luxury tax. Teams above the hard cap cannot add salary until payroll is reduced.</p></section>';return '<div class="grid" style="margin-top:0">'+economy+(mine?'<section class="card s12"><span class="kicker">YOUR NBA TEAM</span><h2 style="margin:6px 0">'+mine.city+' '+mine.name+'</h2><p class="muted">'+mine.conf+' • '+teamDivision(mine)+' Division • '+currentCoach()+' • Record '+S.record.w+'-'+S.record.l+' • '+S.player.role+'</p>'+statLineCard()+'</section>':'')+table(east,"Eastern Conference")+table(west,"Western Conference")+'<section class="card s12"><h3>Team Rosters & Stars</h3><div class="list">'+NBA_TEAMS.map(t=>'<div class="item"><div><b>'+(S.team===t.id?'★ ':'')+t.city+' '+t.name+'</b><small>'+rosterFor(t.id).slice(0,4).map(s=>s.name+' ('+s.pos+') '+s.ppg.toFixed(1)+' PPG / '+s.apg.toFixed(1)+' APG / '+s.rpg.toFixed(1)+' RPG').join(' • ')+'</small></div></div>').join("")+'</div></section>'+leagueCareerLeadersHTML()+leagueTransactionsHTML()+(S.playoffs.active?playoffBanner():'')+'<section class="card s12"><h3>Playoff Bracket</h3>'+playoffBracketHTML()+'</section><section class="card s6"><h3>League News</h3><div class="list">'+(S.leagueNews.length?S.leagueNews.slice(0,8).map(n=>'<div class="item"><small>'+n+'</small></div>').join(""):'<p class="muted">League news will build as the season progresses.</p>')+'</div></section><section class="card s6"><h3>Your Career Resume</h3>'+((S.nbaWorld.allStarSelections||0)>1?'<div class="item"><div><b>All-Star Selections</b><small>Career total</small></div><span class="pill good">'+S.nbaWorld.allStarSelections+'×</span></div>':'')+'<div class="list">'+(S.accolades.length?S.accolades.map(a=>'<div class="item"><b>'+a+'</b></div>').join(""):'<p class="muted">No major accolades yet.</p>')+'</div></section>'+recordBooksHTML()+awardsRaceHTML()+recordsHTML()+'<section class="card s6"><h3>Current Rivalries</h3><div class="list">'+(Object.entries(S.nbaWorld.rivalries).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([id,v])=>'<div class="item"><div><b>'+teamNameById(id)+'</b><small>'+(v>=70?'Heated rivalry':v>=40?'Growing rivalry':'Competitive history')+'</small></div><span class="pill '+(v>=60?'bad':'')+'">'+Math.round(v)+'</span></div>').join("")||'<p class="muted">No major rivalries yet.</p>')+'</div></section><section class="card s6"><h3>League Evolution</h3><div class="list">'+(S.nbaWorld.leagueEvents.length?S.nbaWorld.leagueEvents.slice(0,6).map(x=>'<div class="item"><small>'+x+'</small></div>').join(""):'<p class="muted">The league currently operates with 30 teams across six divisions.</p>')+'</div></section>'+'<section class="card s12"><h3>Your Scouting Report</h3><p class="muted">'+scout()+'</p></section></div>'}function scout(){const a=Object.entries(S.player.attrs).sort((a,b)=>b[1]-a[1]);return S.player.name+' projects as a '+S.player.archetype+'. Strongest areas: '+a[0][0]+' and '+a[1][0]+'. Biggest development need: '+a[a.length-1][0]+'.'}
-function bindDynamic(){document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setScreen(b.dataset.go));if($("chooseCollege"))$("chooseCollege").onclick=collegeModal;if($("fullGameBtn"))$("fullGameBtn").onclick=startFullGame;if($("keyMom"))$("keyMom").onclick=startMoment;if($("quickSim"))$("quickSim").onclick=quickSim;document.querySelectorAll("[data-moment]").forEach(b=>b.onclick=()=>resolveMoment(b.dataset.moment));document.querySelectorAll("[data-full-off]").forEach(b=>b.onclick=()=>fullOffense(b.dataset.fullOff));document.querySelectorAll("[data-full-def]").forEach(b=>b.onclick=()=>fullDefense(b.dataset.fullDef));document.querySelectorAll("[data-half]").forEach(b=>b.onclick=()=>halftimeChoice(b.dataset.half));if($("simBenchBtn"))$("simBenchBtn").onclick=fullSimBench;if($("tipoffStartBtn"))$("tipoffStartBtn").onclick=()=>{S.fullGame.intro=false;S.fullGame.broadcastLine="Tipoff is underway.";save();render()};if($("pregameLockerBtn"))$("pregameLockerBtn").onclick=fullGameLockerRoom;if($("cancelFullGameBtn"))$("cancelFullGameBtn").onclick=cancelFullGameToOptions;if($("fullQuickSimBtn"))$("fullQuickSimBtn").onclick=fullSimRestOfGame;if($("fullToMomentBtn"))$("fullToMomentBtn").onclick=fullJumpToCrucialMoment;document.querySelectorAll("[data-answer-full]").forEach(b=>b.onclick=()=>answerBackFull(b.dataset.answerFull));if($("declineAnswerBtn"))$("declineAnswerBtn").onclick=()=>{S.fullGame.pendingAnswer=null;broadcastAdjust(-1,"The broadcast settles as you stay within the offense.");fullAdvance(32);save();render()};document.querySelectorAll("[data-drill]").forEach(b=>b.onclick=()=>drillTrain(b.dataset.drill));document.querySelectorAll("[data-post]").forEach(b=>b.onclick=()=>socialPost(b.dataset.post));document.querySelectorAll("[data-meet]").forEach(b=>b.onclick=()=>meetPartner(b.dataset.meet));document.querySelectorAll("[data-rel-action]").forEach(b=>b.onclick=()=>relationshipAction(b.dataset.relAction));document.querySelectorAll("[data-phone-contact]").forEach(b=>b.onclick=()=>{ensurePhoneState().active=b.dataset.phoneContact;save();render()});document.querySelectorAll("[data-league-contact]").forEach(b=>b.onclick=()=>{ensurePhoneState().leagueActive=b.dataset.leagueContact;save();render()});document.querySelectorAll("[data-league-message]").forEach(b=>b.onclick=()=>leagueText(b.dataset.leagueMessage));document.querySelectorAll("[data-phone-jump]").forEach(b=>b.onclick=()=>{const id=b.dataset.phoneJump==="bank"?"phoneBankAnchor":b.dataset.phoneJump==="recruit"?"phoneRecruitAnchor":"phoneMessagesAnchor";const el=$(id);if(el)el.scrollIntoView({behavior:"smooth",block:"start"})});document.querySelectorAll("[data-star-message]").forEach(b=>b.onclick=()=>starMessage(b.dataset.starMessage));if($("completeStarTradeBtn"))$("completeStarTradeBtn").onclick=completeStarTrade;if($("compareStarBtn"))$("compareStarBtn").onclick=()=>openStarComparison(false);document.querySelectorAll("[data-rel-event]").forEach(b=>b.onclick=()=>resolveRelationshipEvent(b.dataset.relEvent));document.querySelectorAll("[data-home-action]").forEach(b=>b.onclick=()=>homeAction(b.dataset.homeAction));document.querySelectorAll("[data-home-designer]").forEach(b=>b.onclick=()=>chooseHomeDesigner(b.dataset.homeDesigner));document.querySelectorAll("[data-property-buy]").forEach(b=>b.onclick=()=>buyRealEstate(b.dataset.propertyBuy));document.querySelectorAll("[data-city-buy]").forEach(b=>b.onclick=()=>buyCityPrivilege(b.dataset.cityBuy));document.querySelectorAll("[data-donate]").forEach(b=>b.onclick=()=>donateToCharity(b.dataset.donate,+b.dataset.donateAmount));document.querySelectorAll("[data-bank-transfer]").forEach(b=>b.onclick=()=>transferBank(b.dataset.bankTransfer,+($("bankTransferAmount")?.value||0)));document.querySelectorAll("[data-bank-quick]").forEach(b=>b.onclick=()=>{if($("bankTransferAmount"))$("bankTransferAmount").value=b.dataset.bankQuick});document.querySelectorAll("[data-cap-breaker]").forEach(b=>b.onclick=()=>useCapBreaker(b.dataset.capBreaker));document.querySelectorAll("[data-badge-breaker]").forEach(b=>b.onclick=()=>useBadgeBreaker(b.dataset.badgeBreaker));document.querySelectorAll("[data-roster-team]").forEach(b=>b.onclick=()=>setRosterTeam(b.dataset.rosterTeam));document.querySelectorAll("[data-sponsor]").forEach(b=>b.onclick=()=>signSponsor(b.dataset.sponsor));document.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>buyAsset(b.dataset.buy));document.querySelectorAll("[data-connection]").forEach(b=>b.onclick=()=>hireConnection(b.dataset.connection));document.querySelectorAll("[data-agent]").forEach(b=>b.onclick=()=>activateAgent(b.dataset.agent));document.querySelectorAll("[data-designer]").forEach(b=>b.onclick=()=>activateDesigner(b.dataset.designer));if($("visitLockerRoomBtn"))$("visitLockerRoomBtn").onclick=openLockerRoom;if($("restBtn"))$("restBtn").onclick=rest;if($("declareDraft"))$("declareDraft").onclick=declareDraft;if($("editAppearance"))$("editAppearance").onclick=openAppearance;document.querySelectorAll("[data-combine]").forEach(b=>b.onclick=()=>combineEvent(b.dataset.combine));if($("draftNightBtn"))$("draftNightBtn").onclick=completeDraftNight;if($("saveProgressBtn"))$("saveProgressBtn").onclick=manualSave;if($("saveProgressCardBtn"))$("saveProgressCardBtn").onclick=manualSave;if($("switchPlayerBtn"))$("switchPlayerBtn").onclick=returnToMainMenu;if($("mainMenuBtn"))$("mainMenuBtn").onclick=returnToMainMenu;if($("topMainMenuBtn"))$("topMainMenuBtn").onclick=returnToMainMenu;if($("talkCoachBtn"))$("talkCoachBtn").onclick=talkToCoach;if($("recoverInjuryBtn"))$("recoverInjuryBtn").onclick=sitOutInjury;document.querySelectorAll("[data-contract]").forEach(b=>b.onclick=()=>acceptContract(+b.dataset.contract));if($("nextSeasonBtn"))$("nextSeasonBtn").onclick=startNextSeason;if($("loadManageBtn"))$("loadManageBtn").onclick=loadManageNextGame;if($("mentorRookieBtn"))$("mentorRookieBtn").onclick=mentorRookie;if($("recruitStarBtn"))$("recruitStarBtn").onclick=recruitStar;if($("retireBtn"))$("retireBtn").onclick=retireCareer;document.querySelectorAll("[data-locker]").forEach(b=>b.onclick=()=>resolveLockerEvent(b.dataset.locker));document.querySelectorAll("[data-allstar]").forEach(b=>b.onclick=()=>playAllStarEvent(b.dataset.allstar));if($("continueAllStarBreakBtn"))$("continueAllStarBreakBtn").onclick=continueAllStarBreak;if($("simAllStarWeekendBtn"))$("simAllStarWeekendBtn").onclick=simAllStarWeekend;document.querySelectorAll("[data-shoe]").forEach(b=>b.onclick=()=>signSignatureShoe(+b.dataset.shoe));document.querySelectorAll("[data-negotiate]").forEach(b=>b.onclick=()=>negotiateContract(+b.dataset.negotiate));document.querySelectorAll("[data-scout]").forEach(b=>b.onclick=()=>scoutProspect(b.dataset.scout));document.querySelectorAll("[data-postcareer]").forEach(b=>b.onclick=()=>choosePostCareer(b.dataset.postcareer))}
-function createModal(){const temp=fresh().player;modal('<h2>Create My Player</h2><div class="form"><div class="field"><label>Name</label><input id="cName" value="Daniel Rosario"></div><div class="field"><label>Jersey #</label><input id="cNum" type="number" min="0" max="99" value="3"></div><div class="field"><label>Position</label><select id="cPos"><option>PG</option><option>SG</option><option>SF</option><option>PF</option><option>C</option></select></div><div class="field"><label>Height</label><select id="cHeight"><option>6\'1\"</option><option>6\'2\"</option><option selected>6\'3\"</option><option>6\'4\"</option><option>6\'5\"</option><option>6\'6\"</option><option>6\'7\"</option><option>6\'8\"</option></select></div></div><h3>Archetype</h3><div class="choiceGrid" id="choices">'+["Two-Way Creator","Three-Level Scorer","Floor General","Slashing Defender"].map((x,i)=>'<button class="choice '+(i===0?"active":"")+'" data-arch="'+x+'"><b>'+x+'</b></button>').join("")+'</div><h3 style="margin-top:18px">Appearance</h3>'+appearanceEditor("create",temp)+'<div class="modalFoot"><button class="btn" id="cancelCreate">Cancel</button><button class="btn primary" id="finishCreate">Start Career</button></div>');document.querySelectorAll("[data-arch]").forEach(b=>b.onclick=()=>{chosen=b.dataset.arch;document.querySelectorAll("[data-arch]").forEach(x=>x.classList.remove("active"));b.classList.add("active")});wireAppearancePreview("create",temp);$("cNum").oninput=()=>{temp.number=Math.max(0,Math.min(99,+$("cNum").value||0));$("createPreview").innerHTML=avatarMarkup("lg",temp)};$("cancelCreate").onclick=closeModal;$("finishCreate").onclick=finishCreate}
-function finishCreate(){activeSlot=pendingNewSlot||activeSlot;localStorage.setItem("mycareer-active-slot",String(activeSlot));S=fresh();S.created=true;frontMode="career";S.player.name=$("cName").value.trim()||"Rookie";S.player.number=Math.max(0,Math.min(99,+$("cNum").value||0));S.player.position=$("cPos").value;S.player.height=$("cHeight").value;S.player.archetype=chosen;S.player.appearance=readAppearance("create");if(chosen==="Three-Level Scorer"){S.player.attrs.Shooting=67;S.player.attrs.Finishing=65;S.player.attrs.Defense=54}if(chosen==="Floor General"){S.player.attrs.Playmaking=69;S.player.attrs.IQ=66;S.player.attrs.Shooting=57}if(chosen==="Slashing Defender"){S.player.attrs.Finishing=66;S.player.attrs.Defense=68;S.player.attrs.Athleticism=68;S.player.attrs.Shooting=52}S.news=["Senior season begins. Scouts are watching every possession."];save();closeModal();render();toast("Career created")}
-function demo(){pendingNewSlot=activeSlot;S=fresh();S.created=true;S.player.name="D. Rosario";S.player.number=3;S.player.level=4;S.record={w:4,l:1};S.game=6;S.offers=["UConn","Villanova"];S.player.attrs.Shooting=68;S.player.attrs.Playmaking=72;S.player.attrs.Defense=67;S.news=["Two programs have offered scholarships after a strong opening month."];save();render()}
-function modal(h){$("modal").innerHTML=h;$("modalWrap").classList.remove("hidden")}function closeModal(){$("modalWrap").classList.add("hidden")}
-function badgeRank(name){const b=BADGES.find(x=>x[0]===name);if(!b)return 0;const t=badgeTierName(b);return {Locked:0,Bronze:1,Silver:2,Gold:3,Legend:4,"G.O.A.T.":5}[t]||0}
-function clutchBadgeBoost(type){
- let names=[];
- if(type==="three")names=["Clutch Shooter","Deadeye","Limitless Range","Catch & Shoot","Open Looks","Killer Instinct","Ice in Veins","Big Game Player"];
- else if(type==="iso")names=["Quick First Step","Posterizer","Fearless Finisher","Slithery Finisher","Bulldozer","Fast Twitch","Killer Instinct","Ice in Veins","Comeback Kid"];
- else if(type==="pnr")names=["Dimer","Needle Threader","Floor General","Versatile Visionary","Bail Out","Ice in Veins"];
- else names=["Floor General","Dimer","Needle Threader","Big Game Player"];
- return Math.min(32,names.reduce((sum,n)=>sum+badgeRank(n)*2.15,0))
-}
-function defensiveClutchBoost(){return Math.min(28,["Clamps","Challenger","Interceptor","Anchor","Glove","On-Ball Menace","Paint Patroller","Lockdown Focus","Big Game Player"].reduce((sum,n)=>sum+badgeRank(n)*1.35,0))}
-function clutchResponseChance(type){
- const a=S.player.attrs;
- const base=28+(ovr()-60)*1.15+(a.IQ-55)*.35+(S.player.energy-45)*.12+clutchBadgeBoost(type)+relationshipClutchBonus();
- return Math.max(20,Math.min(94,Math.round(base)))
-}
-function opponentAnswerChance(){
- const a=S.player.attrs;
- const stop=(a.Defense-55)*.32+(a.IQ-55)*.12+defensiveClutchBoost();
- return Math.max(25,Math.min(72,Math.round(62-stop)))
-}
-function startMoment(){
- const opp=nextOpp(),playoff=!!(S.playoffs&&S.playoffs.active),nba=S.stage==="NBA",spot=nba?currentGameSpotlight():null;
- const base=nba?(playoff?100:104):(S.stage==="College"?68:58),team=base+Math.floor(Math.random()*(nba?15:10)),gap=1+Math.floor(Math.random()*4);
- S.live={opp,stage:S.stage,playoff,storyline:spot?spot.title:null,homeAway:playoff?"PLAYOFF":nextGameLocation(),team,oppScore:team+gap,pts:Math.max(8,Math.round(ovr()/3+Math.random()*7)),ast:Math.floor(Math.random()*6),reb:Math.floor(Math.random()*6),clutchPossessions:0,response:false,lastType:null,lastMessage:"Coach puts the ball in your hands."};
- save();render();requestAnimationFrame(()=>{const el=document.getElementById("keyMomentDecision");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});else scrollTo({top:0,behavior:"smooth"})})
-}
-function momentSkill(t){
- const a=S.player.attrs;
- let base;if(t==="iso")base=(a.Finishing+a.Athleticism)/2;
- else if(t==="three")base=a.Shooting;
- else if(t==="pnr")base=(a.Playmaking+a.IQ)/2;
- else base=(a.IQ+S.player.trust)/2;
- return base+clutchBadgeBoost(t)*.65
-}
-const MAX_CLUTCH_POSSESSIONS=3;
-function openClutchResponseChoice(){
- const g=S.live;if(!g)return;
- modal('<h2>Answer Back • Chance '+((g.clutchPossessions||0)+1)+'/'+MAX_CLUTCH_POSSESSIONS+'</h2><p class="muted">Choose how you want to respond right now.</p><div class="list"><button class="btn primary" data-clutch-response="iso">Attack the Rim</button><button class="btn" data-clutch-response="three">Hunt the Three</button><button class="btn" data-clutch-response="pnr">Run Pick-and-Roll</button><button class="btn" data-clutch-response="team">Make the Team Play</button></div>');
- document.querySelectorAll("[data-clutch-response]").forEach(b=>b.onclick=()=>{const type=b.dataset.clutchResponse;closeModal();if(!S.live)return;S.live.response=true;S.live.lastMessage="Answer-back possession underway.";resolveMoment(type)})
-}
-function showClutchResult(title,body,canRespond){
- if(!S.live)return;
- const button=canRespond?'<button class="btn primary" id="answerBackBtn">Answer Back • Chance '+((S.live.clutchPossessions||0)+1)+'/'+MAX_CLUTCH_POSSESSIONS+'</button>':'<button class="btn primary" id="finishGameBtn">Conclude Game</button>';
- modal('<h2>'+title+'</h2><p class="muted">'+body+'</p><div class="modalFoot">'+button+'</div>');
- if($("answerBackBtn"))$("answerBackBtn").onclick=openClutchResponseChoice;
- if($("finishGameBtn"))$("finishGameBtn").onclick=finishGame
-}
-function resolveMoment(t){
- const g=S.live;if(!g)return;
- g.lastType=t;g.clutchPossessions=(g.clutchPossessions||0)+1;g.response=false;
- const success=momentSkill(t)+Math.random()*34>77;
- if(success){
-   if(t==="three"){g.team+=3;g.pts+=3}
-   else if(t==="pnr"){g.team+=2;g.ast++}
-   else {g.team+=2;if(t==="iso")g.pts+=2;if(t==="team")S.player.trust=Math.min(100,S.player.trust+2)}
- }else{
-   g.lastMessage="The defense wins the possession.";
-   finishGame();return
- }
- const opponentScores=Math.random()*100<opponentAnswerChance();
- if(opponentScores){
-   const three=Math.random()<.28,pts=three?3:2;g.oppScore+=pts;
-   const chance=clutchResponseChance(t),underCap=g.clutchPossessions<MAX_CLUTCH_POSSESSIONS;
-   const canRespond=underCap&&Math.random()*100<chance;
-   g.lastMessage="They answered with "+pts+".";
-   if(!underCap){
-     g.lastMessage="Final clutch exchange complete.";
-     finishGame();return
-   }else if(canRespond){
-     showClutchResult("They answered back","You executed, but "+g.opp+" scored again. You have "+(MAX_CLUTCH_POSSESSIONS-g.clutchPossessions)+" clutch chance"+((MAX_CLUTCH_POSSESSIONS-g.clutchPossessions)===1?"":"s")+" left. Response chance: "+chance+"%. You earned another possession.",true)
-   }else{
-     g.lastMessage="Opponent answered and no extra response was earned.";
-     finishGame();return
-   }
- }else{
-   g.lastMessage="Your defense gets the stop.";
-   if(g.team>g.oppScore){
-     g.win=true;
-     const finalScore=g.team+"-"+g.oppScore;
-     S.news.unshift("Clutch win: "+S.player.name+" delivered and the defense got the stop • "+finalScore+".");
-     S.live=null;
-     recordGame(g);
-     toast("CLUTCH WIN • "+finalScore);
-     return
-   }
-   finishGame();return
- }
-}
-function normalizeFinalScore(g){
- if(!g||g.scoreNormalized)return g;
- const nba=g.stage==="NBA"||S.stage==="NBA";
- if(!nba){g.scoreNormalized=true;return g}
- const playoff=!!g.playoff,originalDiff=Math.abs((g.team||0)-(g.oppScore||0));
- let winnerTarget=(playoff?104:110)+Math.floor(Math.random()*(playoff?20:21));
- winnerTarget=Math.max(winnerTarget,(g.pts||0)+42);
- winnerTarget=Math.min(145,winnerTarget);
- let margin=Math.max(1,Math.min(28,originalDiff||1));
- if(originalDiff>28)margin=28+Math.floor(Math.random()*7);
- const loserTarget=Math.max(playoff?92:96,winnerTarget-margin);
- if(g.win===undefined)g.win=(g.team||0)>(g.oppScore||0);
- if(g.win){g.team=winnerTarget;g.oppScore=loserTarget}else{g.oppScore=winnerTarget;g.team=loserTarget}
- g.scoreNormalized=true;return g
-}
-function quickSimBlockReason(){
- if(S.stage==="Retired")return "Your playing career is complete.";
- if(S.stage==="Draft Combine")return "Finish the Draft Combine before playing another game.";
- if(S.stage==="Offseason")return "Finish offseason roster and contract decisions first.";
- if(S.fullGame&&S.fullGame.active)return "Finish or exit the current full game first.";
- if(S.live)return "Finish the current game first.";
- if(S.stage==="NBA"&&S.nbaWorld.allStar&&S.nbaWorld.allStar.breakActive&&!S.nbaWorld.allStar.completed)return "Complete the All-Star break before the next game.";
- if(S.stage==="NBA"&&isInjured())return "You are injured. Recover before playing the next game.";
- return ""
-}
-function canQuickSimNow(){return !quickSimBlockReason()}
-function showQuickSimResult(g,payout){
- const result=g.win?"WIN":"LOSS",cls=g.win?"good":"bad";
- const score=(g.team||0)+" - "+(g.oppScore||0),blockReason=quickSimBlockReason();
- const earnings=payout>0?'<div class="row"><span>Game earnings</span><strong>$'+Math.round(payout).toLocaleString()+'</strong></div>':'';
- const story=g.storyline?'<div class="item"><div><b>'+g.storyline+'</b><small>Game spotlight</small></div></div>':'';
- const nextAction=blockReason?'<div class="item"><small>'+blockReason+'</small></div>':'<button class="btn good" id="quickResultNext">Quick Sim Next Game</button>';
- modal('<div class="row" style="align-items:flex-start"><div><span class="kicker">QUICK SIM RESULT</span><h2 style="margin:5px 0">'+result+' vs '+g.opp+'</h2><p class="muted" style="margin:0">Final score '+score+'</p></div><span class="pill '+cls+'">'+result+'</span></div><div class="rosterSummary" style="margin-top:14px"><div><small class="muted">PTS</small><b style="display:block;font-size:24px">'+g.pts+'</b></div><div><small class="muted">AST</small><b style="display:block;font-size:24px">'+g.ast+'</b></div><div><small class="muted">REB</small><b style="display:block;font-size:24px">'+g.reb+'</b></div><div><small class="muted">SCORE</small><b style="display:block;font-size:18px">'+score+'</b></div></div>'+earnings+story+'<div class="modalFoot">'+nextAction+'<button class="btn primary" id="quickResultDone">Continue</button><button class="btn" id="quickResultGames">View Games</button></div>');
- if($("quickResultNext"))$("quickResultNext").onclick=()=>{closeModal();setTimeout(()=>quickSim(),80)};
- if($("quickResultDone"))$("quickResultDone").onclick=closeModal;
- if($("quickResultGames"))$("quickResultGames").onclick=()=>{closeModal();setScreen("games")}
-}
-function quickSim(){const reason=quickSimBlockReason();if(reason){toast(reason);render();return}if(S.stage==="NBA"&&!S.playoffs.active&&(S.record.w+S.record.l)>=82){startPlayoffs();render();toast("Regular season complete — playoffs are ready");return}const p=S.player,spot=S.stage==="NBA"?currentGameSpotlight():null,g={quickSim:true,opp:nextOpp(),storyline:spot?spot.title:null,stage:S.stage,playoff:!!(S.playoffs&&S.playoffs.active),homeAway:S.playoffs&&S.playoffs.active?"PLAYOFF":nextGameLocation(),pts:Math.max(5,Math.round(ovr()/3+(Math.random()-.35)*14)),ast:Math.max(0,Math.round(p.attrs.Playmaking/16+Math.random()*4)),reb:Math.max(0,Math.round(p.attrs.Athleticism/20+Math.random()*4))};g.win=ovr()+relationshipClutchBonus()*.55+lineupStrengthBonus()+Math.random()*30>62+Math.random()*35;const base=g.playoff?104:110;const winner=base+Math.floor(Math.random()*(g.playoff?20:21)),margin=2+Math.floor(Math.random()*13);g.team=g.win?winner:winner-margin;g.oppScore=g.win?winner-margin:winner;recordGame(g)}
-function finishGame(){
- closeModal();const g=S.live;if(!g)return;
- if(g.team===g.oppScore){
-   const otEdge=ovr()+(S.player.attrs.IQ*.2)+clutchBadgeBoost(g.lastType||"team")+Math.random()*30;
-   const oppEdge=78+Math.random()*28;
-   g.win=otEdge>=oppEdge;
-   if(g.win)g.team+=2+Math.floor(Math.random()*5);else g.oppScore+=2+Math.floor(Math.random()*5)
- }else g.win=g.team>g.oppScore;
- S.live=null;recordGame(g)
-}
-function recordGame(g){normalizeFinalScore(g);if(S.stage==="NBA"){coolLoadManagementScrutiny();const js=ensureTeamJerseyState();js.games++;updateJerseyUnlocks()}const gameNo=S.game||1,oppId=opponentTeamIdFromName(g.opp)||S.playoffs?.opponentId||null;S.games.unshift(g);const isPlayoff=!!(S.playoffs&&S.playoffs.active&&S.stage==="NBA");updateRecords(g,isPlayoff);if(!isPlayoff){S.record[g.win?"w":"l"]++;S.game++}const st=S.player.stats,old=st.gp;st.gp++;const ckey=S.stage==="NBA"?"nba":S.stage==="College"?"college":"highSchool";S.careerStats=S.careerStats||{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}};const cst=S.careerStats[ckey];cst.gp++;cst.pts+=g.pts;cst.ast+=g.ast;cst.reb+=g.reb;st.ppg=(st.ppg*old+g.pts)/st.gp;st.apg=(st.apg*old+g.ast)/st.gp;st.rpg=(st.rpg*old+g.reb)/st.gp;S.player.energy=Math.max(35,S.player.energy-10);S.player.xp+=90+g.pts*3+g.ast*4+g.reb*2;if(S.stage!=="NBA")S.player.draft=Math.min(99,S.player.draft+(g.pts>=22?3:g.pts>=15?1:0));if(S.stage==="NBA"){S.player.trust=Math.min(100,S.player.trust+coachTrustGain(g)+pathBonus("coachTrust"));updateTeammateRelationships(g);updateCaptaincy();if(oppId)addRivalryHeat(oppId,(isPlayoff?8:0)+(g.pts>=30?3:1)+(Math.abs((g.team||0)-(g.oppScore||0))<=5?3:0));if(g.pts>=30)addCareerPathXP("superstar",g.pts>=40?10:6);if(g.win&&g.pts>=25)addCareerPathXP("superstar",3);if(g.ast>=8)addCareerPathXP("dynasty",2);if((S.year||1)>=5)addCareerPathXP("veteran",2);S.player.chemistry=Math.max(20,Math.min(100,S.player.chemistry+(g.win?2:-1)+(g.ast>=6?1:0)));updateRole()}else if(g.win)S.player.trust=Math.min(100,S.player.trust+1);if(g.win)S.player.morale=Math.min(100,S.player.morale+3);else S.player.morale=Math.max(20,S.player.morale-2);processPlayerLevelUps();if([2,4,6,8,10,12].includes(st.gp)&&S.offers.length<COLLEGES.length&&!S.college){const pool=COLLEGES.filter(c=>!S.offers.includes(c));S.offers.push(pool[Math.floor(Math.random()*pool.length)])}if(S.stage==="NBA"&&!isPlayoff)maybeTriggerAllStarBreak();if(isPlayoff){if(g.win&&g.pts>=25&&Math.abs(g.team-g.oppScore)<=5)S.nbaWorld.records.playoff.clutchWins=(S.nbaWorld.records.playoff.clutchWins||0)+1;if(S.playoffs.playIn){finishPlayInGame(g)}else{const seriesKey=g.win?"seriesWins":"seriesLosses";S.playoffs[seriesKey]=Math.min(4,(S.playoffs[seriesKey]||0)+1);S.news.unshift((g.win?"Playoff win":"Playoff loss")+" vs "+g.opp+" • Series "+S.playoffs.seriesWins+"-"+S.playoffs.seriesLosses);advancePlayoffRound()}}else{S.news.unshift((g.win?"Win":"Loss")+" vs "+g.opp+": "+g.pts+" PTS, "+g.ast+" AST, "+g.reb+" REB.");if(S.stage==="NBA"){simulateOtherTeamsOneGame();ensureLeagueStandings();S.leagueStandings[S.team]={w:S.record.w,l:S.record.l};if(g.pts>=30)pushLeagueNews(S.player.name+" scored "+g.pts+" in "+currentTeamName()+"'s "+(g.win?"win":"loss")+".");updateCup(g,gameNo);maybeCreateLockerEvent();maybeInjury()}}S.training=S.training||{used:0,max:3,recovered:false};resetTrainingCycle();S.social=S.social||{followers:100,fame:0,posted:false,posts:0};S.social.posted=false;resetHomeCycle();processRelationshipAfterGame(g);let payout=0;payout+=sponsorIncome();if((g.stage==="NBA"||S.stage==="NBA")&&S.finance.contract)payout+=S.finance.contract.perGame||0;payout+=passiveIncome();if(payout>0){S.finance.cash+=payout;S.finance.earnings+=payout;S.news.unshift("Off-court earnings paid $"+Math.round(payout).toLocaleString()+" after the game.")}if(S.stage==="NBA"&&!isPlayoff&&(S.record.w+S.record.l)>=82)startPlayoffs();save();render();if(g.quickSim)setTimeout(()=>showQuickSimResult(g,payout),0);else toast(isPlayoff?"Playoff game complete":"Game complete — progress saved")}
-function rest(){
- S.training=S.training||{used:0,max:baseTrainingSessions(),recovered:false,recoveryUsed:0,recoveryMax:baseRecoveryUses()};
- refreshConnectionBenefits();
- if((S.training.recoveryUsed||0)>=S.training.recoveryMax){toast("All recovery days used — play a game to reset");return}
- S.training.recoveryUsed=(S.training.recoveryUsed||0)+1;S.training.recovered=S.training.recoveryUsed>=S.training.recoveryMax;
- S.player.energy=100;S.player.morale=Math.min(100,S.player.morale+2);S.training.max+=recoveryTrainingBonus();
- save();render();toast("Recovered • +"+recoveryTrainingBonus()+" training sessions • "+Math.max(0,S.training.recoveryMax-S.training.recoveryUsed)+" recovery day(s) left")
-}
-function declareDraft(){if(S.stage!=="College"||(S.game-1)<8||S.player.draft<55){toast("Not draft eligible yet");return}S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[]};S.careerHistory.collegeSeasons=S.careerHistory.collegeSeasons||[];S.careerHistory.collegeSeasons.push({school:S.college,year:S.year,record:{w:S.record.w,l:S.record.l},games:S.game-1,stats:{...S.player.stats},level:S.player.level,ovr:ovr(),draft:S.player.draft});S.stage="Draft Combine";S.draftProcess={declared:true,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null};S.live=null;S.news.unshift("You declared for the NBA Draft. Next stop: NBA Draft Combine.");resetTrainingCycle();save();setScreen("career");toast("NBA Draft Combine unlocked")}
-function collegeModal(){if(S.college){toast("Already committed to "+S.college);return}if(!S.offers.length){toast("You need a scholarship offer first");return}modal('<h2>Choose College</h2><p class="muted">This is a one-time commitment. Your player level, XP, attributes, badges, draft stock, and career game history will carry into college.</p><div class="list">'+S.offers.map(c=>'<button class="btn" data-college="'+c+'">'+c+'</button>').join("")+'</div><div class="modalFoot"><button class="btn" id="ccancel">Cancel</button></div>');document.querySelectorAll("[data-college]").forEach(b=>b.onclick=()=>{if(S.college){toast("College already selected");closeModal();return}const school=b.dataset.college;S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[]};S.careerHistory.highSchool={record:{w:S.record.w,l:S.record.l},games:S.game-1,stats:{...S.player.stats},level:S.player.level,ovr:ovr(),draft:S.player.draft};S.college=school;S.stage="College";S.year=1;S.record={w:0,l:0};S.game=1;resetSeasonStatLine();S.live=null;S.news.unshift("Committed to "+S.college+". Your high-school career is saved and your college season begins.");save();closeModal();setScreen("home");toast("Committed to "+S.college)});$("ccancel").onclick=closeModal}
-window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEventListener("error",e=>{console.error("MYCAREER error",e.error||e.message);const content=$("content");if(content&&!content.innerHTML.trim())content.innerHTML='<section class="card s12"><h3>MYCAREER recovered from an error</h3><p class="muted">Tap New Career again. Your save has not been deleted.</p><button class="btn primary" id="recoverBtn">Return Home</button></section>';const r=$("recoverBtn");if(r)r.onclick=()=>{S.screen="home";render()}});$("profileBtn").onclick=()=>frontMode==="career"&&S.created?openAppearance():null;$("modalWrap").onclick=e=>{if(e.target===$("modalWrap"))closeModal()};render();maybeSendPreviewTransfer();
-</script>
-</body>
-</html>+x.price.toLocaleString()+'">'+compactMoney(x.price)+'</strong><button class="btn '+(owned?'good':'')+'" style="width:100%;margin-top:10px" data-city-buy="'+x.id+'" '+(owned||locked?'disabled':'')+'>'+(owned?'Unlocked':locked?'Key Required':'Purchase Access')+'</button></div>'}).join("")+'</div></section>'
+ ensureWealthState();
+ return '<section class="card s12"><span class="kicker">KEYS TO THE CITY</span><h3>Civic Access & Legacy Purchases</h3><p class="muted">Keys are permanent status unlocks earned through lifetime charitable giving. They are not spent; they unlock exclusive places and projects where superstar money can actually go.</p><div class="grid cityPrivilegeGrid" style="margin-top:10px">'+CITY_PRIVILEGES.map(x=>{
+   const owned=S.civic.purchases.includes(x.id),locked=(S.civic.keys||0)<x.keys;
+   return '<div class="card cityPrivilegeCard"><div class="row"><b>'+x.name+'</b><span class="pill">'+x.keys+' KEY'+(x.keys===1?'':'S')+'</span></div><p class="muted">'+x.desc+'</p><strong class="cityPrice">'+compactMoney(x.price)+'</strong><button class="btn '+(owned?'good':'')+'" style="width:100%;margin-top:10px" data-city-buy="'+x.id+'" '+(owned||locked?'disabled':'')+'>'+(owned?'Unlocked':locked?'Key Required':'Purchase Access')+'</button></div>'
+ }).join("")+'</div></section>'
 }
 function passiveIncome(){ensureWealthState();const base=S.finance.owned.reduce((sum,id)=>{const x=STORE_ITEMS.find(i=>i.id===id);return sum+(x?x.income:0)},0);return Math.round(base*(1+connectionEffect("passiveIncome")+pathBonus("passiveIncome")))+realEstateNetIncome()+shoeIncome()+jerseyMerchIncome()}
 function endorsementSlots(){return (S.social.fame>=80?4:S.social.fame>=60?3:S.social.fame>=35?2:1)+Math.round(connectionEffect("endorsementSlots"))}
