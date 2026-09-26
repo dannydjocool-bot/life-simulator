@@ -1274,6 +1274,7 @@ function tradeRumorHTML(){
 }
 function startOffseason(){
  if(S.stage!=="Offseason"){
+   applyBankSeasonInterest();
    evaluateSeasonAwards();evaluateComebackSeason();processSeasonPromisesAndIncentives();updateLeaguePlayerCareers();archiveCompletedSeason();processLeagueFreeAgency();processContractSeasonEnd();S.nbaWorld.comebackEligible=(S.nbaWorld.loadManagement.missedInjury||0)>=3;
    if(S.finance.contract&&S.finance.contract.yearsRemaining===0)S.finance.contract.teamId=S.team;
    S.player.age++
@@ -2051,7 +2052,76 @@ function negotiateContract(idx){
  if(Math.random()*100<chance){o.total=Math.round(o.total*1.1);o.label=o.label+" • Negotiated";S.news.unshift("Your camp negotiated a 10% stronger offer.");toast("Negotiation successful")}else{S.news.unshift("Negotiation did not improve the offer.");toast("Team held firm")}save();render()
 }
 function promiseLabel(p){return p==="starter"?"Guaranteed Starter":p==="contender"?"Build a Contender":p==="touches"?"Featured Offensive Role":"No Special Promise"}
-function passiveIncome(){const base=S.finance.owned.reduce((sum,id)=>{const x=STORE_ITEMS.find(i=>i.id===id);return sum+(x?x.income:0)},0);return Math.round(base*(1+connectionEffect("passiveIncome")+pathBonus("passiveIncome")))+shoeIncome()+jerseyMerchIncome()}
+function ensureWealthState(){
+ S.finance=S.finance||{};if(typeof S.finance.cash!=="number")S.finance.cash=0;if(typeof S.finance.bank!=="number")S.finance.bank=0;
+ if(!Array.isArray(S.finance.realEstate))S.finance.realEstate=[];
+ S.civic=S.civic||{donated:0,keys:0,milestones:[],purchases:[],history:[]};
+ if(typeof S.civic.donated!=="number")S.civic.donated=0;if(typeof S.civic.keys!=="number")S.civic.keys=0;
+ if(!Array.isArray(S.civic.milestones))S.civic.milestones=[];if(!Array.isArray(S.civic.purchases))S.civic.purchases=[];if(!Array.isArray(S.civic.history))S.civic.history=[];
+ syncCityKeys();return S.finance
+}
+function totalLiquid(){ensureWealthState();return Math.max(0,S.finance.cash)+Math.max(0,S.finance.bank)}
+function spendLiquid(amount){
+ ensureWealthState();amount=Math.max(0,Math.round(amount||0));if(totalLiquid()<amount)return false;
+ const fromCash=Math.min(Math.max(0,S.finance.cash),amount);S.finance.cash-=fromCash;const remain=amount-fromCash;if(remain>0)S.finance.bank=Math.max(0,S.finance.bank-remain);return true
+}
+function transferBank(direction,amount){
+ ensureWealthState();amount=Math.max(0,Math.floor(Number(amount)||0));if(amount<=0){toast("Enter a transfer amount");return}
+ if(direction==="deposit"){if(S.finance.cash<amount){toast("Not enough cash");return}S.finance.cash-=amount;S.finance.bank+=amount;toast("$"+amount.toLocaleString()+" moved to bank")}
+ else{if(S.finance.bank<amount){toast("Not enough money in bank");return}S.finance.bank-=amount;S.finance.cash+=amount;toast("$"+amount.toLocaleString()+" withdrawn")}
+ save();render()
+}
+function cityKeyThresholds(){return [1000000,5000000,15000000,30000000]}
+function syncCityKeys(){
+ S.civic=S.civic||{donated:0,keys:0,milestones:[],purchases:[],history:[]};
+ const thresholds=cityKeyThresholds(),earned=thresholds.filter(x=>(S.civic.donated||0)>=x).length;
+ if(earned>(S.civic.keys||0)){
+   for(let i=S.civic.keys||0;i<earned;i++){const mark=thresholds[i];S.civic.history.unshift("Received Key to the City after $"+mark.toLocaleString()+" in lifetime giving.");S.news.unshift("Community leaders awarded "+S.player.name+" a Key to the City.")}
+ }
+ S.civic.keys=Math.max(S.civic.keys||0,earned);return S.civic.keys
+}
+function donateToCharity(causeId,amount){
+ ensureWealthState();const cause=CHARITY_CAUSES.find(x=>x.id===causeId);amount=Math.max(0,Math.round(amount||0));if(!cause||amount<=0)return;
+ if(!spendLiquid(amount)){toast("Not enough cash or bank funds");return}
+ const before=S.civic.keys||0;S.civic.donated+=amount;S.civic.history.unshift("Donated $"+amount.toLocaleString()+" to "+cause.name+".");S.civic.history=S.civic.history.slice(0,20);
+ S.social.fame=Math.min(100,S.social.fame+Math.min(6,Math.max(1,Math.floor(Math.log10(Math.max(10,amount))-3))));
+ if(S.stage==="NBA"||S.stage==="Offseason"){addCareerPathXP("business",Math.min(35,Math.max(4,Math.round(amount/250000))));addCareerPathXP("veteran",Math.min(25,Math.max(3,Math.round(amount/400000))))}
+ syncCityKeys();save();render();toast((S.civic.keys||0)>before?"Donation made • Key to the City earned":"Donation made")
+}
+function buyRealEstate(id){
+ ensureWealthState();const p=REAL_ESTATE.find(x=>x.id===id);if(!p||S.finance.realEstate.includes(id))return;
+ if((p.keys||0)>(S.civic.keys||0)){toast("Requires "+p.keys+" Keys to the City");return}
+ if(!spendLiquid(p.price)){toast("Not enough liquid funds");return}
+ S.finance.realEstate.push(id);S.homeSpace=S.homeSpace||{};if(p.tier==="mansion")S.homeSpace.tier="mansion";else if(p.tier==="penthouse"&&!["mansion"].includes(S.homeSpace.tier))S.homeSpace.tier="penthouse";
+ S.player.morale=Math.min(100,S.player.morale+5);addCareerPathXP("business",Math.min(80,15+Math.round(p.price/2000000)));
+ S.news.unshift("Purchased "+p.name+" for $"+p.price.toLocaleString()+".");S.homeSpace.history=(S.homeSpace.history||[]);S.homeSpace.history.unshift("Property acquired: "+p.name);save();render();toast(p.name+" purchased")
+}
+function buyCityPrivilege(id){
+ ensureWealthState();const x=CITY_PRIVILEGES.find(v=>v.id===id);if(!x||S.civic.purchases.includes(id))return;
+ if((S.civic.keys||0)<x.keys){toast("Requires "+x.keys+" Keys to the City");return}
+ if(!spendLiquid(x.price)){toast("Not enough liquid funds");return}
+ S.civic.purchases.push(id);if(x.fame)S.social.fame=Math.min(100,S.social.fame+x.fame);if(x.morale)S.player.morale=Math.min(100,S.player.morale+x.morale);if(x.trust)S.player.trust=Math.min(100,S.player.trust+x.trust);
+ S.civic.history.unshift("Unlocked "+x.name+" for $"+x.price.toLocaleString()+".");addCareerPathXP("business",Math.min(60,10+Math.round(x.price/1000000)));save();render();toast(x.name+" unlocked")
+}
+function realEstateNetIncome(){
+ ensureWealthState();return S.finance.realEstate.reduce((sum,id)=>{const p=REAL_ESTATE.find(x=>x.id===id);return sum+(p?(p.income||0)-(p.upkeep||0):0)},0)
+}
+function applyBankSeasonInterest(){
+ ensureWealthState();if(S.finance.lastInterestYear===S.year)return;S.finance.lastInterestYear=S.year;
+ if(S.finance.bank<=0)return;const interest=Math.min(250000,Math.round(S.finance.bank*.01));if(interest>0){S.finance.bank+=interest;S.finance.earnings+=interest;S.news.unshift("Bank account earned $"+interest.toLocaleString()+" in annual interest.")}
+}
+function bankPhoneHTML(){
+ ensureWealthState();const net=realEstateNetIncome();
+ return '<section class="card s12"><span class="kicker">MOBILE BANKING</span><div class="row"><div><h2 style="margin:6px 0">Private Bank</h2><small class="muted">Move money between wallet cash and your bank account.</small></div><span class="pill good">$'+Math.round(totalLiquid()).toLocaleString()+' LIQUID</span></div><div class="rosterSummary"><div><small class="muted">CASH</small><b style="display:block">$'+Math.round(S.finance.cash).toLocaleString()+'</b></div><div><small class="muted">BANK</small><b style="display:block">$'+Math.round(S.finance.bank).toLocaleString()+'</b></div><div><small class="muted">REAL ESTATE NET</small><b style="display:block">$'+Math.round(net).toLocaleString()+'/game</b></div><div><small class="muted">KEYS TO CITY</small><b style="display:block">'+(S.civic.keys||0)+'</b></div></div><div class="field" style="margin-top:12px"><label>Transfer amount</label><input id="bankTransferAmount" type="number" min="1" step="1000" inputmode="numeric" placeholder="100000"></div><div class="actions"><button class="btn primary" data-bank-transfer="deposit">Cash → Bank</button><button class="btn" data-bank-transfer="withdraw">Bank → Cash</button><button class="btn" data-bank-quick="100000">$100K</button><button class="btn" data-bank-quick="1000000">$1M</button></div><small class="muted">Bank balance earns 1% each completed season, capped at $250K interest per season.</small></section>'
+}
+function philanthropyHTML(){
+ ensureWealthState();const next=cityKeyThresholds().find(x=>(S.civic.donated||0)<x),amounts=[25000,100000,500000,1000000,5000000];
+ return '<section class="card s12"><div class="row"><div><span class="kicker">PHILANTHROPY</span><h3 style="margin:5px 0">Community Legacy</h3></div><span class="pill good">'+(S.civic.keys||0)+' KEY'+((S.civic.keys||0)===1?'':'S')+'</span></div><p class="muted">Lifetime donations: $'+Math.round(S.civic.donated||0).toLocaleString()+'. '+(next?'Next Key to the City at $'+next.toLocaleString()+'.':'All civic-key milestones reached.')+'</p><div class="grid" style="margin-top:10px">'+CHARITY_CAUSES.map(cause=>'<div class="card" style="grid-column:span 6"><b>'+cause.name+'</b><div class="actions" style="margin-top:10px">'+amounts.map(a=>'<button class="btn" data-donate="'+cause.id+'" data-donate-amount="'+a+'">$'+(a>=1000000?(a/1000000)+'M':(a/1000)+'K')+'</button>').join("")+'</div></div>').join("")+'</div></section>'
+}
+function cityPrivilegesHTML(){
+ ensureWealthState();return '<section class="card s12"><span class="kicker">KEYS TO THE CITY</span><h3>Civic Access & Legacy Purchases</h3><p class="muted">Keys are permanent status unlocks earned through lifetime charitable giving. They are not spent; they unlock exclusive places and projects where superstar money can actually go.</p><div class="grid" style="margin-top:10px">'+CITY_PRIVILEGES.map(x=>{const owned=S.civic.purchases.includes(x.id),locked=(S.civic.keys||0)<x.keys;return '<div class="card" style="grid-column:span 4"><div class="row"><b>'+x.name+'</b><span class="pill">'+x.keys+' KEY'+(x.keys===1?'':'S')+'</span></div><p class="muted">'+x.desc+'</p><strong>$'+x.price.toLocaleString()+'</strong><button class="btn '+(owned?'good':'')+'" style="width:100%;margin-top:10px" data-city-buy="'+x.id+'" '+(owned||locked?'disabled':'')+'>'+(owned?'Unlocked':locked?'Key Required':'Purchase Access')+'</button></div>'}).join("")+'</div></section>'
+}
+function passiveIncome(){ensureWealthState();const base=S.finance.owned.reduce((sum,id)=>{const x=STORE_ITEMS.find(i=>i.id===id);return sum+(x?x.income:0)},0);return Math.round(base*(1+connectionEffect("passiveIncome")+pathBonus("passiveIncome")))+realEstateNetIncome()+shoeIncome()+jerseyMerchIncome()}
 function endorsementSlots(){return (S.social.fame>=80?4:S.social.fame>=60?3:S.social.fame>=35?2:1)+Math.round(connectionEffect("endorsementSlots"))}
 function endorsementStageOK(s){return s.stage===S.stage||(S.stage==="NBA"&&s.stage==="College")}
 function sponsorEligible(s){return endorsementStageOK(s)&&ovr()>=s.ovr&&S.social.followers>=s.followers&&S.social.fame>=s.fame}
