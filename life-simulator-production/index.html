@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.12</title>
+<title>MYCAREER Basketball Sim v0.16.13</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -351,7 +351,8 @@ body.menuReducedMotion *{scroll-behavior:auto!important;transition:none!importan
 @media(max-width:900px){
  .floatingPhone.phoneCustomPosition{
    left:0!important;right:auto!important;top:0!important;bottom:auto!important;
-   transform:none!important;touch-action:none;user-select:none;-webkit-user-select:none;
+   transform:none!important;touch-action:none!important;user-select:none;-webkit-user-select:none;
+   -webkit-touch-callout:none;overscroll-behavior:contain;
  }
  .floatingPhone.phoneEditMode{
    border-color:#ff9b52!important;
@@ -369,6 +370,17 @@ body.menuReducedMotion *{scroll-behavior:auto!important;transition:none!importan
  .phoneEditToggle.hidden{display:none!important}
  .phoneEditToggle .uiIcon{width:14px;height:14px}
  .phoneEditToggle.editing{border-color:#ff9b52;background:#2b1a0e;color:#ffbd87}
+}
+
+html.phoneDraggingNow,body.phoneDraggingNow{
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+  touch-action:none!important;
+}
+body.phoneDraggingNow .main,
+body.phoneDraggingNow .content,
+body.phoneDraggingNow .bottom{
+  touch-action:none!important;
 }
 </style>
 </head>
@@ -791,13 +803,16 @@ function bindPhoneDrag(){
  fp.dataset.dragBound="1";
  fp.addEventListener("pointerdown",e=>{
    if(!phoneEditMode)return;
-   e.preventDefault();phoneDragging=true;phoneDragMoved=false;
+   e.preventDefault();e.stopPropagation();
+   phoneDragging=true;phoneDragMoved=false;
+   document.documentElement.classList.add("phoneDraggingNow");
+   document.body.classList.add("phoneDraggingNow");
    const r=fp.getBoundingClientRect();phoneDragOffset={x:e.clientX-r.left,y:e.clientY-r.top};
    try{fp.setPointerCapture(e.pointerId)}catch(_){}
  });
  fp.addEventListener("pointermove",e=>{
    if(!phoneDragging||!phoneEditMode)return;
-   e.preventDefault();phoneDragMoved=true;
+   e.preventDefault();e.stopPropagation();phoneDragMoved=true;
    const p=phoneSafePosition(e.clientX-phoneDragOffset.x,e.clientY-phoneDragOffset.y,fp);
    fp.style.setProperty("left",p.x+"px","important");fp.style.setProperty("top",p.y+"px","important");
    if(edit){
@@ -808,6 +823,8 @@ function bindPhoneDrag(){
  });
  const finish=e=>{
    if(!phoneDragging)return;phoneDragging=false;
+   document.documentElement.classList.remove("phoneDraggingNow");
+   document.body.classList.remove("phoneDraggingNow");
    const r=fp.getBoundingClientRect(),p=phoneSafePosition(r.left,r.top,fp);
    localStorage.setItem(PHONE_POS_KEY,JSON.stringify(p));applyPhonePosition();
    try{fp.releasePointerCapture(e.pointerId)}catch(_){}
