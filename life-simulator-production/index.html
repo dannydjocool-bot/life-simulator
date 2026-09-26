@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.1</title>
+<title>MYCAREER Basketball Sim v0.16.2</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -466,7 +466,7 @@ const CAREER_PATHS=[
 ];
 
 
-const fresh=()=>({version:"0.16.1",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false,recoveryUsed:0,recoveryMax:1},connections:{owned:[],activeAgent:null,activeDesigner:null},careerPaths:{xp:{superstar:0,franchise:0,dynasty:0,media:0,business:0,veteran:0},franchiseTeamId:null,lastTeamId:null},finance:{cash:1000,bank:0,earnings:0,owned:[],realEstate:[],sponsor:null,sponsors:[],contract:null},civic:{donated:0,keys:0,milestones:[],purchases:[],history:[]},social:{followers:100,fame:0,posted:false,posts:0},homeSpace:{designer:"classic",ownedDesigners:["classic"],actionsUsed:0,history:[],tier:"family"},relationships:{partner:null,status:"Single",chemistry:0,trust:0,happiness:0,attention:0,actionsThisCycle:0,lastActionGame:0,pendingEvent:null,history:[],exclusive:false},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],recordBook:{seasons:seedRecordBook()},championshipCelebration:null,playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null,lineups:{}},fullGame:null,postgameMedia:null,mediaProfile:{interviews:0,rivalryHeat:0},nbaWorld:{rivalries:{},relationships:{},captain:false,mentorUsedYear:0,lockerEvent:null,allStarSelections:0,allStar:{year:0,selected:false,pending:false,breakActive:false,completed:false,events:{},captains:[],teams:[],pool:[]},records:{careerHighPts:0,careerHighAst:0,careerHighReb:0,games50:0,games60:0,tripleDoubles:0,franchiseTotals:{},playoff:{games:0,wins:0,pts:0,ast:0,reb:0,clutchWins:0,finalsGames:0,titles:0}},cup:{year:0,w:0,l:0,qualified:false,champion:false},loadManagement:{rests:0,missedInjury:0,abuseScore:0,broadcastRests:0,warnings:0,totalFines:0,lastFine:0,highestFineTier:0,cleanGames:0},promises:[],negotiatedYear:0,signatureShoe:null,retirement:{eligible:false,retired:false,hof:false,postCareer:null},formerTeams:[],leagueEvents:[],usedProspectNames:[],scouting:{year:0,points:6,scouted:{}},leagueTransactions:[],socialFeed:[],phone:{threads:{},active:null},leagueCareerProcessedYear:0,leagueFAProcessedYear:0,teamJerseys:{}},news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,capBreakers:{earned:0,available:0,spent:{}},badgeBreakers:{earned:0,available:0,spent:{}},energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
+const fresh=()=>({version:"0.16.2",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[]},training:{used:0,max:3,recovered:false,recoveryUsed:0,recoveryMax:1},connections:{owned:[],activeAgent:null,activeDesigner:null},careerPaths:{xp:{superstar:0,franchise:0,dynasty:0,media:0,business:0,veteran:0},franchiseTeamId:null,lastTeamId:null},finance:{cash:1000,bank:0,earnings:0,owned:[],realEstate:[],sponsor:null,sponsors:[],contract:null},civic:{donated:0,keys:0,milestones:[],purchases:[],history:[]},social:{followers:100,fame:0,posted:false,posts:0},homeSpace:{designer:"classic",ownedDesigners:["classic"],actionsUsed:0,history:[],tier:"family"},relationships:{partner:null,status:"Single",chemistry:0,trust:0,happiness:0,attention:0,actionsThisCycle:0,lastActionGame:0,pendingEvent:null,history:[],exclusive:false},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],recordBook:{seasons:seedRecordBook()},championshipCelebration:null,playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null,lineups:{}},fullGame:null,postgameMedia:null,mediaProfile:{interviews:0,rivalryHeat:0},nbaWorld:{rivalries:{},relationships:{},captain:false,mentorUsedYear:0,lockerEvent:null,allStarSelections:0,allStar:{year:0,selected:false,pending:false,breakActive:false,completed:false,events:{},captains:[],teams:[],pool:[]},records:{careerHighPts:0,careerHighAst:0,careerHighReb:0,games50:0,games60:0,tripleDoubles:0,franchiseTotals:{},playoff:{games:0,wins:0,pts:0,ast:0,reb:0,clutchWins:0,finalsGames:0,titles:0}},cup:{year:0,w:0,l:0,qualified:false,champion:false},loadManagement:{rests:0,missedInjury:0,abuseScore:0,broadcastRests:0,warnings:0,totalFines:0,lastFine:0,highestFineTier:0,cleanGames:0},promises:[],negotiatedYear:0,signatureShoe:null,retirement:{eligible:false,retired:false,hof:false,postCareer:null},formerTeams:[],leagueEvents:[],usedProspectNames:[],scouting:{year:0,points:6,scouted:{}},leagueTransactions:[],socialFeed:[],phone:{threads:{},active:null},leagueCareerProcessedYear:0,leagueFAProcessedYear:0,teamJerseys:{}},news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,capBreakers:{earned:0,available:0,spent:{}},badgeBreakers:{earned:0,available:0,spent:{}},energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
 function merge(a,b){for(const k in b){if(a[k]===undefined)a[k]=b[k];else if(a[k]&&b[k]&&typeof a[k]==="object"&&!Array.isArray(a[k])&&!Array.isArray(b[k]))merge(a[k],b[k])}return a}
 const SAVE_SLOT_COUNT=3;
 let activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+(localStorage.getItem("mycareer-active-slot")||1)));
@@ -2015,31 +2015,62 @@ function starMessage(action){
  save();render()
 }
 function tradePackageForStar(target){
- const ours=[...rosterFor(S.team)].sort((a,b)=>(b.ovr||0)-(a.ovr||0)),star=target.player,out=[];
- if(ours[0])out.push(ours[0]);
- if((star.ovr||85)>=90&&ours[1])out.push(ours[1]);
- return out
+ const star=target.player,ours=[...rosterFor(S.team)].sort((a,b)=>(b.ovr||0)-(a.ovr||0));
+ if(!ours.length)return [];
+ const targetValue=(star.ovr||85)+(star.potential||star.ovr||85)*.28;
+ const hard=leagueCapLine("hard"),basePayroll=teamPayrollAnnual(S.team),starAnnual=annualSalaryValue(star);
+ let picked=[],salaryOut=0,valueOut=0;
+ for(const p of ours){
+   if(picked.length>=4)break;
+   picked.push(p);salaryOut+=annualSalaryValue(p);valueOut+=(p.ovr||70)+(p.potential||p.ovr||70)*.22;
+   const projected=basePayroll-salaryOut+starAnnual;
+   if(projected<=hard&&valueOut>=targetValue*.72)break
+ }
+ return picked
+}
+function validateStarTrade(target,pkg){
+ if(!target)return {ok:false,reason:"Player no longer available"};
+ if(!pkg||!pkg.length)return {ok:false,reason:"Your team has no trade package available"};
+ const ours=rosterFor(S.team),src=rosterFor(target.team.id);
+ if(!src.some(p=>p.name===target.player.name))return {ok:false,reason:"Player no longer available"};
+ if(pkg.some(p=>!ours.some(x=>x.name===p.name)))return {ok:false,reason:"Trade package changed. Reopen the proposal."};
+ const starAnnual=annualSalaryValue(target.player),outAnnual=pkg.reduce((sum,p)=>sum+annualSalaryValue(p),0);
+ const ourProjected=teamPayrollAnnual(S.team)-outAnnual+starAnnual;
+ const incomingAnnual=outAnnual,otherProjected=teamPayrollAnnual(target.team.id)-starAnnual+incomingAnnual;
+ if(ourProjected>leagueCapLine("hard"))return {ok:false,reason:"Your team would exceed the hard cap. More outgoing salary is required."};
+ if(otherProjected>leagueCapLine("hard"))return {ok:false,reason:target.team.name+" would exceed the hard cap with this package."};
+ return {ok:true,ourProjected,otherProjected,outAnnual,starAnnual}
+}
+function executeStarTrade(){
+ const phone=ensurePhoneState(),thread=phone.threads[phone.active];
+ if(!thread||!thread.tradeRequested){toast("The player has not requested a trade yet");return}
+ const target=phoneTarget(thread);if(!target){toast("Player no longer available");return}
+ const pkg=tradePackageForStar(target),check=validateStarTrade(target,pkg);
+ if(!check.ok){toast(check.reason);return}
+ const src=rosterFor(target.team.id),ours=rosterFor(S.team),starIdx=src.findIndex(p=>p.name===target.player.name);
+ if(starIdx<0){toast("Player no longer available");return}
+ src.splice(starIdx,1);
+ pkg.forEach(p=>{const idx=ours.findIndex(x=>x.name===p.name);if(idx>=0){ours.splice(idx,1);src.push(p)}});
+ ours.push(target.player);
+ rebalanceRosterPayroll(ours,S.team);rebalanceRosterPayroll(src,target.team.id);
+ thread.completed=true;thread.tradeRequested=false;S.nbaWorld.recruitedYear=S.year;addCareerPathXP("dynasty",55);
+ const pkgNames=pkg.map(p=>p.name).join(" + "),msg=currentTeamName()+" acquired "+target.player.name+" from "+teamNameById(target.team.id)+" for "+pkgNames+".";
+ S.nbaWorld.leagueTransactions.unshift(msg);S.nbaWorld.leagueTransactions=S.nbaWorld.leagueTransactions.slice(0,30);pushLeagueNews(msg);pushSocialHeadline(msg,"TRADE");S.news.unshift("Your phone recruitment helped complete the trade for "+target.player.name+".");
+ save();closeModal();render();toast(target.player.name+" traded to "+currentTeamName())
 }
 function completeStarTrade(){
- const phone=ensurePhoneState(),thread=phone.threads[phone.active];if(!thread||!thread.tradeRequested)return;
+ const phone=ensurePhoneState(),thread=phone.threads[phone.active];
+ if(!thread){toast("Open a player conversation first");return}
+ if(!thread.tradeRequested){toast("Get the player to request a trade first");return}
  if(S.stage!=="Offseason"){toast("Star trades can only be completed in the offseason");return}
  if(careerPathLevel("dynasty")<3){toast("Requires Dynasty Builder Level 3");return}
  if(S.nbaWorld.recruitedYear===S.year){toast("You already completed a star recruitment this offseason");return}
  const target=phoneTarget(thread);if(!target){toast("Player no longer available");return}
- const pkg=tradePackageForStar(target);if(!pkg.length){toast("Your team has no trade package available");return}
- const starAnnual=annualSalaryValue(target.player),outAnnual=pkg.reduce((sum,p)=>sum+annualSalaryValue(p),0);
- const projected=teamPayrollAnnual(S.team)-outAnnual+starAnnual;
- if(projected>leagueCapLine("hard")){toast("Trade cannot be completed — projected payroll exceeds hard cap");return}
- const src=rosterFor(target.team.id),starIdx=src.findIndex(p=>p.name===target.player.name);if(starIdx<0){toast("Player no longer available");return}
- src.splice(starIdx,1);
- const ours=rosterFor(S.team);
- pkg.forEach(p=>{const idx=ours.findIndex(x=>x.name===p.name);if(idx>=0)ours.splice(idx,1);src.push(p)});
- ours.push(target.player);
- rebalanceRosterPayroll(ours,S.team);rebalanceRosterPayroll(src,target.team.id);
- thread.completed=true;S.nbaWorld.recruitedYear=S.year;addCareerPathXP("dynasty",55);
- const pkgNames=pkg.map(p=>p.name).join(" + "),msg=currentTeamName()+" acquired "+target.player.name+" from "+teamNameById(target.team.id)+" for "+pkgNames+".";
- S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg);pushSocialHeadline(msg,"TRADE");S.news.unshift("Your phone recruitment helped complete the trade for "+target.player.name+".");
- save();render();toast(target.player.name+" traded to "+currentTeamName())
+ const pkg=tradePackageForStar(target),check=validateStarTrade(target,pkg);
+ if(!check.ok){toast(check.reason);return}
+ const pkgRows=pkg.map(p=>'<div class="row"><span>'+p.name+' • '+p.pos+' • '+(p.ovr||0)+' OVR</span><strong>$'+Math.round(annualSalaryValue(p)/1000000)+'M/yr</strong></div>').join("");
+ modal('<span class="kicker">TRADE PROPOSAL</span><h2>'+target.player.name+' → '+currentTeamName()+'</h2><p class="muted">'+teamNameById(target.team.id)+' receives the package below. Review it before completing the trade.</p><div class="item"><div><b>Incoming Star</b><small>'+target.player.pos+' • '+(target.player.ovr||0)+' OVR</small></div><strong>$'+Math.round(check.starAnnual/1000000)+'M/yr</strong></div><h3 style="margin-top:14px">Outgoing Package</h3>'+pkgRows+'<div class="row" style="margin-top:12px"><span>Projected team payroll</span><strong>$'+Math.round(check.ourProjected/1000000)+'M / $'+Math.round(leagueCapLine("hard")/1000000)+'M hard cap</strong></div><div class="modalFoot"><button class="btn" id="cancelStarTradeBtn">Cancel</button><button class="btn primary" id="confirmStarTradeBtn">Confirm Trade</button></div>');
+ $("cancelStarTradeBtn").onclick=closeModal;$("confirmStarTradeBtn").onclick=executeStarTrade
 }
 function recruitStar(){
  if(!(S.stage==="Offseason"&&careerPathLevel("dynasty")>=3)){toast("Requires Dynasty Builder Level 3 during the offseason");return}
