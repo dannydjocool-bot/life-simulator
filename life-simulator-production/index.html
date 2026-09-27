@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.31</title>
+<title>MYCAREER Basketball Sim v0.16.32</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -2161,7 +2161,7 @@ function rivalryHeat(teamId){return Math.max(0,Math.min(100,S.nbaWorld?.rivalrie
 function addRivalryHeat(teamId,amt){if(!teamId||teamId===S.team)return;S.nbaWorld.rivalries[teamId]=Math.max(0,Math.min(100,rivalryHeat(teamId)+amt))}
 function ensureTeammateRelationships(){if(!(S.stage==="NBA"||S.stage==="Offseason")||!S.team)return;rosterFor(S.team).forEach(p=>{if(typeof S.nbaWorld.relationships[p.name]!=="number")S.nbaWorld.relationships[p.name]=50})}
 function relationshipLabel(v){return v>=85?"Brotherhood":v>=70?"Close":v>=50?"Good":v>=35?"Neutral":"Tense"}
-function updateTeammateRelationships(g){if(S.stage!=="NBA")return;ensureTeammateRelationships();const gain=(g.win?1:-1)+(g.ast>=8?3:g.ast>=5?2:0);Object.keys(S.nbaWorld.relationships).forEach(n=>S.nbaWorld.relationships[n]=Math.max(0,Math.min(100,S.nbaWorld.relationships[n]+gain)))}
+function updateTeammateRelationships(g){if(S.stage!=="NBA")return;ensureTeammateRelationships();const gain=(g.win?1:-1)+(g.ast>=8?3:g.ast>=5?2:0);rosterFor(S.team).forEach(p=>{const cur=teammateRelationshipValue(p.name);S.nbaWorld.relationships[p.name]=Math.max(0,Math.min(100,cur+gain))})}
 function updateCaptaincy(){if(S.stage!=="NBA")return;const qualify=(S.year>=3&&S.player.trust>=85&&S.player.chemistry>=80)||(careerPathLevel("veteran")>=3)||(careerPathLevel("franchise")>=4);if(qualify&&!S.nbaWorld.captain){S.nbaWorld.captain=true;S.news.unshift("Named team captain of "+currentTeamName()+".");pushLeagueNews(S.player.name+" was named captain of "+currentTeamName()+".")}}
 function resetTeamSpecificState(previousTeam,newTeam){
  if(!previousTeam||!newTeam||previousTeam===newTeam)return;
@@ -3624,7 +3624,7 @@ function phone(){
    starPanel='<div class="phoneThread"><div class="row"><div><b>'+target.player.name+'</b><small class="muted" style="display:block">'+target.team.city+' '+target.team.name+' • '+target.player.pos+' • '+target.player.ovr+' OVR</small></div><span class="pill '+((thread.interest||0)>=72?'good':'')+'">'+Math.round(thread.interest||0)+'% INTEREST</span></div><div class="phoneMessages">'+msgs+'</div>'+controls+'<div class="item" style="margin-top:12px"><div><b>Trade Status</b><small>'+tradeStatus+'</small></div><span class="pill '+(tradeStatus==="Trade package ready."?"good":"")+'">'+(thread.tradeRequested?"REQUESTED":"PENDING")+'</span></div><div class="item"><div><b>Potential trade package</b><small>'+pkgText+'</small></div><span class="pill">$'+Math.round(annualSalaryValue(target.player)/1000000)+'M/yr</span></div></div>'
  }
  return '<div class="grid" style="margin-top:0">'+phoneApps+'<div id="phoneBankAnchor" style="grid-column:1/-1">'+bankPhoneHTML()+'</div>'+
- '<section class="card s12" id="phoneMessagesAnchor"><span class="kicker">PLAYER PHONE</span><h2 style="margin:6px 0">Contacts & Messages</h2><p class="muted">Build real relationships around the league. Become friends, create rivalries, squash beef, or recruit stars during the offseason. Every conversation stays with your career.</p></section>'+
+ '<section class="card s12" id="phoneMessagesAnchor"><span class="kicker">PLAYER PHONE</span><h2 style="margin:6px 0">Contacts & Messages</h2><p class="muted">Chat with teammates and players around the league. Build team chemistry, set up late-night hoops, create friendships or rivalries, and keep every conversation with your career.</p></section>'+
  '<section class="card s12"><div class="row"><div><h3 style="margin:0">Team Chat</h3><small class="muted">Text your teammates, build chemistry, and set up late-night hoops.</small></div><span class="pill good">'+teammates.length+' TEAMMATES</span></div><div class="phoneShell" style="margin-top:12px"><div class="phoneContacts"><h3>Your Team</h3>'+teammateContacts+'</div>'+teammatePanel+'</div></section>'+
  '<section class="card s12"><div class="row"><div><h3 style="margin:0">League Contacts</h3><small class="muted">Text players from other NBA teams and shape the relationship.</small></div><span class="pill good">'+leagueCandidates.length+' CONTACTS</span></div><div class="phoneShell" style="margin-top:12px"><div class="phoneContacts"><h3>Players</h3>'+leagueContacts+'</div>'+leaguePanel+'</div></section>'+
  '<section class="card s12" id="phoneRecruitAnchor"><div class="row"><div><h3 style="margin:0">Star Recruiting</h3><small class="muted">Separate trade-recruiting conversations for elite players.</small></div><span class="pill">OFFSEASON</span></div><div class="phoneShell" style="margin-top:12px"><div class="phoneContacts"><h3>Star Contacts</h3>'+contacts+'</div>'+starPanel+'</div></section></div>'
