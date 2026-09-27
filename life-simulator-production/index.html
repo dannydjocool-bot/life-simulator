@@ -1149,38 +1149,41 @@ let menuSettings={reducedMotion:localStorage.getItem("mycareer-menu-reduced-moti
 const $=id=>document.getElementById(id);
 function ovr(){return Math.round(Object.values(S.player.attrs).reduce((a,b)=>a+b,0)/6)}
 const NATURAL_ATTR_CAP=99,CAP_BREAKER_ATTR_CAP=110;
+function capBreakerSpentTotal(cb){
+ return Object.values((cb&&cb.spent)||{}).reduce((sum,v)=>sum+(typeof v==="number"&&v>0?v:0),0)
+}
+function authoritativeChampionshipCount(){
+ const tracked=Math.max(0,Number(S.nbaWorld&&S.nbaWorld.records&&S.nbaWorld.records.playoff&&S.nbaWorld.records.playoff.titles)||0);
+ const history=typeof championshipCount==="function"?Math.max(0,Number(championshipCount())||0):0;
+ const stored=Math.max(0,Number(S.player&&S.player.capBreakers&&S.player.capBreakers.championshipEarned)||0);
+ return Math.max(tracked,history,stored)
+}
 function ensureCapBreakerState(){
  const p=S.player;
  p.capBreakers=p.capBreakers||{earned:0,available:0,spent:{},levelEarned:0,championshipEarned:0,titleRewards:[]};
- if(!p.capBreakers.spent||typeof p.capBreakers.spent!=="object")p.capBreakers.spent={};
- if(!Array.isArray(p.capBreakers.titleRewards))p.capBreakers.titleRewards=[];
- const spent=Object.values(p.capBreakers.spent).reduce((sum,v)=>sum+(typeof v==="number"?v:0),0);
- const levelEarned=Math.floor(Math.max(1,p.level||1)/10);
- const trackedTitles=Math.max(0,S.nbaWorld?.records?.playoff?.titles||0);
- const historyTitles=typeof championshipCount==="function"?championshipCount():trackedTitles;
- const storedTitles=Math.max(0,typeof p.capBreakers.championshipEarned==="number"?p.capBreakers.championshipEarned:0);
- const knownTitles=Math.max(trackedTitles,historyTitles,storedTitles);
- while(p.capBreakers.titleRewards.length<knownTitles)p.capBreakers.titleRewards.push("legacy-title-"+(p.capBreakers.titleRewards.length+1));
- p.capBreakers.titleRewards=[...new Set(p.capBreakers.titleRewards)];
- const championshipEarned=Math.max(knownTitles,p.capBreakers.titleRewards.length);
- p.capBreakers.levelEarned=levelEarned;
- p.capBreakers.championshipEarned=championshipEarned;
- p.capBreakers.earned=levelEarned+championshipEarned;
- p.capBreakers.available=Math.max(0,p.capBreakers.earned-spent);
- return p.capBreakers
+ const cb=p.capBreakers;
+ if(!cb.spent||typeof cb.spent!=="object")cb.spent={};
+ if(!Array.isArray(cb.titleRewards))cb.titleRewards=[];
+ cb.titleRewards=[...new Set(cb.titleRewards.filter(Boolean))];
+ const levelEarned=Math.floor(Math.max(1,Number(p.level)||1)/10);
+ const championshipEarned=authoritativeChampionshipCount();
+ const spent=capBreakerSpentTotal(cb);
+ cb.levelEarned=levelEarned;
+ cb.championshipEarned=championshipEarned;
+ cb.earned=levelEarned+championshipEarned;
+ cb.available=Math.max(0,cb.earned-spent);
+ return cb
 }
 function awardChampionshipCapBreaker(seasonKey){
  const cb=ensureCapBreakerState(),key=seasonKey||nbaSeasonLabel(S.year||1);
- if(!cb.titleRewards.includes(key)){
-   const legacyIndex=cb.titleRewards.findIndex(x=>String(x).startsWith("legacy-title-"));
-   if(legacyIndex>=0&&cb.titleRewards.length>=Math.max(1,S.nbaWorld?.records?.playoff?.titles||1))cb.titleRewards[legacyIndex]=key;
-   else cb.titleRewards.push(key)
- }
- cb.titleRewards=[...new Set(cb.titleRewards)];
- cb.championshipEarned=Math.max(cb.championshipEarned||0,cb.titleRewards.length,S.nbaWorld?.records?.playoff?.titles||0);
- const spent=Object.values(cb.spent||{}).reduce((sum,v)=>sum+(typeof v==="number"?v:0),0);
- cb.earned=(cb.levelEarned||0)+cb.championshipEarned;
- cb.available=Math.max(0,cb.earned-spent);
+ if(key&&!cb.titleRewards.includes(key))cb.titleRewards.push(key);
+ cb.titleRewards=[...new Set(cb.titleRewards.filter(Boolean))];
+ const tracked=Math.max(0,Number(S.nbaWorld&&S.nbaWorld.records&&S.nbaWorld.records.playoff&&S.nbaWorld.records.playoff.titles)||0);
+ const history=typeof championshipCount==="function"?Math.max(0,Number(championshipCount())||0):0;
+ cb.championshipEarned=Math.max(cb.championshipEarned||0,tracked,history);
+ cb.levelEarned=Math.floor(Math.max(1,Number(S.player.level)||1)/10);
+ cb.earned=cb.levelEarned+cb.championshipEarned;
+ cb.available=Math.max(0,cb.earned-capBreakerSpentTotal(cb));
  return cb
 }
 function naturalAttributeGain(attr,amount=1){
