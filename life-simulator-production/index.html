@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.20</title>
+<title>MYCAREER Basketball Sim v0.16.21</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -497,6 +497,14 @@ body.phoneDraggingNow .bottom{
 .emptyGarage small{display:block;margin-top:4px}
 @media(max-width:900px){.garageOwnedGrid,.dealerGrid{grid-template-columns:1fr 1fr}.garageActionGrid{grid-template-columns:1fr 1fr}.garageActionGrid .btn:last-child{grid-column:1/-1}}
 @media(max-width:580px){.garageOwnedGrid,.dealerGrid{grid-template-columns:1fr}.vehicleArt{height:185px}.vehicleArt.large{height:245px}.garageActionGrid{grid-template-columns:1fr 1fr}.garageVehicleActions{grid-template-columns:1fr}.garageVehicleActions .btn:last-child{grid-column:auto}.vehicleArt.large .vehicleBody{left:7%;right:7%;bottom:55px;height:82px}.vehicleArt.large .vehicleBody:before{top:-48px;height:57px}.vehicleArt.large .vehicleBody .wheel{width:54px;height:54px;bottom:-24px}.vehicleSpecBadge{font-size:8px}}
+
+/* v0.16.21 expanded vehicle lifestyle */
+.vehicleLifestyleHeader{margin-top:14px;padding-top:12px;border-top:1px solid #24354a}
+.vehicleLifestyleGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.vehicleLifestyleGrid .btn:last-child{grid-column:auto!important}
+.vehicleLifestyleGrid .lockedAction{opacity:.5}
+@media(max-width:900px){.vehicleLifestyleGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:580px){.vehicleLifestyleGrid{grid-template-columns:1fr 1fr!important}.vehicleLifestyleGrid .btn{min-height:54px;white-space:normal}}
 </style>
 </head>
 <body>
@@ -727,11 +735,12 @@ function garageCapacity(){
 }
 function ensureGarageState(){
  ensureWealthState();
- S.finance.garage=S.finance.garage||{owned:[],active:null,custom:{},actionsUsed:0,legacyCarMigrated:false};
+ S.finance.garage=S.finance.garage||{owned:[],active:null,custom:{},actionsUsed:0,actionCounts:{},legacyCarMigrated:false};
  const g=S.finance.garage;
  if(!Array.isArray(g.owned))g.owned=[];
  if(!g.custom||typeof g.custom!=="object")g.custom={};
  if(typeof g.actionsUsed!=="number")g.actionsUsed=0;
+ if(!g.actionCounts||typeof g.actionCounts!=="object")g.actionCounts={};
  if(!g.legacyCarMigrated&&S.finance.owned&&S.finance.owned.includes("car")){
    if(!g.owned.includes("metro_gt")){
      g.owned.push("metro_gt");g.custom.metro_gt={color:"midnight",package:"Stock",condition:100};
@@ -783,22 +792,55 @@ function customizeVehicle(id,type){
  if(!spendLiquid(p.cost)){toast("Not enough liquid funds");return}
  c.package=p.name;S.player.morale=Math.min(100,S.player.morale+1);S.social.fame=Math.min(100,S.social.fame+(p.status>=4?1:0));save();render();toast(p.name+" package installed")
 }
+function isTopEndVehicle(v){return !!(v&&(v.status>=80||v.price>=500000))}
+function vehicleActionLimit(v){return isTopEndVehicle(v)?Infinity:4}
+function vehicleActionRewardScale(g,action){
+ const n=Math.max(0,g.actionCounts?.[action]||0);
+ return n===0?1:n===1?.45:.12
+}
+function zaEligible(){
+ const age=Math.round(S.player?.age||0);
+ return age>=21&&["NBA","Offseason","Retired"].includes(S.stage)
+}
 function vehicleAction(action){
  const g=ensureGarageState(),v=vehicleById(g.active);if(!v){toast("Choose an active vehicle first");return}
- if(g.actionsUsed>=2){toast("Vehicle actions reset after your next game");return}
- let msg="",morale=0,trust=0,followers=0,fame=0,relation=0,condition=0;
+ const limit=vehicleActionLimit(v);
+ if(Number.isFinite(limit)&&g.actionsUsed>=limit){toast("This vehicle has used its "+limit+" lifestyle actions for this game cycle");return}
+ if(action==="za"&&!zaEligible()){toast("Smoke the Za unlocks at age 21 in the NBA");return}
+ let msg="",morale=0,trust=0,followers=0,fame=0,relation=0,condition=0,chem=0,xp=0;
  if(action==="arena"){msg="Drove "+v.name+" to the arena";trust=1;morale=1;condition=1}
  if(action==="cruise"){msg="Took "+v.name+" on a night cruise";morale=4;condition=2}
  if(action==="event"){msg="Pulled up to an event in "+v.name;followers=Math.round(100+v.status*8);fame=v.status>=80?2:1;condition=1}
  if(action==="date"){if(!currentPartner()){toast("You need a partner for this action");return}msg="Took "+currentPartner().name+" out in "+v.name;morale=2;relation=4;condition=1}
  if(action==="detail"){const c=g.custom[g.active];const cost=Math.max(500,Math.round(v.price*.001));if(!spendLiquid(cost)){toast("Not enough funds for detailing");return}c.condition=Math.min(100,(c.condition||100)+8);msg="Detailed "+v.name+" for "+compactMoney(cost)}
+ if(action==="music"){msg="Turned the music up and relaxed in "+v.name;morale=3}
+ if(action==="teammate"){msg="Picked up a teammate in "+v.name;chem=2;trust=1;condition=1}
+ if(action==="photos"){msg="Shot new lifestyle photos with "+v.name;followers=Math.round(80+v.status*6);fame=v.status>=85?1:0}
+ if(action==="carmeet"){msg="Took "+v.name+" to a private car meet";followers=Math.round(130+v.status*7);fame=v.status>=75?1:0;condition=1}
+ if(action==="scenic"){msg="Took "+v.name+" on a scenic drive";morale=4;condition=2}
+ if(action==="cabin"){msg="Chilled in the cabin of "+v.name;morale=Math.max(2,Math.round(v.luxury/25))}
+ if(action==="cityview"){msg="Parked "+v.name+" and watched the city lights";morale=3}
+ if(action==="film"){msg="Watched game film from "+v.name;trust=2;xp=25}
+ if(action==="za"){msg="Relaxed in "+v.name+" and smoked the Za";morale=6}
+ if(!msg)return;
+
+ const scale=vehicleActionRewardScale(g,action);
+ morale=Math.round(morale*scale);trust=Math.round(trust*scale);followers=Math.round(followers*scale);fame=Math.round(fame*scale);relation=Math.round(relation*scale);chem=Math.round(chem*scale);xp=Math.round(xp*scale);
+
  const c=g.custom[g.active];if(condition)c.condition=Math.max(55,(c.condition||100)-condition);
- S.player.morale=Math.min(100,S.player.morale+morale);S.player.trust=Math.min(100,S.player.trust+trust);S.social.followers+=followers;S.social.fame=Math.min(100,S.social.fame+fame);
+ S.player.morale=Math.min(100,S.player.morale+morale);
+ S.player.trust=Math.min(100,S.player.trust+trust);
+ S.player.chemistry=Math.min(100,(S.player.chemistry||60)+chem);
+ S.player.xp=(S.player.xp||0)+xp;
+ S.social.followers+=followers;
+ S.social.fame=Math.min(100,S.social.fame+fame);
  if(relation&&S.relationships)S.relationships.happiness=Math.min(100,S.relationships.happiness+relation);
- g.actionsUsed++;S.news.unshift(msg+".");save();render();toast(msg)
+ g.actionsUsed++;g.actionCounts[action]=(g.actionCounts[action]||0)+1;
+ if(scale<1)msg+=" • repeat rewards reduced";
+ S.news.unshift(msg+".");save();render();toast(msg)
 }
 function processVehicleGameCosts(){
- const g=ensureGarageState();const cost=garageUpkeep();g.actionsUsed=0;if(!cost)return;
+ const g=ensureGarageState();const cost=garageUpkeep();g.actionsUsed=0;g.actionCounts={};if(!cost)return;
  if(spendLiquid(cost)){S.news.unshift("Garage upkeep paid: "+compactMoney(cost)+".")}
  else{g.owned.forEach(id=>{const c=g.custom[id];if(c)c.condition=Math.max(50,(c.condition||100)-3)});S.news.unshift("Garage upkeep was missed. Vehicle condition declined.")}
 }
@@ -812,7 +854,7 @@ function garageHTML(){
  const g=ensureGarageState(),active=vehicleById(g.active),owned=g.owned.map(id=>vehicleById(id)).filter(Boolean);
  const ownedCards=owned.map(v=>{const c=g.custom[v.id]||{},isActive=g.active===v.id;return '<div class="garageVehicleCard '+(isActive?'active':'')+'">'+vehicleArtHTML(v.id)+'<div class="row"><span>Condition</span><strong>'+Math.round(c.condition||100)+'%</strong></div><div class="row"><span>Value</span><strong>'+compactMoney(vehicleValue(v.id))+'</strong></div><div class="garageVehicleActions"><button class="btn '+(isActive?'good':'')+'" data-vehicle-active="'+v.id+'" '+(isActive?'disabled':'')+'>'+(isActive?'Active':'Make Active')+'</button><button class="btn" data-vehicle-custom="'+v.id+'">Customize</button><button class="btn bad" data-vehicle-sell="'+v.id+'">Sell</button></div></div>'}).join("");
  const dealer=VEHICLES.map(v=>{const have=g.owned.includes(v.id),reason=vehicleUnlockReason(v),full=g.owned.length>=garageCapacity();return '<div class="dealerVehicleCard">'+vehicleArtHTML(v.id)+'<div class="vehicleStats"><span>SPD <b>'+v.speed+'</b></span><span>LUX <b>'+v.luxury+'</b></span><span>STATUS <b>'+v.status+'</b></span></div><p class="muted">'+v.desc+'</p><div class="row"><span>Price</span><strong>'+compactMoney(v.price)+'</strong></div><div class="row"><span>Upkeep / game</span><strong>'+compactMoney(v.upkeep)+'</strong></div><button class="btn '+(have?'good':'primary')+'" style="width:100%;margin-top:8px" data-vehicle-buy="'+v.id+'" '+(have||reason||full?'disabled':'')+'>'+(have?'Owned':reason||full?"Locked":"Buy Vehicle")+'</button>'+(reason?'<small class="muted vehicleLockReason">'+reason+'</small>':full&&!have?'<small class="muted vehicleLockReason">Garage full</small>':'')+'</div>'}).join("");
- return '<section class="card s12 garageHero"><div class="row"><div><span class="kicker">PRIVATE GARAGE</span><h2 style="margin:5px 0">My Garage</h2><small class="muted">'+owned.length+' / '+garageCapacity()+' spaces • '+compactMoney(garageUpkeep())+' upkeep/game</small></div><span class="pill '+(active?'good':'')+'">'+(active?"ACTIVE: "+active.name:"NO ACTIVE VEHICLE")+'</span></div>'+(active?vehicleArtHTML(active.id,true):'<div class="emptyGarage"><b>Your garage is empty.</b><small>Visit the dealership below to buy your first vehicle.</small></div>')+(active?'<div class="garageActionGrid"><button class="btn" data-vehicle-action="arena">Drive to Arena</button><button class="btn" data-vehicle-action="cruise">Night Cruise</button><button class="btn" data-vehicle-action="event">Pull Up to Event</button><button class="btn" data-vehicle-action="date">Take Partner Out</button><button class="btn" data-vehicle-action="detail">Detail Vehicle</button></div><small class="muted">'+g.actionsUsed+'/2 vehicle actions used this game cycle.</small>':'')+'</section><section class="card s12"><h3>Owned Vehicles</h3><div class="garageOwnedGrid">'+(ownedCards||'<div class="item"><small>No vehicles owned yet.</small></div>')+'</div></section><section class="card s12"><div class="row"><div><span class="kicker">LUXURY DEALERSHIP</span><h3 style="margin:5px 0">Vehicle Showroom</h3></div><span class="pill">'+compactMoney(totalLiquid())+' LIQUID</span></div><p class="muted">Higher Fame and Keys to the City unlock increasingly rare vehicles. Garage space comes from your residence and real-estate portfolio.</p><div class="dealerGrid">'+dealer+'</div></section>'
+ return '<section class="card s12 garageHero"><div class="row"><div><span class="kicker">PRIVATE GARAGE</span><h2 style="margin:5px 0">My Garage</h2><small class="muted">'+owned.length+' / '+garageCapacity()+' spaces • '+compactMoney(garageUpkeep())+' upkeep/game</small></div><span class="pill '+(active?'good':'')+'">'+(active?"ACTIVE: "+active.name:"NO ACTIVE VEHICLE")+'</span></div>'+(active?vehicleArtHTML(active.id,true):'<div class="emptyGarage"><b>Your garage is empty.</b><small>Visit the dealership below to buy your first vehicle.</small></div>')+(active?'<div class="row vehicleLifestyleHeader"><div><h3 style="margin:0">Vehicle Lifestyle</h3><small class="muted">Use your active vehicle for travel, relaxation, social life and career routines.</small></div><span class="pill '+(isTopEndVehicle(active)?'good':'')+'">'+(isTopEndVehicle(active)?'UNLIMITED LIFESTYLE':(g.actionsUsed+'/'+vehicleActionLimit(active)+' USED'))+'</span></div><div class="garageActionGrid vehicleLifestyleGrid"><button class="btn" data-vehicle-action="arena">Drive to Arena</button><button class="btn" data-vehicle-action="cruise">Night Cruise</button><button class="btn" data-vehicle-action="event">Pull Up to Event</button><button class="btn" data-vehicle-action="date">Take Partner Out</button><button class="btn" data-vehicle-action="music">Listen to Music</button><button class="btn" data-vehicle-action="teammate">Pick Up Teammate</button><button class="btn" data-vehicle-action="photos">Lifestyle Photos</button><button class="btn" data-vehicle-action="carmeet">Private Car Meet</button><button class="btn" data-vehicle-action="scenic">Scenic Drive</button><button class="btn" data-vehicle-action="cabin">Chill in Cabin</button><button class="btn" data-vehicle-action="cityview">Watch City Lights</button><button class="btn" data-vehicle-action="film">Watch Game Film</button><button class="btn '+(zaEligible()?'':'lockedAction')+'" data-vehicle-action="za" '+(zaEligible()?'':'disabled')+'>Smoke the Za'+(zaEligible()?'':' • 21+')+'</button><button class="btn" data-vehicle-action="detail">Detail Vehicle</button></div><small class="muted">'+(isTopEndVehicle(active)?'Top-end vehicle: lifestyle activities are not capped. Repeating the same activity gives reduced stat rewards.':'Standard vehicle: '+vehicleActionLimit(active)+' lifestyle actions per game cycle. Upgrade to an Exotic or better for unlimited activities.')+'</small>':'')+'</section><section class="card s12"><h3>Owned Vehicles</h3><div class="garageOwnedGrid">'+(ownedCards||'<div class="item"><small>No vehicles owned yet.</small></div>')+'</div></section><section class="card s12"><div class="row"><div><span class="kicker">LUXURY DEALERSHIP</span><h3 style="margin:5px 0">Vehicle Showroom</h3></div><span class="pill">'+compactMoney(totalLiquid())+' LIQUID</span></div><p class="muted">Higher Fame and Keys to the City unlock increasingly rare vehicles. Garage space comes from your residence and real-estate portfolio.</p><div class="dealerGrid">'+dealer+'</div></section>'
 }
 function openVehicleCustomize(id){
  const v=vehicleById(id),g=ensureGarageState(),c=g.custom[id];if(!v||!c)return;
@@ -2799,7 +2841,7 @@ function negotiateContract(idx){
 function promiseLabel(p){return p==="starter"?"Guaranteed Starter":p==="contender"?"Build a Contender":p==="touches"?"Featured Offensive Role":"No Special Promise"}
 function ensureWealthState(){
  S.finance=S.finance||{};if(typeof S.finance.cash!=="number")S.finance.cash=0;if(typeof S.finance.bank!=="number")S.finance.bank=0;
- if(!Array.isArray(S.finance.realEstate))S.finance.realEstate=[];if(!S.finance.garage)S.finance.garage={owned:[],active:null,custom:{},actionsUsed:0,legacyCarMigrated:false};
+ if(!Array.isArray(S.finance.realEstate))S.finance.realEstate=[];if(!S.finance.garage)S.finance.garage={owned:[],active:null,custom:{},actionsUsed:0,actionCounts:{},legacyCarMigrated:false};
  S.civic=S.civic||{donated:0,keys:0,milestones:[],purchases:[],history:[]};
  if(typeof S.civic.donated!=="number")S.civic.donated=0;if(typeof S.civic.keys!=="number")S.civic.keys=0;
  if(!Array.isArray(S.civic.milestones))S.civic.milestones=[];if(!Array.isArray(S.civic.purchases))S.civic.purchases=[];if(!Array.isArray(S.civic.history))S.civic.history=[];
