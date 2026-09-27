@@ -1151,19 +1151,37 @@ function ovr(){return Math.round(Object.values(S.player.attrs).reduce((a,b)=>a+b
 const NATURAL_ATTR_CAP=99,CAP_BREAKER_ATTR_CAP=110;
 function ensureCapBreakerState(){
  const p=S.player;
- p.capBreakers=p.capBreakers||{earned:0,available:0,spent:{},levelEarned:0,championshipEarned:0};
+ p.capBreakers=p.capBreakers||{earned:0,available:0,spent:{},levelEarned:0,championshipEarned:0,titleRewards:[]};
  if(!p.capBreakers.spent||typeof p.capBreakers.spent!=="object")p.capBreakers.spent={};
+ if(!Array.isArray(p.capBreakers.titleRewards))p.capBreakers.titleRewards=[];
  const spent=Object.values(p.capBreakers.spent).reduce((sum,v)=>sum+(typeof v==="number"?v:0),0);
  const levelEarned=Math.floor(Math.max(1,p.level||1)/10);
  const trackedTitles=Math.max(0,S.nbaWorld?.records?.playoff?.titles||0);
  const historyTitles=typeof championshipCount==="function"?championshipCount():trackedTitles;
  const storedTitles=Math.max(0,typeof p.capBreakers.championshipEarned==="number"?p.capBreakers.championshipEarned:0);
- const championshipEarned=Math.max(storedTitles,trackedTitles,historyTitles);
+ const knownTitles=Math.max(trackedTitles,historyTitles,storedTitles);
+ while(p.capBreakers.titleRewards.length<knownTitles)p.capBreakers.titleRewards.push("legacy-title-"+(p.capBreakers.titleRewards.length+1));
+ p.capBreakers.titleRewards=[...new Set(p.capBreakers.titleRewards)];
+ const championshipEarned=Math.max(knownTitles,p.capBreakers.titleRewards.length);
  p.capBreakers.levelEarned=levelEarned;
  p.capBreakers.championshipEarned=championshipEarned;
  p.capBreakers.earned=levelEarned+championshipEarned;
  p.capBreakers.available=Math.max(0,p.capBreakers.earned-spent);
  return p.capBreakers
+}
+function awardChampionshipCapBreaker(seasonKey){
+ const cb=ensureCapBreakerState(),key=seasonKey||nbaSeasonLabel(S.year||1);
+ if(!cb.titleRewards.includes(key)){
+   const legacyIndex=cb.titleRewards.findIndex(x=>String(x).startsWith("legacy-title-"));
+   if(legacyIndex>=0&&cb.titleRewards.length>=Math.max(1,S.nbaWorld?.records?.playoff?.titles||1))cb.titleRewards[legacyIndex]=key;
+   else cb.titleRewards.push(key)
+ }
+ cb.titleRewards=[...new Set(cb.titleRewards)];
+ cb.championshipEarned=Math.max(cb.championshipEarned||0,cb.titleRewards.length,S.nbaWorld?.records?.playoff?.titles||0);
+ const spent=Object.values(cb.spent||{}).reduce((sum,v)=>sum+(typeof v==="number"?v:0),0);
+ cb.earned=(cb.levelEarned||0)+cb.championshipEarned;
+ cb.available=Math.max(0,cb.earned-spent);
+ return cb
 }
 function naturalAttributeGain(attr,amount=1){
  const cur=S.player.attrs[attr];if(typeof cur!=="number")return 0;
@@ -1192,7 +1210,7 @@ function useCapBreaker(attr){
 function capBreakerHTML(){
  const cb=ensureCapBreakerState(),next=(Math.floor((S.player.level||1)/10)+1)*10;
  const attrs=Object.entries(S.player.attrs).map(([k,v])=>'<div class="item"><div><b>'+k+' • '+v+'</b><small>'+(v<NATURAL_ATTR_CAP?'Natural development to 99':v>=CAP_BREAKER_ATTR_CAP?'MAX BREAKER CAP':('Eligible for Cap Breaker • '+(cb.spent[k]||0)+' used'))+'</small></div><button class="btn '+(v>=NATURAL_ATTR_CAP&&v<CAP_BREAKER_ATTR_CAP&&cb.available>0?'primary':'')+'" data-cap-breaker="'+k+'" '+(v<NATURAL_ATTR_CAP||v>=CAP_BREAKER_ATTR_CAP||cb.available<=0?'disabled':'')+'>+1</button></div>').join("");
- return '<section class="card s12"><div class="row"><div><span class="kicker">LEVEL + CHAMPIONSHIP REWARDS</span><h3 style="margin:5px 0">Cap Breakers</h3></div><span class="pill good">'+cb.available+' AVAILABLE</span></div><p class="muted">Earn 1 Cap Breaker every 10 levels and 1 more for every NBA championship. Normal development stops at 99; Cap Breakers can push an attribute beyond 99 up to 110.</p><div class="row"><span>Lifetime earned</span><strong>'+cb.earned+'</strong></div><div class="row"><span>From levels</span><strong>'+cb.levelEarned+'</strong></div><div class="row"><span>From championships</span><strong>'+cb.championshipEarned+'</strong></div><div class="row"><span>Next level Cap Breaker</span><strong>Level '+next+'</strong></div><div class="list" style="margin-top:10px">'+attrs+'</div></section>'
+ return '<section class="card s12"><div class="row"><div><span class="kicker">LEVEL + CHAMPIONSHIP REWARDS</span><h3 style="margin:5px 0">Cap Breakers</h3></div><span class="pill good">'+cb.available+' AVAILABLE</span></div><p class="muted">Earn 1 Cap Breaker every 10 levels and 1 more for every NBA championship. Normal development stops at 99; Cap Breakers can push an attribute beyond 99 up to 110.</p><div class="row"><span>Lifetime earned</span><strong>'+cb.earned+'</strong></div><div class="row"><span>From levels</span><strong>'+cb.levelEarned+'</strong></div><div class="row"><span>From championships</span><strong>'+cb.championshipEarned+'</strong></div><div class="row"><span>Already spent</span><strong>'+Object.values(cb.spent||{}).reduce((sum,v)=>sum+(typeof v==="number"?v:0),0)+'</strong></div><div class="row"><span>Next level Cap Breaker</span><strong>Level '+next+'</strong></div><div class="list" style="margin-top:10px">'+attrs+'</div></section>'
 }
 function ensureBadgeBreakerState(){
  const p=S.player;
@@ -1650,7 +1668,7 @@ function resumePendingCareerOverlay(){
    if(S.postgameMedia&&S.postgameMedia.pending)openPostgameInterview()
  })
 }
-function showChampionshipCelebration(){const ch=S.championshipCelebration;if(!ch||ch.shown)return;ch.shown=true;save();modal('<div style="text-align:center"><span class="kicker">NBA CHAMPIONS</span><div style="font-size:58px;margin:8px 0">🏆</div><h1 style="margin:4px 0">CHAMPIONSHIP WON</h1><p class="muted">'+ch.season+' NBA Champions</p><div class="item"><div><b>'+ch.team+'</b><small>Defeated '+ch.opponent+' • Finals '+ch.series+'</small></div><span class="pill good">TITLE #'+ch.titleNumber+'</span></div><p class="muted" style="margin-top:14px">This championship is permanently stored in your Record Books.</p><div class="item"><div><b>Cap Breaker Earned</b><small>Every NBA championship permanently adds 1 Cap Breaker to your career total.</small></div><span class="pill good">+1</span></div><div class="item"><div><b>Cap Breaker Earned</b><small>Every NBA championship permanently adds 1 Cap Breaker to your player progression.</small></div><span class="pill good">+1</span></div><div class="item"><div><b>Badge Breaker Earned</b><small>Upgrade one Legend badge to the championship-exclusive G.O.A.T. tier.</small></div><span class="pill good">+1</span></div><div class="modalFoot"><button class="btn primary" id="champContinue">Continue to Offseason</button></div></div>');$("champContinue").onclick=()=>{closeModal();S.championshipCelebration=null;save();if(S.postgameMedia&&S.postgameMedia.pending)openPostgameInterview();else render()}}
+function showChampionshipCelebration(){const ch=S.championshipCelebration;if(!ch||ch.shown)return;ch.shown=true;save();modal('<div style="text-align:center"><span class="kicker">NBA CHAMPIONS</span><div style="font-size:58px;margin:8px 0">🏆</div><h1 style="margin:4px 0">CHAMPIONSHIP WON</h1><p class="muted">'+ch.season+' NBA Champions</p><div class="item"><div><b>'+ch.team+'</b><small>Defeated '+ch.opponent+' • Finals '+ch.series+'</small></div><span class="pill good">TITLE #'+ch.titleNumber+'</span></div><p class="muted" style="margin-top:14px">This championship is permanently stored in your Record Books.</p><div class="item"><div><b>Cap Breaker Earned</b><small>Every NBA championship permanently adds exactly 1 Cap Breaker to your player progression.</small></div><span class="pill good">+1</span></div><div class="item"><div><b>Badge Breaker Earned</b><small>Upgrade one Legend badge to the championship-exclusive G.O.A.T. tier.</small></div><span class="pill good">+1</span></div><div class="modalFoot"><button class="btn primary" id="champContinue">Continue to Offseason</button></div></div>');$("champContinue").onclick=()=>{closeModal();S.championshipCelebration=null;save();if(S.postgameMedia&&S.postgameMedia.pending)openPostgameInterview();else render()}}
 function recordBooksHTML(){const seasons=(S.recordBook?.seasons||seedRecordBook()).slice().reverse(),pick=k=>[...seasons].sort((x,y)=>(y.leaders?.[k]?.value||0)-(x.leaders?.[k]?.value||0))[0],p=pick("ppg"),a=pick("apg"),r=pick("rpg"),best=[...seasons].sort((x,y)=>(y.bestRecord?.w||0)-(x.bestRecord?.w||0))[0],tn=id=>teamNameById(id);return '<section class="card s12"><span class="kicker">NBA HISTORY • LAST 10 SEASONS</span><h2 style="margin:6px 0">Record Books</h2><p class="muted">Championships, award winners and league records update automatically every offseason.</p><div class="grid" style="margin-top:12px"><div class="card" style="grid-column:span 3"><small class="muted">SCORING</small><div class="big" style="font-size:22px">'+(p?.leaders?.ppg?.value||"—")+' PPG</div><small>'+(p?.leaders?.ppg?.name||"—")+' • '+(p?.season||"")+'</small></div><div class="card" style="grid-column:span 3"><small class="muted">ASSISTS</small><div class="big" style="font-size:22px">'+(a?.leaders?.apg?.value||"—")+' APG</div><small>'+(a?.leaders?.apg?.name||"—")+' • '+(a?.season||"")+'</small></div><div class="card" style="grid-column:span 3"><small class="muted">REBOUNDS</small><div class="big" style="font-size:22px">'+(r?.leaders?.rpg?.value||"—")+' RPG</div><small>'+(r?.leaders?.rpg?.name||"—")+' • '+(r?.season||"")+'</small></div><div class="card" style="grid-column:span 3"><small class="muted">BEST RECORD</small><div class="big" style="font-size:22px">'+(best?.bestRecord?.w||0)+'-'+(best?.bestRecord?.l||0)+'</div><small>'+(best?tn(best.bestRecord.teamId):"—")+' • '+(best?.season||"")+'</small></div></div><div class="list" style="margin-top:14px">'+seasons.map(x=>'<div class="item"><div><b>'+x.season+' • '+tn(x.championId)+(x.userChampion?' 🏆 YOUR TITLE':'')+'</b><small>Finals '+x.finals+' vs '+tn(x.runnerUpId)+' • MVP '+x.mvp+' • DPOY '+x.dpoy+' • ROY '+x.roty+'</small></div><span class="pill '+(x.userChampion?'good':'')+'">CHAMPION</span></div>').join("")+'</div></section>'}
 function playoffRoundName(){if(S.playoffs&&S.playoffs.playIn)return "Play-In Tournament";return ["","First Round","Conference Semifinals","Conference Finals","NBA Finals"][S.playoffs.round]||"Playoffs"}
 function playoffGameNumber(){return Math.min(7,(Math.min(4,S.playoffs.seriesWins||0)+Math.min(4,S.playoffs.seriesLosses||0)+1))}
@@ -1754,7 +1772,7 @@ function advancePlayoffRound(){
  }
  if(finishedRound===4){
    const finalsOpp=S.playoffs.opponentId,series="4-"+Math.min(3,S.playoffs.seriesLosses||0);S.playoffs.active=false;S.playoffs.champion=true;S.playoffs.lastFinalsOpponentId=finalsOpp;S.playoffs.finalSeries=series;S.news.unshift(currentTeamName()+" won the NBA Championship!");pushLeagueNews(currentTeamName()+" are NBA Champions.");
-   if(!S.accolades.includes("NBA Champion"))S.accolades.push("NBA Champion");S.nbaWorld.records.playoff.titles=(S.nbaWorld.records.playoff.titles||0)+1;S.player.capBreakers=S.player.capBreakers||{earned:0,available:0,spent:{},levelEarned:0,championshipEarned:0};S.player.capBreakers.championshipEarned=Math.max(S.player.capBreakers.championshipEarned||0,S.nbaWorld.records.playoff.titles);ensureCapBreakerState();ensureBadgeBreakerState();S.player.badgeBreakers.earned=Math.max(S.player.badgeBreakers.earned,championshipCount());S.player.badgeBreakers.available=Math.max(0,S.player.badgeBreakers.earned-Object.values(S.player.badgeBreakers.spent||{}).filter(Boolean).length);addCareerPathXP("superstar",80);addCareerPathXP("dynasty",85);if(S.team===S.careerPaths.franchiseTeamId)addCareerPathXP("franchise",110);S.player.morale=100;S.social.fame=Math.min(100,S.social.fame+20);S.social.followers+=25000;startOffseason();S.championshipCelebration={shown:false,season:nbaSeasonLabel(S.year),team:currentTeamName(),opponent:teamNameById(finalsOpp),series,titleNumber:championshipCount()};save();render();showChampionshipCelebration();return
+   if(!S.accolades.includes("NBA Champion"))S.accolades.push("NBA Champion");S.nbaWorld.records.playoff.titles=(S.nbaWorld.records.playoff.titles||0)+1;awardChampionshipCapBreaker(nbaSeasonLabel(S.year||1));ensureBadgeBreakerState();S.player.badgeBreakers.earned=Math.max(S.player.badgeBreakers.earned,championshipCount());S.player.badgeBreakers.available=Math.max(0,S.player.badgeBreakers.earned-Object.values(S.player.badgeBreakers.spent||{}).filter(Boolean).length);addCareerPathXP("superstar",80);addCareerPathXP("dynasty",85);if(S.team===S.careerPaths.franchiseTeamId)addCareerPathXP("franchise",110);S.player.morale=100;S.social.fame=Math.min(100,S.social.fame+20);S.social.followers+=25000;startOffseason();S.championshipCelebration={shown:false,season:nbaSeasonLabel(S.year),team:currentTeamName(),opponent:teamNameById(finalsOpp),series,titleNumber:championshipCount()};save();render();showChampionshipCelebration();return
  }
  S.playoffs.round=finishedRound+1;S.playoffs.seriesWins=0;S.playoffs.seriesLosses=0;
  let opp=null;
