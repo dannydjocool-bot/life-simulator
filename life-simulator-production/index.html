@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.22</title>
+<title>MYCAREER Basketball Sim v0.16.23</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -20,15 +20,41 @@ button{cursor:pointer}.hidden{display:none!important}.app{min-height:100vh;displ
 .avatar .ear{position:absolute;top:45.5%;width:5.2%;height:10%;background:var(--skin);border-radius:50%;z-index:4;box-shadow:inset 0 0 0 1px rgba(90,40,25,.11)}.avatar .ear.left{left:24.5%}.avatar .ear.right{right:24.5%}
 .avatar .head{position:absolute;left:50%;top:48%;width:49%;height:54%;transform:translate(-50%,-50%);background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--skin) 96%,#fff) 0%,var(--skin) 58%,color-mix(in srgb,var(--skin) 91%,#000) 100%);border-radius:47% 47% 45% 45%/43% 43% 57% 57%;z-index:5;box-shadow:inset 0 -7px 12px rgba(70,30,20,.06),inset 0 4px 7px rgba(255,255,255,.04)}
 .avatar .hair{position:absolute;left:50%;transform:translateX(-50%);background:var(--hair);z-index:8;pointer-events:none}
-.avatar .hair.fade{top:20.5%;width:49%;height:12%;border-radius:55% 55% 18% 18%/92% 92% 16% 16%;box-shadow:inset 0 -3px 0 rgba(255,255,255,.025)}
-.avatar .hair.buzz{top:22%;width:47%;height:8.5%;border-radius:62% 62% 26% 26%;background:repeating-linear-gradient(100deg,var(--hair) 0 2px,color-mix(in srgb,var(--hair) 92%,#fff) 2px 3px)}
-.avatar .hair.waves{top:20.5%;width:49%;height:11.5%;border-radius:56% 56% 20% 20%;background:repeating-linear-gradient(160deg,var(--hair) 0 3px,color-mix(in srgb,var(--hair) 83%,#fff) 3px 4px,var(--hair) 4px 7px)}
-.avatar .hair.curls{top:14%;width:56%;height:23%;border-radius:50% 50% 38% 38%;box-shadow:-9px 4px 0 -5px var(--hair),9px 4px 0 -5px var(--hair),-16px 10px 0 -9px var(--hair),16px 10px 0 -9px var(--hair)}
-.avatar .hair.twists,.avatar .hair.shorttwist{top:14.5%;width:53%;height:22%;border-radius:47% 47% 32% 32%;box-shadow:-7px 7px 0 -5px var(--hair),7px 7px 0 -5px var(--hair),-14px 13px 0 -9px var(--hair),14px 13px 0 -9px var(--hair)}
-.avatar .hair.afro{top:7%;width:65%;height:34%;border-radius:50%;box-shadow:-10px 5px 0 -4px var(--hair),10px 5px 0 -4px var(--hair),0 -5px 0 -3px var(--hair)}
-.avatar .hair.braids{top:16%;width:51%;height:14%;border-radius:48% 48% 28% 28%;box-shadow:-16px 19px 0 -11px var(--hair),-11px 28px 0 -10px var(--hair),11px 28px 0 -10px var(--hair),16px 19px 0 -11px var(--hair)}
-.avatar .hair.dreads{top:13%;width:54%;height:20%;border-radius:48% 48% 30% 30%;box-shadow:-17px 22px 0 -11px var(--hair),-12px 32px 0 -10px var(--hair),12px 32px 0 -10px var(--hair),17px 22px 0 -11px var(--hair)}
-.avatar .hair.long{top:9%;width:61%;height:64%;z-index:3;border-radius:49% 49% 43% 43%/31% 31% 57% 57%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 96%,#fff) 0%,var(--hair) 25%,color-mix(in srgb,var(--hair) 86%,#000) 100%);clip-path:polygon(15% 0,85% 0,98% 17%,94% 100%,73% 100%,68% 34%,32% 34%,27% 100%,6% 100%,2% 17%);box-shadow:none}
+.avatar .hair i{display:none;position:absolute;background:var(--hair);pointer-events:none}
+.avatar .hair.fade{top:20.5%;width:49%;height:11.5%;border-radius:58% 58% 18% 18%/90% 90% 18% 18%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 88%,#fff),var(--hair) 42%,color-mix(in srgb,var(--hair) 88%,#000));box-shadow:inset 0 -2px 0 rgba(255,255,255,.035)}
+.avatar .hair.buzz{top:21.5%;width:47%;height:8%;border-radius:62% 62% 24% 24%;background:repeating-linear-gradient(100deg,var(--hair) 0 2px,color-mix(in srgb,var(--hair) 84%,#fff) 2px 3px)}
+.avatar .hair.waves{top:20%;width:49%;height:11.5%;border-radius:58% 58% 20% 20%;background:repeating-radial-gradient(ellipse at 50% 110%,var(--hair) 0 3px,color-mix(in srgb,var(--hair) 76%,#fff) 3px 4px,var(--hair) 4px 7px)}
+.avatar .hair.curls{top:12%;width:57%;height:24%;border-radius:48% 48% 34% 34%;background:
+ radial-gradient(circle at 14% 68%,var(--hair) 0 10%,transparent 11%),
+ radial-gradient(circle at 28% 28%,var(--hair) 0 12%,transparent 13%),
+ radial-gradient(circle at 43% 18%,var(--hair) 0 13%,transparent 14%),
+ radial-gradient(circle at 57% 18%,var(--hair) 0 13%,transparent 14%),
+ radial-gradient(circle at 72% 28%,var(--hair) 0 12%,transparent 13%),
+ radial-gradient(circle at 86% 68%,var(--hair) 0 10%,transparent 11%),
+ radial-gradient(ellipse at 50% 62%,var(--hair) 0 44%,transparent 45%)}
+.avatar .hair.shorttwist,.avatar .hair.twists,.avatar .hair.braids,.avatar .hair.dreads{background:transparent;box-shadow:none;border-radius:0}
+.avatar .hair.shorttwist{top:12%;width:55%;height:28%}
+.avatar .hair.twists{top:10%;width:57%;height:36%}
+.avatar .hair.braids{top:13%;width:54%;height:39%}
+.avatar .hair.dreads{top:8%;width:59%;height:47%}
+.avatar .hair.shorttwist:before,.avatar .hair.twists:before,.avatar .hair.braids:before,.avatar .hair.dreads:before{content:"";position:absolute;left:8%;right:8%;top:5%;height:35%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 92%,#fff),var(--hair));border-radius:52% 52% 34% 34%/80% 80% 28% 28%;box-shadow:inset 0 -3px 5px rgba(0,0,0,.12)}
+.avatar .hair.shorttwist i,.avatar .hair.twists i,.avatar .hair.braids i,.avatar .hair.dreads i{display:block;top:23%;width:8%;transform-origin:50% 0;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--hair) 82%,#000),var(--hair) 45%,color-mix(in srgb,var(--hair) 88%,#fff) 60%,var(--hair));box-shadow:0 2px 2px rgba(0,0,0,.13)}
+.avatar .hair.shorttwist i{height:24%;width:7%;top:21%}
+.avatar .hair.twists i{height:38%;width:7%;top:20%}
+.avatar .hair.braids i{height:52%;width:6%;top:18%;background:repeating-linear-gradient(180deg,color-mix(in srgb,var(--hair) 78%,#fff) 0 3px,var(--hair) 3px 7px)}
+.avatar .hair.dreads i{height:63%;width:7.5%;top:18%}
+.avatar .hair i:nth-child(1){left:8%;transform:rotate(12deg)}.avatar .hair i:nth-child(2){left:20%;transform:rotate(6deg)}.avatar .hair i:nth-child(3){left:32%;transform:rotate(2deg)}.avatar .hair i:nth-child(4){left:44%;transform:rotate(-1deg)}.avatar .hair i:nth-child(5){right:32%;transform:rotate(-2deg)}.avatar .hair i:nth-child(6){right:20%;transform:rotate(-6deg)}.avatar .hair i:nth-child(7){right:8%;transform:rotate(-12deg)}.avatar .hair i:nth-child(8){left:47%;top:15%;height:48%;transform:rotate(3deg)}
+.avatar .hair.shorttwist i:nth-child(1),.avatar .hair.shorttwist i:nth-child(7){height:18%}
+.avatar .hair.twists i:nth-child(1),.avatar .hair.twists i:nth-child(7){height:30%}
+.avatar .hair.braids i:nth-child(1),.avatar .hair.braids i:nth-child(7){height:44%}
+.avatar .hair.dreads i:nth-child(1),.avatar .hair.dreads i:nth-child(7){height:54%}
+.avatar .hair.afro{top:6.5%;width:66%;height:35%;border-radius:50%;background:
+ radial-gradient(circle at 20% 40%,var(--hair) 0 24%,transparent 25%),
+ radial-gradient(circle at 38% 22%,var(--hair) 0 28%,transparent 29%),
+ radial-gradient(circle at 62% 22%,var(--hair) 0 28%,transparent 29%),
+ radial-gradient(circle at 80% 40%,var(--hair) 0 24%,transparent 25%),
+ radial-gradient(ellipse at 50% 62%,var(--hair) 0 46%,transparent 47%)}
+.avatar .hair.long{top:8%;width:62%;height:65%;z-index:3;border-radius:49% 49% 43% 43%/31% 31% 57% 57%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 94%,#fff) 0%,var(--hair) 25%,color-mix(in srgb,var(--hair) 82%,#000) 100%);clip-path:polygon(15% 0,85% 0,98% 17%,94% 100%,74% 100%,68% 32%,32% 32%,26% 100%,6% 100%,2% 17%);box-shadow:none}
 .avatar .headband{position:absolute;left:50%;top:30%;width:48%;height:4%;transform:translateX(-50%);background:var(--band);border-radius:8px;z-index:9;box-shadow:0 1px 2px rgba(0,0,0,.18)}
 .avatar .brows{position:absolute;left:50%;top:41.8%;width:25%;height:3%;transform:translate(-50%,-50%);z-index:9}.avatar .brows:before,.avatar .brows:after{content:"";position:absolute;top:0;width:30%;height:1.5px;background:color-mix(in srgb,var(--hair) 72%,#352018);border-radius:4px}.avatar .brows:before{left:1%}.avatar .brows:after{right:1%}
 .avatar .eyes{position:absolute;left:50%;top:47.2%;width:25%;height:7%;transform:translate(-50%,-50%);z-index:10}
@@ -520,6 +546,9 @@ body.phoneDraggingNow .bottom{
 .nightPlayerCard{border:1px solid #2a3e58;background:#0d1622;border-radius:16px;padding:10px;min-width:0}
 .nightCarMini .vehicleArt{height:105px;margin:8px 0}.nightCarMini .vehicleArtLabel,.nightCarMini .vehicleSpecBadge,.nightCarMini .vehicleConditionBadge{display:none}.nightCarMini .vehicleBody{bottom:24px;height:38px}.nightCarMini .vehicleBody:before{top:-23px;height:28px}.nightCarMini .vehicleBody .wheel{width:28px;height:28px;bottom:-12px}.nightCarMini .vehicleBody .wheel b{inset:6px}.nightCarMini .vehicleBody .glass{top:-17px;height:18px}.nightCarMini .vehicleBody .light{top:12px;width:13px;height:5px}
 @media(max-width:580px){.nightActionGrid,.nightMateGrid,.nightVisitorGrid{grid-template-columns:1fr}.nightCourt{min-height:130px}.nightCourt b{font-size:24px}}
+
+.avatar:has(.hair.dreads) .headband,.avatar:has(.hair.braids) .headband,.avatar:has(.hair.twists) .headband{top:28.5%;z-index:9}
+.avatar.sm .hair i{box-shadow:none}
 </style>
 </head>
 <body>
@@ -1278,7 +1307,7 @@ const AVATAR_PALETTE={
  band:{none:"transparent",black:"#171717",white:"#f4f4f4",red:"#b42f2f",blue:"#3157bd",orange:"#ff7a1c"}
 };
 function ensureAppearance(){if(!S.player.appearance)S.player.appearance={skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"};return S.player.appearance}
-function avatarMarkup(size="sm",player=S.player){const a=player.appearance||ensureAppearance(),skin=AVATAR_PALETTE.skin[a.skin]||AVATAR_PALETTE.skin.medium,hair=AVATAR_PALETTE.hair[a.hairColor]||AVATAR_PALETTE.hair.black,eyes=AVATAR_PALETTE.eyes[a.eyeColor]||AVATAR_PALETTE.eyes.brown,band=AVATAR_PALETTE.band[a.headband]||"transparent";return '<span class="avatar '+size+' acc-'+(a.accessory||"none")+'" style="--skin:'+skin+';--hair:'+hair+';--eyes:'+eyes+';--band:'+band+'"><span class="shirt" data-num="'+(player.number||0)+'"></span><span class="neck"></span><span class="ear left"></span><span class="ear right"></span><span class="head"></span><span class="hair '+(a.hairStyle||"fade")+'"></span><span class="headband"></span><span class="brows"></span><span class="eyes"></span><span class="nose"></span><span class="glasses"></span><span class="earring"></span><span class="beard '+(a.facialHair||"none")+'"></span><span class="mouth"></span></span>'}
+function avatarMarkup(size="sm",player=S.player){const a=player.appearance||ensureAppearance(),skin=AVATAR_PALETTE.skin[a.skin]||AVATAR_PALETTE.skin.medium,hair=AVATAR_PALETTE.hair[a.hairColor]||AVATAR_PALETTE.hair.black,eyes=AVATAR_PALETTE.eyes[a.eyeColor]||AVATAR_PALETTE.eyes.brown,band=AVATAR_PALETTE.band[a.headband]||"transparent";const strands='<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>';return '<span class="avatar '+size+' acc-'+(a.accessory||"none")+'" style="--skin:'+skin+';--hair:'+hair+';--eyes:'+eyes+';--band:'+band+'"><span class="shirt" data-num="'+(player.number||0)+'"></span><span class="neck"></span><span class="ear left"></span><span class="ear right"></span><span class="head"></span><span class="hair '+(a.hairStyle||"fade")+'">'+strands+'</span><span class="headband"></span><span class="brows"></span><span class="eyes"></span><span class="nose"></span><span class="glasses"></span><span class="earring"></span><span class="beard '+(a.facialHair||"none")+'"></span><span class="mouth"></span></span>'}
 function optionList(items,value){return items.map(x=>'<option value="'+x+'" '+(x===value?'selected':'')+'>'+x[0].toUpperCase()+x.slice(1)+'</option>').join("")}
 function appearanceEditor(prefix,player=S.player){const a=player.appearance||ensureAppearance();return '<div class="avatarEditor"><div><div class="avatarPreviewFrame" id="'+prefix+'Preview">'+avatarMarkup("lg",player)+'</div><p class="muted">This face appears in your profile chip.</p></div><div class="avatarControls"><div class="field"><label>Skin Tone</label><select id="'+prefix+'Skin">'+optionList(["light","tan","medium","brown","deep"],a.skin)+'</select></div><div class="field"><label>Hair Style</label><select id="'+prefix+'HairStyle">'+optionList(["fade","waves","buzz","curls","shorttwist","twists","braids","dreads","afro","long"],a.hairStyle)+'</select></div><div class="field"><label>Hair Color</label><select id="'+prefix+'HairColor">'+optionList(["black","brown","blonde","red","blue","pink"],a.hairColor)+'</select></div><div class="field"><label>Eye Color</label><select id="'+prefix+'EyeColor">'+optionList(["brown","hazel","green","blue","gray"],a.eyeColor)+'</select></div><div class="field"><label>Facial Hair</label><select id="'+prefix+'FacialHair">'+optionList(["none","mustache","goatee","short","full"],a.facialHair)+'</select></div><div class="field"><label>Accessory</label><select id="'+prefix+'Accessory">'+optionList(["none","glasses","earring","both"],a.accessory)+'</select></div><div class="field"><label>Headband</label><select id="'+prefix+'Headband">'+optionList(["none","black","white","red","blue","orange"],a.headband)+'</select></div></div></div>'}
 function readAppearance(prefix){return {skin:$(prefix+"Skin").value,hairStyle:$(prefix+"HairStyle").value,hairColor:$(prefix+"HairColor").value,eyeColor:$(prefix+"EyeColor").value,facialHair:$(prefix+"FacialHair").value,accessory:$(prefix+"Accessory").value,headband:$(prefix+"Headband").value}}
