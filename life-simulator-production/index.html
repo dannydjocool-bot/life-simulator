@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.21</title>
+<title>MYCAREER Basketball Sim v0.16.22</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -505,6 +505,21 @@ body.phoneDraggingNow .bottom{
 .vehicleLifestyleGrid .lockedAction{opacity:.5}
 @media(max-width:900px){.vehicleLifestyleGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
 @media(max-width:580px){.vehicleLifestyleGrid{grid-template-columns:1fr 1fr!important}.vehicleLifestyleGrid .btn{min-height:54px;white-space:normal}}
+
+/* v0.16.22 Arena After Hours + City Runs */
+.arenaNightModal{min-width:0}
+.nightArenaHero{border:1px solid #2d4260;border-radius:20px;overflow:hidden;margin:14px 0;background:radial-gradient(circle at 50% 35%,rgba(255,150,65,.12),transparent 35%),linear-gradient(180deg,#121e2d,#090f18)}
+.nightCourt{min-height:150px;position:relative;display:grid;place-items:center;align-content:center;text-align:center;background:linear-gradient(90deg,transparent 49.7%,rgba(255,255,255,.18) 49.7% 50.3%,transparent 50.3%),radial-gradient(circle at 50% 50%,transparent 0 31px,rgba(255,255,255,.18) 32px 34px,transparent 35px)}
+.nightCourt:before,.nightCourt:after{content:"";position:absolute;top:12%;bottom:12%;width:24%;border:2px solid rgba(255,255,255,.16)}
+.nightCourt:before{left:2%;border-left:0;border-radius:0 50% 50% 0}.nightCourt:after{right:2%;border-right:0;border-radius:50% 0 0 50%}
+.nightCourt b{font-size:28px}.nightCourt small{color:#aab8ca;margin-top:4px}
+.nightActionGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0 16px}
+.nightMateGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.nightMateBtn{border:1px solid #293c55;background:#101a28;color:#fff;border-radius:13px;padding:11px;text-align:left}.nightMateBtn small{display:block;color:#a6b5c9;margin-top:3px}
+.nightVisitorGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.nightPlayerCard{border:1px solid #2a3e58;background:#0d1622;border-radius:16px;padding:10px;min-width:0}
+.nightCarMini .vehicleArt{height:105px;margin:8px 0}.nightCarMini .vehicleArtLabel,.nightCarMini .vehicleSpecBadge,.nightCarMini .vehicleConditionBadge{display:none}.nightCarMini .vehicleBody{bottom:24px;height:38px}.nightCarMini .vehicleBody:before{top:-23px;height:28px}.nightCarMini .vehicleBody .wheel{width:28px;height:28px;bottom:-12px}.nightCarMini .vehicleBody .wheel b{inset:6px}.nightCarMini .vehicleBody .glass{top:-17px;height:18px}.nightCarMini .vehicleBody .light{top:12px;width:13px;height:5px}
+@media(max-width:580px){.nightActionGrid,.nightMateGrid,.nightVisitorGrid{grid-template-columns:1fr}.nightCourt{min-height:130px}.nightCourt b{font-size:24px}}
 </style>
 </head>
 <body>
@@ -735,7 +750,7 @@ function garageCapacity(){
 }
 function ensureGarageState(){
  ensureWealthState();
- S.finance.garage=S.finance.garage||{owned:[],active:null,custom:{},actionsUsed:0,actionCounts:{},legacyCarMigrated:false};
+ S.finance.garage=S.finance.garage||{owned:[],active:null,custom:{},actionsUsed:0,actionCounts:{},nightCity:null,legacyCarMigrated:false};
  const g=S.finance.garage;
  if(!Array.isArray(g.owned))g.owned=[];
  if(!g.custom||typeof g.custom!=="object")g.custom={};
@@ -808,7 +823,7 @@ function vehicleAction(action){
  if(Number.isFinite(limit)&&g.actionsUsed>=limit){toast("This vehicle has used its "+limit+" lifestyle actions for this game cycle");return}
  if(action==="za"&&!zaEligible()){toast("Smoke the Za unlocks at age 21 in the NBA");return}
  let msg="",morale=0,trust=0,followers=0,fame=0,relation=0,condition=0,chem=0,xp=0;
- if(action==="arena"){msg="Drove "+v.name+" to the arena";trust=1;morale=1;condition=1}
+ if(action==="arena"){openArenaNight();return}
  if(action==="cruise"){msg="Took "+v.name+" on a night cruise";morale=4;condition=2}
  if(action==="event"){msg="Pulled up to an event in "+v.name;followers=Math.round(100+v.status*8);fame=v.status>=80?2:1;condition=1}
  if(action==="date"){if(!currentPartner()){toast("You need a partner for this action");return}msg="Took "+currentPartner().name+" out in "+v.name;morale=2;relation=4;condition=1}
@@ -838,6 +853,98 @@ function vehicleAction(action){
  g.actionsUsed++;g.actionCounts[action]=(g.actionCounts[action]||0)+1;
  if(scale<1)msg+=" • repeat rewards reduced";
  S.news.unshift(msg+".");save();render();toast(msg)
+}
+
+function topEndNpcVehicle(seed=0){
+ const pool=VEHICLES.filter(v=>v.status>=79);
+ return pool[Math.abs(seed)%pool.length]||VEHICLES[VEHICLES.length-1]
+}
+function cityPlayerPool(){
+ ensureLeagueRosters();
+ const all=[];
+ NBA_TEAMS.filter(t=>t.id!==S.team).forEach(t=>{
+   rosterFor(t.id).slice(0,5).forEach(p=>all.push({team:t,player:p}))
+ });
+ return all.sort((a,b)=>(b.player.ovr||0)-(a.player.ovr||0))
+}
+function ensureNightCityState(){
+ const g=ensureGarageState(),key=(S.year||1)+":"+(S.game||1)+":"+S.stage;
+ if(g.nightCity&&g.nightCity.key===key)return g.nightCity;
+ const pool=cityPlayerPool(),base=(S.year||1)*37+(S.game||1)*19+(S.team||"x").length*11;
+ const visitors=[];
+ for(let i=0;i<4&&pool.length;i++){
+   const pick=pool[(base+i*17)%pool.length];
+   if(!pick||visitors.some(x=>x.playerName===pick.player.name))continue;
+   const car=topEndNpcVehicle(base+i*23+(pick.player.ovr||0));
+   visitors.push({playerName:pick.player.name,teamId:pick.team.id,pos:pick.player.pos,ovr:pick.player.ovr||70,carId:car.id})
+ }
+ g.nightCity={key,visitors,history:[],teamRuns:0,soloWork:0};
+ return g.nightCity
+}
+function nightVisitorRelationship(v){
+ const n=S.nbaWorld?.relationships?.[v.playerName];
+ return typeof n==="number"?n:0
+}
+function arenaNightPlayerCard(v){
+ const car=vehicleById(v.carId),rel=nightVisitorRelationship(v),team=nbaTeamById(v.teamId);
+ return '<div class="nightPlayerCard"><div class="row"><div><b>'+v.playerName+' • '+v.pos+'</b><small class="muted" style="display:block">'+team.abbr+' • '+v.ovr+' OVR • '+(car?car.name:"Exotic")+'</small></div><span class="pill '+(rel>=35?'good':rel<=-20?'bad':'')+'">'+(rel>0?'+':'')+Math.round(rel)+' REL</span></div><div class="nightCarMini">'+(car?vehicleArtHTML(car.id):'')+'</div><button class="btn" style="width:100%" data-arena-visitor="'+v.playerName+'">Invite to Late-Night Run</button></div>'
+}
+function openArenaNight(){
+ const g=ensureGarageState(),v=vehicleById(g.active);if(!v){toast("Choose an active vehicle first");return}
+ if(!(S.stage==="NBA"||S.stage==="Offseason")){toast("Late-night arena access unlocks in the NBA");return}
+ ensureTeammateRelationships();
+ const n=ensureNightCityState(),mates=rosterFor(S.team).slice(0,6);
+ const mateCards=mates.map(p=>{const rel=S.nbaWorld.relationships[p.name]??50;return '<button class="nightMateBtn" data-arena-mate="'+p.name+'"><b>'+p.name+' • '+p.pos+'</b><small>'+relationshipLabel(rel)+' • '+Math.round(rel)+'</small></button>'}).join("");
+ const visitors=n.visitors.map(arenaNightPlayerCard).join("");
+ modal('<div class="arenaNightModal"><div class="row"><div><span class="kicker">LATE NIGHT • '+currentTeamName().toUpperCase()+'</span><h2 style="margin:5px 0">Arena After Hours</h2><small class="muted">You pulled up in the '+v.name+'. The practice court is open and players are still moving around the city.</small></div><span class="pill good">OPEN RUN</span></div><div class="nightArenaHero"><div class="nightCourt"><i></i><b>11:47 PM</b><small>Practice court lights are still on.</small></div></div><h3>What do you want to do?</h3><div class="nightActionGrid"><button class="btn primary" data-arena-night="solo">Late-Night Practice</button><button class="btn" data-arena-night="teamrun">Call Team for Late Hoops</button><button class="btn" data-arena-night="shootaround">Quick Shootaround</button><button class="btn" data-arena-night="film">Film + Court Session</button><button class="btn" data-arena-night="leave">Head Back to Garage</button></div><h3>Teammates Nearby</h3><p class="muted">Invite a specific teammate for extra work and build your relationship.</p><div class="nightMateGrid">'+mateCards+'</div><h3>Players Out in the City</h3><p class="muted">Stars around the league can show up in high-end cars, cruise through the city, and join late-night hoops.</p><div class="nightVisitorGrid">'+(visitors||'<div class="item"><small>No league players are nearby tonight.</small></div>')+'</div><div class="modalFoot"><button class="btn" id="arenaNightClose">Close</button></div></div>');
+ bindArenaNightModal()
+}
+function useNightActionReward(key){
+ const g=ensureGarageState(),n=ensureNightCityState(),count=(n[key]||0);
+ n[key]=count+1;
+ return count===0?1:count===1?.55:.2
+}
+function arenaNightAction(action){
+ const g=ensureGarageState(),v=vehicleById(g.active),n=ensureNightCityState();if(!v)return;
+ if(action==="leave"){closeModal();return}
+ let msg="",morale=0,trust=0,chem=0,xp=0,energy=0;
+ const scale=useNightActionReward(action);
+ if(action==="solo"){msg="Stayed late for an intense solo practice";xp=85;trust=2;energy=8;naturalAttributeGain("Shooting",Math.random()<.45?1:0);naturalAttributeGain("Playmaking",Math.random()<.25?1:0)}
+ if(action==="teamrun"){msg="Organized a full late-night team run";chem=5;trust=3;morale=3;xp=65;energy=7;ensureTeammateRelationships();rosterFor(S.team).slice(0,8).forEach(p=>S.nbaWorld.relationships[p.name]=Math.min(100,(S.nbaWorld.relationships[p.name]??50)+Math.max(1,Math.round(4*scale))));n.teamRuns=(n.teamRuns||0)+1}
+ if(action==="shootaround"){msg="Got extra shots up under the arena lights";xp=45;morale=2;energy=4;naturalAttributeGain("Shooting",Math.random()<.3?1:0)}
+ if(action==="film"){msg="Watched film and worked through reads on the court";xp=55;trust=3;energy=3;naturalAttributeGain("IQ",Math.random()<.35?1:0)}
+ if(!msg)return;
+ S.player.xp+=Math.round(xp*scale);S.player.trust=Math.min(100,S.player.trust+Math.round(trust*scale));S.player.chemistry=Math.min(100,(S.player.chemistry||60)+Math.round(chem*scale));S.player.morale=Math.min(100,S.player.morale+Math.round(morale*scale));S.player.energy=Math.max(25,S.player.energy-energy);
+ g.actionsUsed++;g.actionCounts["arena_"+action]=(g.actionCounts["arena_"+action]||0)+1;
+ n.history.unshift(msg);n.history=n.history.slice(0,8);processPlayerLevelUps();save();closeModal();render();toast(msg)
+}
+function arenaMateRun(name){
+ ensureTeammateRelationships();const mate=rosterFor(S.team).find(p=>p.name===name);if(!mate)return;
+ const n=ensureNightCityState(),key="mate:"+name,count=n[key]||0,scale=count===0?1:count===1?.5:.2;n[key]=count+1;
+ const relGain=Math.max(1,Math.round(8*scale));
+ S.nbaWorld.relationships[name]=Math.min(100,(S.nbaWorld.relationships[name]??50)+relGain);
+ S.player.chemistry=Math.min(100,(S.player.chemistry||60)+Math.max(1,Math.round(3*scale)));
+ S.player.trust=Math.min(100,S.player.trust+Math.max(1,Math.round(2*scale)));
+ S.player.energy=Math.max(25,S.player.energy-5);S.player.xp+=Math.round(45*scale);
+ n.history.unshift("Late-night hoops with "+name);save();closeModal();render();toast("Late-night run with "+name+" • relationship +"+relGain)
+}
+function arenaVisitorRun(name){
+ const n=ensureNightCityState(),v=n.visitors.find(x=>x.playerName===name);if(!v)return;
+ const key="visitor:"+name,count=n[key]||0,scale=count===0?1:count===1?.45:.15;n[key]=count+1;
+ const gain=Math.max(1,Math.round(10*scale));
+ if(!S.nbaWorld.relationships)S.nbaWorld.relationships={};
+ S.nbaWorld.relationships[name]=Math.max(-100,Math.min(100,(S.nbaWorld.relationships[name]||0)+gain));
+ S.player.morale=Math.min(100,S.player.morale+Math.max(1,Math.round(2*scale)));
+ S.social.followers+=Math.round((80+(v.ovr||70)*4)*scale);
+ S.player.energy=Math.max(25,S.player.energy-5);S.player.xp+=Math.round(55*scale);
+ n.history.unshift("Open run with "+name+" after meeting in the city");
+ save();closeModal();render();toast(name+" joined the late-night run • relationship +"+gain)
+}
+function bindArenaNightModal(){
+ document.querySelectorAll("[data-arena-night]").forEach(b=>b.onclick=()=>arenaNightAction(b.dataset.arenaNight));
+ document.querySelectorAll("[data-arena-mate]").forEach(b=>b.onclick=()=>arenaMateRun(b.dataset.arenaMate));
+ document.querySelectorAll("[data-arena-visitor]").forEach(b=>b.onclick=()=>arenaVisitorRun(b.dataset.arenaVisitor));
+ if($("arenaNightClose"))$("arenaNightClose").onclick=closeModal
 }
 function processVehicleGameCosts(){
  const g=ensureGarageState();const cost=garageUpkeep();g.actionsUsed=0;g.actionCounts={};if(!cost)return;
@@ -2841,7 +2948,7 @@ function negotiateContract(idx){
 function promiseLabel(p){return p==="starter"?"Guaranteed Starter":p==="contender"?"Build a Contender":p==="touches"?"Featured Offensive Role":"No Special Promise"}
 function ensureWealthState(){
  S.finance=S.finance||{};if(typeof S.finance.cash!=="number")S.finance.cash=0;if(typeof S.finance.bank!=="number")S.finance.bank=0;
- if(!Array.isArray(S.finance.realEstate))S.finance.realEstate=[];if(!S.finance.garage)S.finance.garage={owned:[],active:null,custom:{},actionsUsed:0,actionCounts:{},legacyCarMigrated:false};
+ if(!Array.isArray(S.finance.realEstate))S.finance.realEstate=[];if(!S.finance.garage)S.finance.garage={owned:[],active:null,custom:{},actionsUsed:0,actionCounts:{},nightCity:null,legacyCarMigrated:false};
  S.civic=S.civic||{donated:0,keys:0,milestones:[],purchases:[],history:[]};
  if(typeof S.civic.donated!=="number")S.civic.donated=0;if(typeof S.civic.keys!=="number")S.civic.keys=0;
  if(!Array.isArray(S.civic.milestones))S.civic.milestones=[];if(!Array.isArray(S.civic.purchases))S.civic.purchases=[];if(!Array.isArray(S.civic.history))S.civic.history=[];
