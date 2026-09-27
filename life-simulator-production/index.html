@@ -837,10 +837,10 @@ function garageCapacity(){
 }
 function ensureGarageState(){
  ensureWealthState();
- S.finance.garage=S.finance.garage||{owned:[],active:null,custom:{},actionsUsed:0,actionCounts:{},nightCity:null,legacyCarMigrated:false};
+ S.finance.garage=S.finance.garage||{owned:[],active:null,gameDay:null,showCar:null,custom:{},actionsUsed:0,actionCounts:{},nightCity:null,legacyCarMigrated:false};
  const g=S.finance.garage;
  if(!Array.isArray(g.owned))g.owned=[];
- if(!g.custom||typeof g.custom!=="object")g.custom={};
+ if(!g.custom||typeof g.custom!=="object")g.custom={};if(g.gameDay&&!g.owned.includes(g.gameDay))g.gameDay=null;if(g.showCar&&!g.owned.includes(g.showCar))g.showCar=null;
  if(typeof g.actionsUsed!=="number")g.actionsUsed=0;
  if(!g.actionCounts||typeof g.actionCounts!=="object")g.actionCounts={};
  if(!g.legacyCarMigrated&&S.finance.owned&&S.finance.owned.includes("car")){
@@ -852,7 +852,7 @@ function ensureGarageState(){
  }
  g.owned=g.owned.filter((id,i,a)=>vehicleById(id)&&a.indexOf(id)===i);
  if(g.active&&!g.owned.includes(g.active))g.active=g.owned[0]||null;
- g.owned.forEach(id=>{if(!g.custom[id])g.custom[id]={color:"midnight",package:"Stock",condition:100};if(typeof g.custom[id].condition!=="number")g.custom[id].condition=100});
+ g.owned.forEach(id=>{if(!g.custom[id])g.custom[id]={color:"midnight",package:"Stock",condition:100};const c=g.custom[id];if(typeof c.condition!=="number")c.condition=100;if(!c.upgrades||typeof c.upgrades!=="object")c.upgrades={};if(!c.insurance)c.insurance="none";if(typeof c.mileage!=="number")c.mileage=0});if(!g.gameDay)g.gameDay=g.active||g.owned[0]||null;if(!g.showCar)g.showCar=g.active||g.owned[0]||null;
  return g
 }
 function vehicleUnlockReason(v){
@@ -863,9 +863,9 @@ function vehicleUnlockReason(v){
  return ""
 }
 function vehicleValue(id){
- const v=vehicleById(id),g=ensureGarageState(),c=g.custom[id]||{},pkg=c.package==="Performance"?45000:c.package==="Luxury"?30000:c.package==="Blackout"?18000:0;
+ const v=vehicleById(id),g=ensureGarageState(),c=g.custom[id]||{},pkg=c.package==="Performance"?45000:c.package==="Luxury"?30000:c.package==="Blackout"?18000:0,upgradeSpend=Object.keys(c.upgrades||{}).reduce((s,k)=>s+(VEHICLE_UPGRADES[k]?.cost||0),0);
  const condition=Math.max(.55,Math.min(1,(c.condition||100)/100));
- return v?Math.round((v.price+pkg)*.72*condition):0
+ return v?Math.round((v.price+pkg+upgradeSpend*.62)*.72*condition):0
 }
 function garageUpkeep(){const g=ensureGarageState();return g.owned.reduce((sum,id)=>sum+(vehicleById(id)?.upkeep||0),0)}
 function buyVehicle(id){
@@ -893,6 +893,50 @@ function customizeVehicle(id,type){
  const p=packages[type];if(!p)return;if(c.package===p.name){toast("Package already installed");return}
  if(!spendLiquid(p.cost)){toast("Not enough liquid funds");return}
  c.package=p.name;S.player.morale=Math.min(100,S.player.morale+1);S.social.fame=Math.min(100,S.social.fame+(p.status>=4?1:0));save();render();toast(p.name+" package installed")
+}
+const VEHICLE_UPGRADES={
+ engine:{name:"Engine Tune",cost:55000,group:"Performance",speed:5,desc:"ECU, cooling and power delivery upgrade."},
+ turbo:{name:"Twin Turbo",cost:85000,group:"Performance",speed:8,desc:"Major acceleration and top-end power."},
+ transmission:{name:"Race Transmission",cost:42000,group:"Performance",speed:4,desc:"Faster shifts and stronger launch."},
+ suspension:{name:"Adaptive Suspension",cost:32000,group:"Handling",speed:2,desc:"Sharper handling with street comfort."},
+ brakes:{name:"Carbon Brakes",cost:28000,group:"Handling",speed:1,desc:"High-performance stopping package."},
+ tires:{name:"Performance Tires",cost:18000,group:"Handling",speed:2,desc:"Extra grip for city and event driving."},
+ exhaust:{name:"Sport Exhaust",cost:22000,group:"Style",status:1,desc:"Performance exhaust with a deeper note."},
+ body:{name:"Carbon Body Kit",cost:48000,group:"Style",status:3,desc:"Premium aero and carbon exterior package."},
+ interior:{name:"Executive Interior",cost:65000,group:"Luxury",luxury:5,status:2,desc:"Hand-finished cabin with custom materials."},
+ sound:{name:"Studio Sound",cost:24000,group:"Luxury",luxury:2,desc:"Reference-grade audio system."},
+ security:{name:"Elite Security",cost:50000,group:"Security",status:1,desc:"Tracking, immobilizer and enhanced vehicle protection."},
+ armor:{name:"Armored Glass",cost:90000,group:"Security",luxury:1,desc:"Discreet reinforced glass and protection."}
+};
+function vehicleUpgradeStats(id){
+ const v=vehicleById(id),g=ensureGarageState(),c=g.custom[id]||{},ups=c.upgrades||{};
+ let speed=v?.speed||0,luxury=v?.luxury||0,status=v?.status||0;
+ Object.keys(ups).forEach(k=>{if(!ups[k]||!VEHICLE_UPGRADES[k])return;const u=VEHICLE_UPGRADES[k];speed+=u.speed||0;luxury+=u.luxury||0;status+=u.status||0});
+ return {speed:Math.min(100,speed),luxury:Math.min(100,luxury),status:Math.min(100,status)}
+}
+function installVehicleUpgrade(id,key){
+ const v=vehicleById(id),g=ensureGarageState(),c=g.custom[id],u=VEHICLE_UPGRADES[key];if(!v||!c||!u)return;
+ c.upgrades=c.upgrades||{};if(c.upgrades[key]){toast(u.name+" already installed");return}
+ if(!spendLiquid(u.cost)){toast("Not enough liquid funds");return}
+ c.upgrades[key]=true;S.player.morale=Math.min(100,S.player.morale+1);if((u.status||0)>=2)S.social.fame=Math.min(100,S.social.fame+1);
+ S.news.unshift("Installed "+u.name+" on "+v.name+" for "+compactMoney(u.cost)+".");save();render();toast(u.name+" installed")
+}
+function setVehicleRole(id,role){
+ const g=ensureGarageState();if(!g.owned.includes(id))return;
+ if(role==="gameDay")g.gameDay=id;if(role==="showCar")g.showCar=id;if(role==="active")g.active=id;
+ save();render();toast(vehicleById(id).name+" set as "+(role==="gameDay"?"Game-Day Car":role==="showCar"?"Show Car":"Active Vehicle"))
+}
+function insureVehicle(id,tier){
+ const v=vehicleById(id),g=ensureGarageState(),c=g.custom[id];if(!v||!c)return;
+ const plans={basic:{name:"Basic",cost:Math.max(1200,Math.round(v.price*.002))},premium:{name:"Premium",cost:Math.max(3000,Math.round(v.price*.004))}};
+ const p=plans[tier];if(!p)return;if(c.insurance===tier){toast("Insurance already active");return}
+ if(!spendLiquid(p.cost)){toast("Not enough liquid funds");return}
+ c.insurance=tier;S.news.unshift(v.name+" is now covered by "+p.name+" vehicle insurance.");save();render();toast(p.name+" insurance activated")
+}
+function serviceVehicle(id){
+ const v=vehicleById(id),g=ensureGarageState(),c=g.custom[id];if(!v||!c)return;
+ const cost=Math.max(750,Math.round(v.price*.0025));if(!spendLiquid(cost)){toast("Not enough funds for service");return}
+ c.condition=100;S.news.unshift(v.name+" received full maintenance service for "+compactMoney(cost)+".");save();render();toast(v.name+" serviced to 100%")
 }
 function isTopEndVehicle(v){return !!(v&&(v.status>=80||v.price>=500000))}
 function vehicleActionLimit(v){return isTopEndVehicle(v)?Infinity:4}
@@ -929,7 +973,7 @@ function vehicleAction(action){
  const scale=vehicleActionRewardScale(g,action);
  morale=Math.round(morale*scale);trust=Math.round(trust*scale);followers=Math.round(followers*scale);fame=Math.round(fame*scale);relation=Math.round(relation*scale);chem=Math.round(chem*scale);xp=Math.round(xp*scale);
 
- const c=g.custom[g.active];if(condition)c.condition=Math.max(55,(c.condition||100)-condition);
+ const c=g.custom[g.active];c.mileage=(c.mileage||0)+(action==="cruise"||action==="scenic"?42:action==="arena"?18:12);if(condition)c.condition=Math.max(55,(c.condition||100)-condition);
  S.player.morale=Math.min(100,S.player.morale+morale);
  S.player.trust=Math.min(100,S.player.trust+trust);
  S.player.chemistry=Math.min(100,(S.player.chemistry||60)+chem);
