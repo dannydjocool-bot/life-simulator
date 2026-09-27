@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.29</title>
+<title>MYCAREER Basketball Sim v0.16.30</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -2416,7 +2416,15 @@ function maybeTriggerAllStarBreak(){
  pushLeagueNews("The All-Star Game is set: East vs West.");
  return true
 }
-function ensureAllStarBreakState(){if(S.stage==="NBA"&&!S.playoffs?.active)maybeTriggerAllStarBreak()}
+function repairAllStarConferenceFormat(){
+ const a=S.nbaWorld&&S.nbaWorld.allStar;if(!a||!a.breakActive||a.completed)return;
+ const valid=Array.isArray(a.teams)&&a.teams.length===2&&a.teams.some(t=>t&&t.name==="East")&&a.teams.some(t=>t&&t.name==="West");
+ if(valid)return;
+ const pool=allStarVotePool(),draft=buildAllStarTeams(pool),selected=draft.selected,userSelected=selected.some(x=>x.user);
+ a.teams=draft.teams;a.captains=[];a.pool=selected;a.selected=userSelected;a.pending=userSelected;
+ if(a.audience===undefined)a.audience=null;if(a.gameResult===undefined)a.gameResult=null
+}
+function ensureAllStarBreakState(){if(S.stage==="NBA"&&!S.playoffs?.active){maybeTriggerAllStarBreak();repairAllStarConferenceFormat()}}
 function allStarPlayerRow(p){return '<div class="item"><div><b>'+p.name+(p.user?' • YOU':'')+'</b><small>'+p.team+' • '+p.pos+' • '+p.ppg+' PPG • '+p.apg+' APG • '+p.rpg+' RPG</small></div><span class="pill '+(p.user?'good':'')+'">'+Math.round(p.votes).toLocaleString()+' votes</span></div>'}
 function allStarWeekendHTML(){
  const a=S.nbaWorld.allStar;if(!a||!a.breakActive||a.completed)return "";
