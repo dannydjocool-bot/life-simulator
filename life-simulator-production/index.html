@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.16.24</title>
+<title>MYCAREER Basketball Sim v0.16.25</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -34,25 +34,65 @@ button{cursor:pointer}.hidden{display:none!important}.app{min-height:100vh;displ
  radial-gradient(ellipse at 50% 62%,var(--hair) 0 44%,transparent 45%)}
 .avatar .hair.shorttwist,.avatar .hair.twists,.avatar .hair.braids,.avatar .hair.dreads{background:transparent;box-shadow:none;border-radius:0}
 .avatar .hair.shorttwist i,.avatar .hair.twists i,.avatar .hair.braids i,.avatar .hair.dreads i{display:block;position:absolute;background:linear-gradient(90deg,color-mix(in srgb,var(--hair) 86%,#000),var(--hair) 42%,color-mix(in srgb,var(--hair) 88%,#fff) 62%,var(--hair));border-radius:999px;box-shadow:0 2px 2px rgba(0,0,0,.14)}
-.avatar .hair.shorttwist{top:10.5%;width:55%;height:25%}
-.avatar .hair.shorttwist:before{content:"";position:absolute;left:14%;right:14%;top:1%;height:34%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 91%,#fff),var(--hair));border-radius:55% 55% 32% 32%/82% 82% 28% 28%;box-shadow:inset 0 -2px 4px rgba(0,0,0,.13)}
-.avatar .hair.shorttwist i{width:8%;top:17%;border-radius:45% 45% 55% 55%}
-.avatar .hair.shorttwist .s1{left:17%;height:15%;transform:rotate(9deg)}.avatar .hair.shorttwist .s2{left:27%;height:21%;transform:rotate(5deg)}.avatar .hair.shorttwist .s3{left:38%;height:25%;transform:rotate(2deg)}.avatar .hair.shorttwist .s4{left:49%;height:18%;transform:rotate(-2deg)}.avatar .hair.shorttwist .s5{left:60%;height:23%;transform:rotate(2deg)}.avatar .hair.shorttwist .s6{left:71%;height:17%;transform:rotate(-7deg)}.avatar .hair.shorttwist .s7{left:45%;top:10%;height:13%;width:7%}.avatar .hair.shorttwist .s8{display:none}
-.avatar .hair.twists{top:9%;width:57%;height:34%}
-.avatar .hair.twists:before{content:"";position:absolute;left:12%;right:12%;top:2%;height:32%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 91%,#fff),var(--hair));border-radius:54% 54% 32% 32%/82% 82% 28% 28%}
-.avatar .hair.twists i{top:18%;width:7%;height:34%}
-.avatar .hair.twists .s1{left:10%;height:26%;transform:rotate(10deg)}.avatar .hair.twists .s2{left:21%;height:34%;transform:rotate(5deg)}.avatar .hair.twists .s3{left:32%;height:38%;transform:rotate(2deg)}.avatar .hair.twists .s4{left:43%;height:31%;transform:rotate(-1deg)}.avatar .hair.twists .s5{left:55%;height:36%;transform:rotate(2deg)}.avatar .hair.twists .s6{left:67%;height:35%;transform:rotate(-5deg)}.avatar .hair.twists .s7{left:79%;height:27%;transform:rotate(-10deg)}.avatar .hair.twists .s8{left:48%;top:13%;height:29%}
-.avatar .hair.braids{top:11%;width:55%;height:39%}
-.avatar .hair.braids:before{content:"";position:absolute;left:12%;right:12%;top:1%;height:30%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 91%,#fff),var(--hair));border-radius:54% 54% 30% 30%/80% 80% 28% 28%}
-.avatar .hair.braids i{top:17%;width:6%;height:46%;background:repeating-linear-gradient(180deg,color-mix(in srgb,var(--hair) 76%,#fff) 0 3px,var(--hair) 3px 7px)}
-.avatar .hair.braids .s1{left:10%;height:38%;transform:rotate(10deg)}.avatar .hair.braids .s2{left:21%;height:45%;transform:rotate(5deg)}.avatar .hair.braids .s3{left:32%;height:49%;transform:rotate(2deg)}.avatar .hair.braids .s4{left:43%;height:42%;transform:rotate(-1deg)}.avatar .hair.braids .s5{left:55%;height:48%;transform:rotate(2deg)}.avatar .hair.braids .s6{left:67%;height:46%;transform:rotate(-5deg)}.avatar .hair.braids .s7{left:79%;height:39%;transform:rotate(-10deg)}.avatar .hair.braids .s8{left:48%;top:14%;height:35%}
-.avatar .hair.dreads{top:9%;width:59%;height:40%}
-.avatar .hair.dreads:before{content:"";position:absolute;left:10%;right:10%;top:1%;height:28%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 92%,#fff),var(--hair));border-radius:53% 53% 29% 29%/82% 82% 25% 25%;box-shadow:inset 0 -3px 5px rgba(0,0,0,.14)}
-.avatar .hair.dreads i{top:15%;width:7.2%}
-.avatar .hair.dreads .s1{left:9%;height:30%;transform:rotate(10deg)}.avatar .hair.dreads .s2{left:20%;height:38%;transform:rotate(6deg)}.avatar .hair.dreads .s3{left:31%;height:44%;transform:rotate(2deg)}.avatar .hair.dreads .s4{left:42%;height:35%;transform:rotate(-1deg)}.avatar .hair.dreads .s5{left:53%;height:41%;transform:rotate(2deg)}.avatar .hair.dreads .s6{left:64%;height:45%;transform:rotate(-4deg)}.avatar .hair.dreads .s7{left:75%;height:36%;transform:rotate(-9deg)}.avatar .hair.dreads .s8{left:47%;top:10%;height:27%;width:6.5%}
+.avatar .hair.shorttwist{top:8.5%;width:58%;height:27%;background:transparent}
+.avatar .hair.shorttwist:before{content:"";position:absolute;left:13%;right:13%;top:5%;height:31%;background:var(--hair);border-radius:52% 52% 38% 38%/78% 78% 32% 32%}
+.avatar .hair.shorttwist i{display:block;position:absolute;width:13%;height:26%;top:18%;border-radius:48% 48% 55% 55%;background:radial-gradient(circle at 45% 20%,color-mix(in srgb,var(--hair) 72%,#fff) 0 9%,var(--hair) 10% 100%);box-shadow:0 2px 2px rgba(0,0,0,.18)}
+.avatar .hair.shorttwist .s1{left:10%;top:21%;height:22%;transform:rotate(10deg)}
+.avatar .hair.shorttwist .s2{left:24%;top:14%;height:28%;transform:rotate(5deg)}
+.avatar .hair.shorttwist .s3{left:38%;top:10%;height:31%;transform:rotate(1deg)}
+.avatar .hair.shorttwist .s4{left:52%;top:12%;height:27%;transform:rotate(-2deg)}
+.avatar .hair.shorttwist .s5{left:66%;top:17%;height:25%;transform:rotate(-6deg)}
+.avatar .hair.shorttwist .s6{left:78%;top:23%;height:20%;transform:rotate(-11deg)}
+.avatar .hair.shorttwist .s7{left:45%;top:0;height:21%;width:12%;transform:rotate(3deg)}
+.avatar .hair.shorttwist .s8{display:none}
+
+.avatar .hair.twists{top:7%;width:60%;height:38%;background:transparent}
+.avatar .hair.twists:before{content:"";position:absolute;left:12%;right:12%;top:4%;height:28%;background:var(--hair);border-radius:52% 52% 35% 35%/80% 80% 30% 30%}
+.avatar .hair.twists i{display:block;position:absolute;width:10%;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--hair) 84%,#000),var(--hair) 45%,color-mix(in srgb,var(--hair) 88%,#fff) 61%,var(--hair));box-shadow:0 2px 2px rgba(0,0,0,.16)}
+.avatar .hair.twists .s1{left:8%;top:19%;height:37%;transform:rotate(11deg)}
+.avatar .hair.twists .s2{left:20%;top:14%;height:45%;transform:rotate(6deg)}
+.avatar .hair.twists .s3{left:32%;top:11%;height:49%;transform:rotate(2deg)}
+.avatar .hair.twists .s4{left:44%;top:15%;height:41%;transform:rotate(-1deg)}
+.avatar .hair.twists .s5{left:56%;top:12%;height:47%;transform:rotate(2deg)}
+.avatar .hair.twists .s6{left:68%;top:16%;height:43%;transform:rotate(-6deg)}
+.avatar .hair.twists .s7{left:80%;top:21%;height:35%;transform:rotate(-12deg)}
+.avatar .hair.twists .s8{left:48%;top:5%;height:34%;width:9%}
+
+.avatar .hair.braids{top:8%;width:58%;height:44%;background:transparent}
+.avatar .hair.braids:before{content:"";position:absolute;left:12%;right:12%;top:4%;height:27%;background:var(--hair);border-radius:52% 52% 34% 34%/80% 80% 30% 30%}
+.avatar .hair.braids i{display:block;position:absolute;width:7%;border-radius:999px;background:repeating-linear-gradient(180deg,color-mix(in srgb,var(--hair) 70%,#fff) 0 3px,var(--hair) 3px 7px);box-shadow:0 2px 2px rgba(0,0,0,.15)}
+.avatar .hair.braids .s1{left:9%;top:18%;height:46%;transform:rotate(10deg)}
+.avatar .hair.braids .s2{left:21%;top:14%;height:54%;transform:rotate(5deg)}
+.avatar .hair.braids .s3{left:33%;top:11%;height:60%;transform:rotate(2deg)}
+.avatar .hair.braids .s4{left:45%;top:15%;height:51%;transform:rotate(-1deg)}
+.avatar .hair.braids .s5{left:57%;top:12%;height:58%;transform:rotate(2deg)}
+.avatar .hair.braids .s6{left:69%;top:16%;height:53%;transform:rotate(-5deg)}
+.avatar .hair.braids .s7{left:81%;top:20%;height:44%;transform:rotate(-10deg)}
+.avatar .hair.braids .s8{left:49%;top:7%;height:42%;width:6%}
+
+.avatar .hair.dreads{top:5.5%;width:63%;height:46%;background:transparent}
+.avatar .hair.dreads:before{content:"";position:absolute;left:10%;right:10%;top:5%;height:25%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 90%,#fff),var(--hair));border-radius:54% 54% 30% 30%/82% 82% 28% 28%;box-shadow:inset 0 -3px 5px rgba(0,0,0,.15)}
+.avatar .hair.dreads i{display:block;position:absolute;width:9%;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--hair) 83%,#000),var(--hair) 42%,color-mix(in srgb,var(--hair) 90%,#fff) 60%,var(--hair));box-shadow:0 3px 3px rgba(0,0,0,.2)}
+.avatar .hair.dreads .s1{left:6%;top:22%;height:44%;transform:rotate(14deg)}
+.avatar .hair.dreads .s2{left:18%;top:15%;height:57%;transform:rotate(7deg)}
+.avatar .hair.dreads .s3{left:31%;top:11%;height:63%;transform:rotate(2deg)}
+.avatar .hair.dreads .s4{left:44%;top:17%;height:49%;transform:rotate(-1deg)}
+.avatar .hair.dreads .s5{left:56%;top:12%;height:61%;transform:rotate(3deg)}
+.avatar .hair.dreads .s6{left:69%;top:16%;height:55%;transform:rotate(-8deg)}
+.avatar .hair.dreads .s7{left:82%;top:23%;height:40%;transform:rotate(-15deg)}
+.avatar .hair.dreads .s8{left:48%;top:4%;height:38%;width:8%;transform:rotate(4deg)}
 .avatar .hair.afro{top:6.5%;width:66%;height:35%;border-radius:50%;background:radial-gradient(circle at 20% 40%,var(--hair) 0 24%,transparent 25%),radial-gradient(circle at 38% 22%,var(--hair) 0 28%,transparent 29%),radial-gradient(circle at 62% 22%,var(--hair) 0 28%,transparent 29%),radial-gradient(circle at 80% 40%,var(--hair) 0 24%,transparent 25%),radial-gradient(ellipse at 50% 62%,var(--hair) 0 46%,transparent 47%)}
-.avatar .hair.long{top:7.5%;width:61%;height:61%;z-index:3;border-radius:50% 50% 42% 42%/27% 27% 58% 58%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 94%,#fff) 0%,var(--hair) 25%,color-mix(in srgb,var(--hair) 84%,#000) 100%);clip-path:polygon(17% 0,83% 0,95% 11%,92% 92%,78% 100%,71% 45%,66% 34%,34% 34%,29% 45%,22% 100%,8% 92%,5% 11%);box-shadow:none}
-.avatar .hair.long:before{content:"";position:absolute;left:26%;right:26%;top:2%;height:20%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 94%,#fff),var(--hair));border-radius:50% 50% 35% 35%}
+.avatar .hair.long{top:5.5%;width:65%;height:66%;z-index:3;background:transparent;box-shadow:none;clip-path:none}
+.avatar .hair.long:before{content:"";position:absolute;left:13%;right:13%;top:2%;height:33%;background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 92%,#fff),var(--hair));border-radius:54% 54% 34% 34%/78% 78% 30% 30%}
+.avatar .hair.long i{display:block;position:absolute;background:linear-gradient(90deg,color-mix(in srgb,var(--hair) 82%,#000),var(--hair) 48%,color-mix(in srgb,var(--hair) 90%,#fff) 65%,var(--hair));border-radius:999px;box-shadow:0 3px 3px rgba(0,0,0,.18)}
+.avatar .hair.long .s1{left:5%;top:18%;width:14%;height:72%;transform:rotate(8deg)}
+.avatar .hair.long .s2{left:17%;top:13%;width:13%;height:80%;transform:rotate(4deg)}
+.avatar .hair.long .s3{left:29%;top:10%;width:12%;height:61%;transform:rotate(1deg)}
+.avatar .hair.long .s4{left:41%;top:8%;width:11%;height:45%;transform:rotate(-1deg)}
+.avatar .hair.long .s5{right:29%;top:10%;width:12%;height:61%;transform:rotate(-1deg)}
+.avatar .hair.long .s6{right:17%;top:13%;width:13%;height:80%;transform:rotate(-4deg)}
+.avatar .hair.long .s7{right:5%;top:18%;width:14%;height:72%;transform:rotate(-8deg)}
+.avatar .hair.long .s8{left:46%;top:4%;width:10%;height:40%}
 .avatar .headband{position:absolute;left:50%;top:30%;width:48%;height:4%;transform:translateX(-50%);background:var(--band);border-radius:8px;z-index:9;box-shadow:0 1px 2px rgba(0,0,0,.18)}
 .avatar .brows{position:absolute;left:50%;top:41.8%;width:25%;height:3%;transform:translate(-50%,-50%);z-index:9}.avatar .brows:before,.avatar .brows:after{content:"";position:absolute;top:0;width:30%;height:1.5px;background:color-mix(in srgb,var(--hair) 72%,#352018);border-radius:4px}.avatar .brows:before{left:1%}.avatar .brows:after{right:1%}
 .avatar .eyes{position:absolute;left:50%;top:47.2%;width:25%;height:7%;transform:translate(-50%,-50%);z-index:10}
