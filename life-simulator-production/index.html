@@ -2911,6 +2911,7 @@ function buildCareerStory(g){
  return pool[(gp+(S.year||1)*3+ensureImmersionState().storySeq)%pool.length]
 }
 function maybeTriggerCareerStory(g){
+ if(["High School","College","Draft Combine"].includes(S.stage))return null;
  const im=ensureImmersionState(),gp=S.player.stats?.gp||0;
  if(im.pending)return null;
  const major=!!(g&&(g.pts>=35||Math.abs((g.team||0)-(g.oppScore||0))<=3||g.playoff));
@@ -4432,6 +4433,7 @@ function ensureRoadToNBAState(){
  const r=S.roadToNBA;
  if(!Array.isArray(r.completed))r.completed=[];
  if(!Array.isArray(r.history))r.history=[];
+ if(!Array.isArray(r.queue))r.queue=[];
  if(!r.flags)r.flags={};
  if(!r.rival)r.rival={...ROAD_TO_NBA_RIVAL,heat:20,respect:50};
  if(!r.pending&&!r.completed.includes("hs_intro")&&S.stage==="High School")r.pending="hs_intro";
@@ -4440,8 +4442,8 @@ function ensureRoadToNBAState(){
 }
 function roadToNBATransition(id){
  const r=ensureRoadToNBAState();
- if(r.completed.includes(id))return;
- r.pending=id;
+ if(r.completed.includes(id)||r.pending===id||r.queue.includes(id))return;
+ if(r.pending)r.queue.push(id);else r.pending=id;
 }
 function roadChapterAvailable(id){
  const r=ensureRoadToNBAState(),gp=S.player.stats?.gp||0;
@@ -4458,6 +4460,7 @@ function roadChapterAvailable(id){
 }
 function syncRoadToNBAStory(){
  const r=ensureRoadToNBAState();if(r.pending||r.finished)return;
+ if(r.queue.length){r.pending=r.queue.shift();return}
  const order=["hs_scout","hs_rival","hs_pressure","college_role","college_rival","college_choice","combine_interview","green_room"];
  const next=order.find(roadChapterAvailable);if(next)r.pending=next;
 }
