@@ -721,6 +721,139 @@ input,select{min-width:0;max-width:100%}
 .avatar.sm .hair.dreads i,
 .avatar.sm .hair.long i{box-shadow:none}
 
+
+/* v0.17.0 avatar hair geometry rebuild */
+.avatar .hair{left:50%;transform:translateX(-50%);transform-origin:50% 0}
+
+/* SHORT HAIR — scalp-following silhouette */
+.avatar .hair.fade{
+  top:18.8%;width:49.5%;height:12.5%;
+  border-radius:52% 52% 20% 20%/82% 82% 22% 22%;
+  clip-path:ellipse(50% 58% at 50% 58%)
+}
+.avatar .hair.waves{
+  top:18.7%;width:49.7%;height:12.3%;
+  border-radius:52% 52% 20% 20%/82% 82% 22% 22%;
+  clip-path:ellipse(50% 58% at 50% 58%)
+}
+.avatar .hair.buzz{
+  top:19.5%;width:48.7%;height:10.4%;
+  border-radius:54% 54% 22% 22%/84% 84% 24% 24%;
+  clip-path:ellipse(50% 58% at 50% 58%)
+}
+
+/* VOLUME HAIR — crown stays above the brows */
+.avatar .hair.curls{
+  top:10.2%;width:56%;height:23.5%;
+}
+.avatar .hair.afro{
+  top:4.8%;width:64%;height:34.5%;
+}
+
+/* STRAND STYLES — shared scalp cap ends around the natural hairline */
+.avatar .hair.shorttwist,
+.avatar .hair.twists,
+.avatar .hair.braids,
+.avatar .hair.dreads,
+.avatar .hair.long{
+  background:transparent;
+  box-shadow:none;
+  border-radius:0;
+}
+
+/* Short twists */
+.avatar .hair.shorttwist{top:12.4%;width:55%;height:24%}
+.avatar .hair.shorttwist:before{
+  content:"";position:absolute;left:14%;right:14%;top:29%;height:18%;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 90%,#fff),var(--hair));
+  border-radius:54% 54% 26% 26%/82% 82% 24% 24%;
+}
+.avatar .hair.shorttwist i{width:9.5%}
+.avatar .hair.shorttwist .s1{left:15%;top:22%;height:17%;transform:rotate(10deg)}
+.avatar .hair.shorttwist .s2{left:27%;top:14%;height:21%;transform:rotate(6deg)}
+.avatar .hair.shorttwist .s3{left:39%;top:10%;height:24%;transform:rotate(2deg)}
+.avatar .hair.shorttwist .s4{left:51%;top:10%;height:23%;transform:rotate(-2deg)}
+.avatar .hair.shorttwist .s5{left:63%;top:14%;height:21%;transform:rotate(-6deg)}
+.avatar .hair.shorttwist .s6{left:75%;top:22%;height:17%;transform:rotate(-10deg)}
+.avatar .hair.shorttwist .s7{left:45%;top:1%;height:15%;width:9%}
+
+/* Twists */
+.avatar .hair.twists{top:10.5%;width:57%;height:38%}
+.avatar .hair.twists:before{
+  content:"";position:absolute;left:13%;right:13%;top:26%;height:15%;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 91%,#fff),var(--hair));
+  border-radius:54% 54% 24% 24%/82% 82% 24% 24%;
+}
+.avatar .hair.twists i{width:6.7%}
+.avatar .hair.twists .s1{left:11%;top:28%;height:27%;transform:rotate(11deg)}
+.avatar .hair.twists .s2{left:23%;top:23%;height:31%;transform:rotate(6deg)}
+.avatar .hair.twists .s3{left:35%;top:19%;height:34%;transform:rotate(2deg)}
+.avatar .hair.twists .s4{left:47%;top:20%;height:31%;transform:rotate(-1deg)}
+.avatar .hair.twists .s5{left:59%;top:19%;height:34%;transform:rotate(2deg)}
+.avatar .hair.twists .s6{left:71%;top:23%;height:31%;transform:rotate(-6deg)}
+.avatar .hair.twists .s7{left:83%;top:28%;height:27%;transform:rotate(-11deg)}
+.avatar .hair.twists .s8{left:48%;top:8%;height:20%;width:6.2%}
+
+/* Braids */
+.avatar .hair.braids{top:10.5%;width:57%;height:44%}
+.avatar .hair.braids:before{
+  content:"";position:absolute;left:13%;right:13%;top:23%;height:14%;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 91%,#fff),var(--hair));
+  border-radius:54% 54% 22% 22%/82% 82% 22% 22%;
+}
+.avatar .hair.braids i{width:4.7%}
+.avatar .hair.braids .s1{left:11%;top:27%;height:40%;transform:rotate(9deg)}
+.avatar .hair.braids .s2{left:23%;top:23%;height:46%;transform:rotate(5deg)}
+.avatar .hair.braids .s3{left:35%;top:20%;height:49%;transform:rotate(2deg)}
+.avatar .hair.braids .s4{left:47%;top:21%;height:44%;transform:rotate(-1deg)}
+.avatar .hair.braids .s5{left:59%;top:20%;height:49%;transform:rotate(2deg)}
+.avatar .hair.braids .s6{left:71%;top:23%;height:46%;transform:rotate(-5deg)}
+.avatar .hair.braids .s7{left:83%;top:27%;height:40%;transform:rotate(-9deg)}
+.avatar .hair.braids .s8{left:49%;top:8%;height:24%;width:4.5%}
+
+/* Dreads */
+.avatar .hair.dreads{top:8.8%;width:60%;height:48%}
+.avatar .hair.dreads:before{
+  content:"";position:absolute;left:12%;right:12%;top:24%;height:15%;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 91%,#fff),var(--hair));
+  border-radius:54% 54% 23% 23%/82% 82% 23% 23%;
+  box-shadow:inset 0 -2px 4px rgba(0,0,0,.12)
+}
+.avatar .hair.dreads i{width:6.2%}
+.avatar .hair.dreads .s1{left:9%;top:29%;height:37%;transform:rotate(12deg)}
+.avatar .hair.dreads .s2{left:21%;top:24%;height:44%;transform:rotate(7deg)}
+.avatar .hair.dreads .s3{left:33%;top:21%;height:48%;transform:rotate(2deg)}
+.avatar .hair.dreads .s4{left:45%;top:23%;height:40%;transform:rotate(-1deg)}
+.avatar .hair.dreads .s5{left:57%;top:21%;height:48%;transform:rotate(2deg)}
+.avatar .hair.dreads .s6{left:69%;top:24%;height:44%;transform:rotate(-7deg)}
+.avatar .hair.dreads .s7{left:81%;top:29%;height:37%;transform:rotate(-12deg)}
+.avatar .hair.dreads .s8{left:48%;top:8%;height:25%;width:5.8%}
+
+/* Long hair — crown on scalp, side lengths outside the eyes */
+.avatar .hair.long{top:8%;width:61%;height:64%;z-index:7}
+.avatar .hair.long:before{
+  content:"";position:absolute;left:13%;right:13%;top:18%;height:18%;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 93%,#fff),var(--hair));
+  border-radius:54% 54% 24% 24%/82% 82% 22% 22%;
+  z-index:2
+}
+.avatar .hair.long i{z-index:1}
+.avatar .hair.long .s1{left:7%;top:27%;width:9%;height:58%;transform:rotate(6deg)}
+.avatar .hair.long .s2{left:17%;top:23%;width:8%;height:64%;transform:rotate(4deg)}
+.avatar .hair.long .s3{left:27%;top:21%;width:7%;height:50%;transform:rotate(2deg)}
+.avatar .hair.long .s4{left:36%;top:21%;width:6%;height:34%;transform:rotate(1deg)}
+.avatar .hair.long .s5{right:27%;top:21%;width:7%;height:50%;transform:rotate(-2deg)}
+.avatar .hair.long .s6{right:17%;top:23%;width:8%;height:64%;transform:rotate(-4deg)}
+.avatar .hair.long .s7{right:7%;top:27%;width:9%;height:58%;transform:rotate(-6deg)}
+.avatar .hair.long .s8{left:47%;top:15%;width:6%;height:24%}
+
+/* Headband follows the true forehead line */
+.avatar .headband{top:29.3%!important;left:50%!important;right:auto!important;width:47%!important;height:3.7%!important;transform:translateX(-50%)!important;z-index:10!important}
+
+/* Keep long side hair from sitting over the eyes */
+.avatar .hair.long .s3,.avatar .hair.long .s4{margin-left:-3%}
+.avatar .hair.long .s5{margin-right:-3%}
+
 </style>
 </head>
 <body>
