@@ -1768,6 +1768,12 @@ function ensurePlayerSeasonHistory(){
  S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[],nbaSeasons:[]};
  if(!Array.isArray(S.careerHistory.collegeSeasons))S.careerHistory.collegeSeasons=[];
  if(!Array.isArray(S.careerHistory.nbaSeasons))S.careerHistory.nbaSeasons=[];
+ S.careerHistory.nbaSeasons.forEach(x=>{
+   if(x&&x.legacy&&(x.gp===0||x.gp===null||x.gp===undefined)){
+     const completed=(S.recordBook?.seasons||[]).some(r=>r&&r.season===x.season&&r.userStats&&r.userStats.teamId);
+     if(completed)x.gp=82
+   }
+ });
  const known=new Set(S.careerHistory.nbaSeasons.map(x=>x.season));
  (S.recordBook?.seasons||[]).filter(x=>x.userStats&&x.userStats.teamId).forEach((x,idx)=>{
    if(known.has(x.season))return;
@@ -1804,7 +1810,7 @@ function archivePlayerSeason(){
 function playerCareerStatsHTML(){
  ensurePlayerSeasonHistory();
  const nba=(S.careerHistory.nbaSeasons||[]).slice().reverse(),live=(S.stage==="NBA"&&S.team)?{season:nbaSeasonLabel(S.year||1),year:S.year||1,team:currentTeamName(),gp:S.player.stats.gp||0,ppg:+(S.player.stats.ppg||0).toFixed(1),apg:+(S.player.stats.apg||0).toFixed(1),rpg:+(S.player.stats.rpg||0).toFixed(1),record:{w:S.record.w||0,l:S.record.l||0},ovr:ovr(),awards:currentSeasonAwardsList(),playoffResult:currentPlayoffResult(),current:true}:null;
- const rows=(live?[live,...nba.filter(x=>x.season!==live.season)]:nba).map(x=>'<div class="item"><div style="min-width:0"><b>'+(x.current?'CURRENT • ':'')+(x.season||('Year '+(x.year||"—")))+' • '+(x.team||teamNameById(x.teamId)||"NBA")+'</b><small>'+((x.record&&Number.isFinite(x.record.w))?(x.record.w+'-'+x.record.l+' • '):'')+(Number.isFinite(+x.gp)?(+x.gp)+' GP':'GP —')+' • '+(+x.ppg||0).toFixed(1)+' PPG • '+(+x.apg||0).toFixed(1)+' APG • '+(+x.rpg||0).toFixed(1)+' RPG'+(x.ovr?' • '+x.ovr+' OVR':'')+'</small><small>'+(x.playoffResult||"Season complete")+(x.awards&&x.awards.length?' • '+x.awards.join(" • "):'')+(x.legacy?' • Legacy save snapshot':'')+'</small></div><span class="pill '+(x.champion?'good':'')+'">'+(x.champion?'CHAMPION':x.current?'LIVE':'YEAR '+(x.year||"—"))+'</span></div>').join("");
+ const rows=(live?[live,...nba.filter(x=>x.season!==live.season)]:nba).map(x=>'<div class="item"><div style="min-width:0"><b>'+(x.current?'CURRENT • ':'')+(x.season||('Year '+(x.year||"—")))+' • '+(x.team||teamNameById(x.teamId)||"NBA")+'</b><small>'+((x.record&&Number.isFinite(x.record.w))?(x.record.w+'-'+x.record.l+' • '):'')+(Number.isFinite(+x.gp)&&+x.gp>0?(+x.gp)+' GP':x.legacy?'82 GP':'GP —')+' • '+(+x.ppg||0).toFixed(1)+' PPG • '+(+x.apg||0).toFixed(1)+' APG • '+(+x.rpg||0).toFixed(1)+' RPG'+(x.ovr?' • '+x.ovr+' OVR':'')+'</small><small>'+(x.playoffResult||"Season complete")+(x.awards&&x.awards.length?' • '+x.awards.join(" • "):'')+(x.legacy?' • Legacy save snapshot':'')+'</small></div><span class="pill '+(x.champion?'good':'')+'">'+(x.champion?'CHAMPION':x.current?'LIVE':'YEAR '+(x.year||"—"))+'</span></div>').join("");
  const hs=S.careerHistory?.highSchool,cols=S.careerHistory?.collegeSeasons||[];
  const pre=(hs?'<div class="item"><div><b>High School</b><small>'+(hs.games||hs.stats?.gp||0)+' GP • '+(+hs.stats?.ppg||0).toFixed(1)+' PPG • '+(+hs.stats?.apg||0).toFixed(1)+' APG • '+(+hs.stats?.rpg||0).toFixed(1)+' RPG</small></div><span class="pill">HS</span></div>':'')+cols.map(x=>'<div class="item"><div><b>College • '+(x.school||S.college||"College")+' • Year '+(x.year||1)+'</b><small>'+(x.games||x.stats?.gp||0)+' GP • '+(+x.stats?.ppg||0).toFixed(1)+' PPG • '+(+x.stats?.apg||0).toFixed(1)+' APG • '+(+x.stats?.rpg||0).toFixed(1)+' RPG • '+(x.ovr||"—")+' OVR</small></div><span class="pill">NCAA</span></div>').join("");
  const cs=S.careerStats?.nba||{gp:0,pts:0,ast:0,reb:0};
