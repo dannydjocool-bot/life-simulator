@@ -854,6 +854,55 @@ input,select{min-width:0;max-width:100%}
 .avatar .hair.long .s3,.avatar .hair.long .s4{margin-left:-3%}
 .avatar .hair.long .s5{margin-right:-3%}
 
+
+/* v0.17.0 hairstyle refinement pass */
+.avatar .hair.fade{
+ top:20.1%!important;width:47.8%!important;height:8.4%!important;
+ border-radius:58% 58% 18% 18%/90% 90% 18% 18%!important;
+ clip-path:ellipse(50% 58% at 50% 58%)!important
+}
+.avatar .hair.buzz{
+ top:20.8%!important;width:46.7%!important;height:6.4%!important;
+ border-radius:60% 60% 22% 22%/92% 92% 20% 20%!important;
+ clip-path:ellipse(50% 58% at 50% 58%)!important
+}
+.avatar .hair.waves{
+ top:20%!important;width:48%!important;height:8.6%!important;
+ border-radius:58% 58% 18% 18%/90% 90% 18% 18%!important;
+ clip-path:ellipse(50% 58% at 50% 58%)!important
+}
+
+/* rebuild long hair into a crown + side/back silhouette */
+.avatar .hair.long{
+ top:11%!important;width:57%!important;height:55%!important;
+ background:transparent!important;box-shadow:none!important;border-radius:0!important;z-index:7!important
+}
+.avatar .hair.long:before{
+ content:""!important;position:absolute!important;left:18%!important;right:18%!important;top:10%!important;height:17%!important;
+ background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 94%,#fff),var(--hair) 58%,color-mix(in srgb,var(--hair) 90%,#000))!important;
+ border-radius:58% 58% 18% 18%/92% 92% 18% 18%!important;z-index:4!important
+}
+.avatar .hair.long:after{
+ content:"";position:absolute;left:12%;right:12%;top:18%;height:66%;
+ background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 91%,#fff),var(--hair) 36%,color-mix(in srgb,var(--hair) 86%,#000));
+ border-radius:40% 40% 24% 24%/28% 28% 18% 18%;z-index:0
+}
+.avatar .hair.long i{
+ display:block!important;border-radius:999px!important;z-index:2!important;
+ background:linear-gradient(90deg,color-mix(in srgb,var(--hair) 82%,#000),var(--hair) 48%,color-mix(in srgb,var(--hair) 88%,#fff) 66%,var(--hair))!important
+}
+.avatar .hair.long .s1{left:8%!important;top:24%!important;width:8%!important;height:58%!important;transform:rotate(5deg)!important}
+.avatar .hair.long .s2{left:18%!important;top:21%!important;width:7%!important;height:61%!important;transform:rotate(3deg)!important}
+.avatar .hair.long .s3{left:29%!important;top:22%!important;width:5%!important;height:31%!important;transform:rotate(1deg)!important;z-index:5!important}
+.avatar .hair.long .s4{display:none!important}
+.avatar .hair.long .s5{right:29%!important;left:auto!important;top:22%!important;width:5%!important;height:31%!important;transform:rotate(-1deg)!important;z-index:5!important}
+.avatar .hair.long .s6{right:18%!important;left:auto!important;top:21%!important;width:7%!important;height:61%!important;transform:rotate(-3deg)!important}
+.avatar .hair.long .s7{right:8%!important;left:auto!important;top:24%!important;width:8%!important;height:58%!important;transform:rotate(-5deg)!important}
+.avatar .hair.long .s8{display:none!important}
+
+/* keep forehead clean */
+.avatar .hair.long .s3,.avatar .hair.long .s5{margin:0!important}
+
 </style>
 </head>
 <body>
