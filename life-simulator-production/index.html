@@ -1753,7 +1753,7 @@ const AVATAR_PALETTE={
  eyes:{brown:"#5c3927",hazel:"#7d693b",green:"#507c51",blue:"#4d76c4",gray:"#7b8791"},
  band:{none:"transparent",black:"#171717",white:"#f4f4f4",red:"#b42f2f",blue:"#3157bd",orange:"#ff7a1c"}
 };
-const SUPPORTED_HAIR_STYLES=["fade","buzz","waves","curls","afro"];
+const SUPPORTED_HAIR_STYLES=["fade","waves","curls","afro"];
 function ensureAppearance(){
  if(!S.player.appearance)S.player.appearance={skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"};
  if(!SUPPORTED_HAIR_STYLES.includes(S.player.appearance.hairStyle))S.player.appearance.hairStyle="fade";
