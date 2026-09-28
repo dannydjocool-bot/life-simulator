@@ -669,6 +669,58 @@ input,select{min-width:0;max-width:100%}
  .big{font-size:30px}
 }
 
+
+/* v0.17.0 avatar hairstyle alignment pass
+   Head begins at roughly 21%; all scalp bases now meet the same hairline. */
+.avatar .hair{transform:translateX(-50%);transform-origin:50% 0}
+
+/* short cuts sit directly on the scalp instead of inside the forehead */
+.avatar .hair.fade{top:19.3%;width:49.5%;height:12.2%;clip-path:ellipse(50% 60% at 50% 58%)}
+.avatar .hair.waves{top:19.1%;width:49.8%;height:12.4%;clip-path:ellipse(50% 61% at 50% 58%)}
+.avatar .hair.buzz{top:19.8%;width:48.5%;height:10.3%;clip-path:ellipse(50% 61% at 50% 58%)}
+
+/* volume styles overlap the crown naturally but terminate at the forehead */
+.avatar .hair.curls{top:10.8%;width:56%;height:24.8%}
+.avatar .hair.afro{top:5.5%;width:64%;height:35.5%}
+
+/* strand styles use a shared ~20.5% scalp anchor */
+.avatar .hair.shorttwist{top:13.5%;width:55%;height:26%}
+.avatar .hair.shorttwist:before{top:27%;height:30%}
+
+.avatar .hair.twists{top:11.5%;width:57%;height:36%}
+.avatar .hair.twists:before{top:24%;height:28%}
+
+.avatar .hair.braids{top:11.5%;width:57%;height:41%}
+.avatar .hair.braids:before{top:22%;height:27%}
+
+.avatar .hair.dreads{top:9.5%;width:60%;height:45%}
+.avatar .hair.dreads:before{top:24%;height:27%}
+
+/* long hair needs the crown above the face while side lengths fall behind facial features */
+.avatar .hair.long{top:8.5%;width:61%;height:62%;z-index:7}
+.avatar .hair.long:before{top:19.5%;height:27%;z-index:2}
+.avatar .hair.long i{z-index:1}
+
+/* headbands align to the forehead rather than individual hair container tops */
+.avatar .headband{top:29.2%;left:27%;right:27%;height:4.3%;z-index:10}
+.avatar:has(.hair.fade) .headband,
+.avatar:has(.hair.buzz) .headband,
+.avatar:has(.hair.waves) .headband,
+.avatar:has(.hair.curls) .headband,
+.avatar:has(.hair.afro) .headband,
+.avatar:has(.hair.shorttwist) .headband,
+.avatar:has(.hair.twists) .headband,
+.avatar:has(.hair.braids) .headband,
+.avatar:has(.hair.dreads) .headband,
+.avatar:has(.hair.long) .headband{top:29.2%}
+
+/* keep the small profile avatar from exaggerating strand thickness */
+.avatar.sm .hair.shorttwist i,
+.avatar.sm .hair.twists i,
+.avatar.sm .hair.braids i,
+.avatar.sm .hair.dreads i,
+.avatar.sm .hair.long i{box-shadow:none}
+
 </style>
 </head>
 <body>
