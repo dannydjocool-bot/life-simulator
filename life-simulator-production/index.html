@@ -4454,7 +4454,7 @@ function ensureV018State(){
  return x
 }
 function generateSeasonGoals(){
- const x=ensureV018State(),gp=S.player.stats?.gp||0;
+ const x=S.v018||{};S.v018=x;
  const pool=[
   {id:"ppg25",label:"Average 25+ PPG",test:()=>S.player.stats.ppg>=25,reward:"35 XP"},
   {id:"apg8",label:"Average 8+ APG",test:()=>S.player.stats.apg>=8,reward:"35 XP"},
