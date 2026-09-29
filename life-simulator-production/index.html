@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.17.0</title>
+<title>MYCAREER Basketball Sim v0.18.0</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -608,7 +608,7 @@ body.phoneDraggingNow .bottom{
 @media(max-width:700px){.storyChoiceGrid{grid-template-columns:1fr 1fr}.paceGrid{grid-template-columns:1fr}.paceGrid .btn{min-height:62px}}
 @media(max-width:380px){.storyChoiceGrid{grid-template-columns:1fr}}
 
-/* v0.17.0 mobile text-overlap hardening */
+/* v0.18.0 mobile text-overlap hardening */
 .card,.item,.badge,.row,.list,.grid,.actions,.field,.modal,.phoneShell,.phoneContacts,.phoneThread,
 .garageVehicleCard,.dealerVehicleCard,.connectionCategory,.careerPathCard{min-width:0}
 .card h1,.card h2,.card h3,.card h4,.card p,.card b,.card strong,.card span,.card small,
@@ -670,7 +670,7 @@ input,select{min-width:0;max-width:100%}
 }
 
 
-/* v0.17.0 avatar hairstyle alignment pass
+/* v0.18.0 avatar hairstyle alignment pass
    Head begins at roughly 21%; all scalp bases now meet the same hairline. */
 .avatar .hair{transform:translateX(-50%);transform-origin:50% 0}
 
@@ -722,7 +722,7 @@ input,select{min-width:0;max-width:100%}
 .avatar.sm .hair.long i{box-shadow:none}
 
 
-/* v0.17.0 avatar hair geometry rebuild */
+/* v0.18.0 avatar hair geometry rebuild */
 .avatar .hair{left:50%;transform:translateX(-50%);transform-origin:50% 0}
 
 /* SHORT HAIR — scalp-following silhouette */
@@ -855,7 +855,7 @@ input,select{min-width:0;max-width:100%}
 .avatar .hair.long .s5{margin-right:-3%}
 
 
-/* v0.17.0 hairstyle refinement pass */
+/* v0.18.0 hairstyle refinement pass */
 .avatar .hair.fade{
  top:20.1%!important;width:47.8%!important;height:8.4%!important;
  border-radius:58% 58% 18% 18%/90% 90% 18% 18%!important;
@@ -904,7 +904,7 @@ input,select{min-width:0;max-width:100%}
 .avatar .hair.long .s3,.avatar .hair.long .s5{margin:0!important}
 
 
-/* v0.17.0 natural short-hair fit */
+/* v0.18.0 natural short-hair fit */
 .avatar .hair.fade{
   top:18.2%!important;
   width:49.2%!important;
@@ -1731,7 +1731,7 @@ const CAREER_PATHS=[
 ];
 
 
-const fresh=()=>({version:"0.17.0",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[],nbaSeasons:[]},training:{used:0,max:3,recovered:false,recoveryUsed:0,recoveryMax:1},connections:{owned:[],activeAgent:null,activeDesigner:null},careerPaths:{xp:{superstar:0,franchise:0,dynasty:0,media:0,business:0,veteran:0},franchiseTeamId:null,lastTeamId:null},finance:{cash:1000,bank:0,earnings:0,owned:[],realEstate:[],sponsor:null,sponsors:[],contract:null},civic:{donated:0,keys:0,milestones:[],purchases:[],history:[]},social:{followers:100,fame:0,posted:false,posts:0},homeSpace:{designer:"classic",ownedDesigners:["classic"],actionsUsed:0,history:[],tier:"family"},relationships:{partner:null,status:"Single",chemistry:0,trust:0,happiness:0,attention:0,actionsThisCycle:0,lastActionGame:0,pendingEvent:null,history:[],exclusive:false},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},superstar:{staff:[],businesses:[],classics:[],pregame:{choice:null,game:0},form:{label:"Steady",score:0},era:{year:1,label:"Modern Balance",note:"The league is balanced between shooting, athleticism and size."},legacy:{retiredJersey:false,signatureMoments:[]}},polish:{timeline:[],milestones:[],favorites:["games","stats","phone","life"],seasonAdvanced:{gp:0,stl:0,blk:0,tov:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,doubleDoubles:0,tripleDoubles:0},careerAdvanced:{gp:0,stl:0,blk:0,tov:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,doubleDoubles:0,tripleDoubles:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],recordBook:{seasons:seedRecordBook()},championshipCelebration:null,playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null,lineups:{}},fullGame:null,postgameMedia:null,mediaProfile:{interviews:0,rivalryHeat:0},nbaWorld:{rivalries:{},relationships:{},captain:false,mentorUsedYear:0,lockerEvent:null,allStarSelections:0,allStar:{year:0,selected:false,pending:false,breakActive:false,completed:false,events:{},captains:[],teams:[],pool:[]},records:{careerHighPts:0,careerHighAst:0,careerHighReb:0,games50:0,games60:0,tripleDoubles:0,franchiseTotals:{},playoff:{games:0,wins:0,pts:0,ast:0,reb:0,clutchWins:0,finalsGames:0,titles:0}},cup:{year:0,w:0,l:0,qualified:false,champion:false},loadManagement:{rests:0,missedInjury:0,abuseScore:0,broadcastRests:0,warnings:0,totalFines:0,lastFine:0,highestFineTier:0,cleanGames:0},promises:[],negotiatedYear:0,signatureShoe:null,retirement:{eligible:false,retired:false,hof:false,postCareer:null},formerTeams:[],leagueEvents:[],usedProspectNames:[],scouting:{year:0,points:6,scouted:{}},leagueTransactions:[],socialFeed:[],phone:{threads:{},active:null},leagueCareerProcessedYear:0,leagueFAProcessedYear:0,teamJerseys:{}},news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,attributeUpgrades:{earned:0,available:0,spent:{}},capBreakers:{earned:0,available:0,spent:{}},badgeBreakers:{earned:0,available:0,spent:{}},energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
+const fresh=()=>({version:"0.18.0",created:false,screen:"home",stage:"High School",year:1,game:1,record:{w:0,l:0},college:null,offers:[],games:[],careerHistory:{highSchool:null,collegeSeasons:[],nbaSeasons:[]},training:{used:0,max:3,recovered:false,recoveryUsed:0,recoveryMax:1},connections:{owned:[],activeAgent:null,activeDesigner:null},careerPaths:{xp:{superstar:0,franchise:0,dynasty:0,media:0,business:0,veteran:0},franchiseTeamId:null,lastTeamId:null},finance:{cash:1000,bank:0,earnings:0,owned:[],realEstate:[],sponsor:null,sponsors:[],contract:null},civic:{donated:0,keys:0,milestones:[],purchases:[],history:[]},social:{followers:100,fame:0,posted:false,posts:0},homeSpace:{designer:"classic",ownedDesigners:["classic"],actionsUsed:0,history:[],tier:"family"},relationships:{partner:null,status:"Single",chemistry:0,trust:0,happiness:0,attention:0,actionsThisCycle:0,lastActionGame:0,pendingEvent:null,history:[],exclusive:false},team:null,draftProcess:{declared:false,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null},careerStats:{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}},superstar:{staff:[],businesses:[],classics:[],pregame:{choice:null,game:0},form:{label:"Steady",score:0},era:{year:1,label:"Modern Balance",note:"The league is balanced between shooting, athleticism and size."},legacy:{retiredJersey:false,signatureMoments:[]}},polish:{timeline:[],milestones:[],favorites:["games","stats","phone","life"],seasonAdvanced:{gp:0,stl:0,blk:0,tov:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,doubleDoubles:0,tripleDoubles:0},careerAdvanced:{gp:0,stl:0,blk:0,tov:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,doubleDoubles:0,tripleDoubles:0}},saveMeta:{lastSaved:null,manualSaves:0},leagueStandings:null,leagueRosters:null,leagueNews:[],playoffBracket:null,seasonAwards:null,accolades:[],recordBook:{seasons:seedRecordBook()},championshipCelebration:null,playoffs:{active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false},offseason:{active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false},coach:{talks:0,lastRequestGame:0,tradeRequested:false,targetPlayer:null,lineups:{}},fullGame:null,postgameMedia:null,mediaProfile:{interviews:0,rivalryHeat:0},nbaWorld:{rivalries:{},relationships:{},captain:false,mentorUsedYear:0,lockerEvent:null,allStarSelections:0,allStar:{year:0,selected:false,pending:false,breakActive:false,completed:false,events:{},captains:[],teams:[],pool:[]},records:{careerHighPts:0,careerHighAst:0,careerHighReb:0,games50:0,games60:0,tripleDoubles:0,franchiseTotals:{},playoff:{games:0,wins:0,pts:0,ast:0,reb:0,clutchWins:0,finalsGames:0,titles:0}},cup:{year:0,w:0,l:0,qualified:false,champion:false},loadManagement:{rests:0,missedInjury:0,abuseScore:0,broadcastRests:0,warnings:0,totalFines:0,lastFine:0,highestFineTier:0,cleanGames:0},promises:[],negotiatedYear:0,signatureShoe:null,retirement:{eligible:false,retired:false,hof:false,postCareer:null},formerTeams:[],leagueEvents:[],usedProspectNames:[],scouting:{year:0,points:6,scouted:{}},leagueTransactions:[],socialFeed:[],phone:{threads:{},active:null},leagueCareerProcessedYear:0,leagueFAProcessedYear:0,teamJerseys:{}},news:["Create your player and begin your senior season."],player:{name:"Rookie",number:0,age:17,position:"PG",height:"6'3\"",weight:185,hand:"Right",archetype:"Two-Way Creator",level:1,xp:0,attributeUpgrades:{earned:0,available:0,spent:{}},capBreakers:{earned:0,available:0,spent:{}},badgeBreakers:{earned:0,available:0,spent:{}},energy:100,morale:75,trust:50,chemistry:60,role:"Rotation",minutes:22,injury:null,fans:120,draft:35,appearance:{skin:"medium",hairStyle:"fade",hairColor:"black",eyeColor:"brown",facialHair:"none",accessory:"none",headband:"none"},attrs:{Finishing:61,Shooting:59,Playmaking:64,Defense:60,Athleticism:63,IQ:58},stats:{gp:0,ppg:0,apg:0,rpg:0}}});
 function merge(a,b){for(const k in b){if(a[k]===undefined)a[k]=b[k];else if(a[k]&&b[k]&&typeof a[k]==="object"&&!Array.isArray(a[k])&&!Array.isArray(b[k]))merge(a[k],b[k])}return a}
 const SAVE_SLOT_COUNT=3;
 let activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+(localStorage.getItem("mycareer-active-slot")||1)));
@@ -1739,15 +1739,34 @@ let pendingNewSlot=activeSlot;
 function slotKey(slot){return "mycareer-v03-slot"+slot}
 function slotBackupKey(slot){return slotKey(slot)+"-backup"}
 function parseSave(raw){if(!raw)return null;try{const d=JSON.parse(raw);return d&&typeof d==="object"?d:null}catch(e){return null}}
+function validateCareerSave(data){
+ if(!data||typeof data!=="object")throw new Error("Invalid career data");
+ const d=merge(data,fresh()),clamp=(v,min,max,fallback=min)=>{v=Number(v);return Number.isFinite(v)?Math.max(min,Math.min(max,v)):fallback};
+ const stages=["High School","College","Draft Combine","NBA","Offseason","Retired"];if(!stages.includes(d.stage))d.stage="High School";
+ d.version="0.18.0";d.year=Math.round(clamp(d.year,1,40,1));d.game=Math.round(clamp(d.game,1,200,1));
+ d.player=d.player||fresh().player;d.player.level=Math.round(clamp(d.player.level,1,500,1));d.player.xp=clamp(d.player.xp,0,10000000,0);
+ d.player.energy=clamp(d.player.energy,0,100,100);d.player.morale=clamp(d.player.morale,0,100,75);d.player.trust=clamp(d.player.trust,0,100,50);d.player.chemistry=clamp(d.player.chemistry,0,100,60);d.player.draft=clamp(d.player.draft,0,99,35);
+ const core=["Finishing","Shooting","Playmaking","Defense","Athleticism","IQ"];d.player.attrs=d.player.attrs||{};
+ core.forEach(k=>d.player.attrs[k]=clamp(d.player.attrs[k],25,110,60));
+ if(d.player.expandedAttrs&&typeof d.player.expandedAttrs==="object")Object.keys(d.player.expandedAttrs).forEach(k=>d.player.expandedAttrs[k]=clamp(d.player.expandedAttrs[k],25,110,60));
+ d.careerStats=d.careerStats||fresh().careerStats;const careerGames=["highSchool","college","nba"].reduce((s,k)=>s+Math.max(0,Math.round(Number(d.careerStats?.[k]?.gp)||0)),0);
+ d.player.attributeUpgrades=d.player.attributeUpgrades||{earned:0,available:0,spent:{}};const au=d.player.attributeUpgrades;
+ au.earned=Math.round(clamp(au.earned,0,careerGames*3,0));au.available=Math.round(clamp(au.available,0,au.earned,0));if(!au.spent||typeof au.spent!=="object")au.spent={};
+ Object.keys(au.spent).forEach(k=>au.spent[k]=Math.round(clamp(au.spent[k],0,au.earned,0)));
+ d.finance=d.finance||fresh().finance;["cash","bank","earnings"].forEach(k=>d.finance[k]=clamp(d.finance[k],0,1000000000000,k==="cash"?1000:0));
+ d.social=d.social||fresh().social;d.social.followers=clamp(d.social.followers,0,10000000000,100);d.social.fame=clamp(d.social.fame,0,100,0);
+ if(d.record){d.record.w=Math.round(clamp(d.record.w,0,200,0));d.record.l=Math.round(clamp(d.record.l,0,200,0))}
+ return d
+}
 function writeSlot(slot,data){const key=slotKey(slot),payload=JSON.stringify(data),current=localStorage.getItem(key);if(current&&current!==payload)localStorage.setItem(slotBackupKey(slot),current);localStorage.setItem(key,payload);if(slot===1)localStorage.setItem("mycareer-v03",payload)}
 function recoverSlot(slot){const primary=parseSave(localStorage.getItem(slotKey(slot)));if(primary&&primary.created)return primary;const backup=parseSave(localStorage.getItem(slotBackupKey(slot)));if(backup&&backup.created){localStorage.setItem(slotKey(slot),JSON.stringify(backup));return backup}return primary}
 function migrateLegacySave(){if(recoverSlot(1)?.created)return;const old=localStorage.getItem("mycareer-v03");if(!old)return;const data=parseSave(old);if(data&&data.created){writeSlot(1,data);localStorage.setItem("mycareer-active-slot","1")}}
 migrateLegacySave();
-function loadSlot(slot){const d=recoverSlot(slot);return d?merge(d,fresh()):fresh()}
+function loadSlot(slot){const d=recoverSlot(slot);if(!d)return fresh();try{return validateCareerSave(d)}catch(e){console.warn("Save validation recovery",e);return merge(d,fresh())}}
 function load(){return loadSlot(activeSlot)}
 function slotData(slot){const d=recoverSlot(slot);return d&&d.created?d:null}
 function exportSaves(){const pack={type:"mycareer-save-pack",version:1,exportedAt:new Date().toISOString(),activeSlot,slots:{}};for(let i=1;i<=SAVE_SLOT_COUNT;i++){const d=slotData(i);if(d)pack.slots[i]=d}const blob=new Blob([JSON.stringify(pack)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="MyHallOfFame-saves-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("Save backup exported")}
-function importSavesFile(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const pack=JSON.parse(String(reader.result||""));if(!pack||pack.type!=="mycareer-save-pack"||!pack.slots)throw new Error("Invalid save file");let count=0;for(let i=1;i<=SAVE_SLOT_COUNT;i++){const d=pack.slots[i]||pack.slots[String(i)];if(d&&d.created){writeSlot(i,d);count++}}if(!count)throw new Error("No careers found");activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+pack.activeSlot||1));localStorage.setItem("mycareer-active-slot",String(activeSlot));S=loadSlot(activeSlot);frontMode="main";closeModal();render();toast(count+" career save"+(count===1?"":"s")+" imported")}catch(e){toast("Import failed — choose a valid MyHallOfFame save file")}};reader.readAsText(file)}
+function importSavesFile(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const pack=JSON.parse(String(reader.result||""));if(!pack||pack.type!=="mycareer-save-pack"||!pack.slots)throw new Error("Invalid save file");let count=0;for(let i=1;i<=SAVE_SLOT_COUNT;i++){const d=pack.slots[i]||pack.slots[String(i)];if(d&&d.created){const clean=validateCareerSave(d);writeSlot(i,clean);count++}}if(!count)throw new Error("No careers found");activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+pack.activeSlot||1));localStorage.setItem("mycareer-active-slot",String(activeSlot));S=loadSlot(activeSlot);frontMode="main";closeModal();render();toast(count+" career save"+(count===1?"":"s")+" imported")}catch(e){toast("Import failed — choose a valid MyHallOfFame save file")}};reader.readAsText(file)}
 function selectSlot(slot){activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+slot||1));localStorage.setItem("mycareer-active-slot",String(activeSlot));S=loadSlot(activeSlot);frontMode="career";render();if(S.created)toast("Loaded Slot "+activeSlot)}
 function newCareerInSlot(slot){activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+slot||1));pendingNewSlot=activeSlot;localStorage.setItem("mycareer-active-slot",String(activeSlot));createModal()}
 function newestCareerSlot(){
@@ -1765,15 +1784,80 @@ function confirmReplaceCareer(slot){
  $("replaceCancel").onclick=closeModal;$("replaceConfirm").onclick=()=>{closeModal();newCareerInSlot(slot)}
 }
 function returnToMainMenu(){if(S&&S.created){if(S.championshipCelebration)S.championshipCelebration.shown=false;save()}closeModal();frontMode="main";S=fresh();S.created=false;render();scrollTo({top:0})}
-function slotOvr(d){if(!d||!d.player||!d.player.attrs)return 0;const vals=Object.values(d.player.attrs);return Math.round(vals.reduce((a,b)=>a+b,0)/Math.max(1,vals.length))}
+function slotOvr(d){if(!d||!d.player||!d.player.attrs)return 0;return typeof playerOverall==="function"?playerOverall(d.player):Math.round(Object.values(d.player.attrs).reduce((a,b)=>a+b,0)/6)}
 function slotTeamLabel(d){if(!d)return "";if((d.stage==="NBA"||d.stage==="Offseason"||d.stage==="Retired")&&d.team){const t=NBA_TEAMS.find(x=>x.id===d.team);if(t)return t.city+" "+t.name}if(d.stage==="College"&&d.college)return d.college;return d.stage||"Career"}
 function slotSavedLabel(d){if(!d||!d.saveMeta||!d.saveMeta.lastSaved)return "Autosaved";const dt=new Date(d.saveMeta.lastSaved);return Number.isNaN(dt.getTime())?"Autosaved":dt.toLocaleString()}
 let S=load(),chosen="Two-Way Creator";
 let frontMode="main";
 let menuSettings={reducedMotion:localStorage.getItem("mycareer-menu-reduced-motion")==="1"};
 const $=id=>document.getElementById(id);
-function ovr(){return Math.round(Object.values(S.player.attrs).reduce((a,b)=>a+b,0)/6)}
+const EXPANDED_ATTRIBUTE_GROUPS={
+ "Finishing":["Close Shot","Driving Layup","Driving Dunk","Standing Dunk","Post Control"],
+ "Shooting":["Mid-Range","Three-Point","Free Throw"],
+ "Playmaking":["Pass Accuracy","Ball Handle","Speed With Ball"],
+ "Defense":["Interior Defense","Perimeter Defense","Steal","Block"],
+ "Rebounding":["Offensive Rebound","Defensive Rebound"],
+ "Physicals":["Speed","Acceleration","Strength","Vertical","Stamina"],
+ "Mental":["Basketball IQ","Clutch","Consistency"]
+};
+const CORE_TO_EXPANDED={
+ Finishing:EXPANDED_ATTRIBUTE_GROUPS.Finishing,Shooting:EXPANDED_ATTRIBUTE_GROUPS.Shooting,Playmaking:EXPANDED_ATTRIBUTE_GROUPS.Playmaking,
+ Defense:EXPANDED_ATTRIBUTE_GROUPS.Defense,Athleticism:EXPANDED_ATTRIBUTE_GROUPS.Physicals,IQ:EXPANDED_ATTRIBUTE_GROUPS.Mental
+};
+const POSITION_GROUP_WEIGHTS={
+ PG:{Finishing:.11,Shooting:.20,Playmaking:.26,Defense:.12,Rebounding:.03,Physicals:.13,Mental:.15},
+ SG:{Finishing:.15,Shooting:.24,Playmaking:.17,Defense:.14,Rebounding:.05,Physicals:.13,Mental:.12},
+ SF:{Finishing:.16,Shooting:.18,Playmaking:.12,Defense:.17,Rebounding:.10,Physicals:.15,Mental:.12},
+ PF:{Finishing:.18,Shooting:.12,Playmaking:.08,Defense:.20,Rebounding:.17,Physicals:.16,Mental:.09},
+ C:{Finishing:.20,Shooting:.07,Playmaking:.05,Defense:.22,Rebounding:.22,Physicals:.16,Mental:.08}
+};
+const EXPANDED_ATTR_KEYS=Object.values(EXPANDED_ATTRIBUTE_GROUPS).flat();
 const NATURAL_ATTR_CAP=99,CAP_BREAKER_ATTR_CAP=110;
+function attrClamp(v,min=25,max=CAP_BREAKER_ATTR_CAP){v=Number(v);return Number.isFinite(v)?Math.max(min,Math.min(max,Math.round(v))):min}
+function ensureExpandedAttributes(p=S.player){
+ if(!p)return {};
+ if(!p.expandedAttrs||typeof p.expandedAttrs!=="object"){
+   const a=p.attrs||{},f=attrClamp(a.Finishing||60),s=attrClamp(a.Shooting||60),pm=attrClamp(a.Playmaking||60),d=attrClamp(a.Defense||60),ath=attrClamp(a.Athleticism||60),iq=attrClamp(a.IQ||60);
+   p.expandedAttrs={
+    "Close Shot":attrClamp(f-2),"Driving Layup":attrClamp(f+1),"Driving Dunk":attrClamp(f),"Standing Dunk":attrClamp(f-6),"Post Control":attrClamp(f-4),
+    "Mid-Range":attrClamp(s+1),"Three-Point":attrClamp(s),"Free Throw":attrClamp(s-2),
+    "Pass Accuracy":attrClamp(pm+1),"Ball Handle":attrClamp(pm+1),"Speed With Ball":attrClamp(pm-1),
+    "Interior Defense":attrClamp(d-3),"Perimeter Defense":attrClamp(d+2),"Steal":attrClamp(d),"Block":attrClamp(d-2),
+    "Offensive Rebound":attrClamp((d+ath)/2-8),"Defensive Rebound":attrClamp((d+ath)/2-4),
+    "Speed":attrClamp(ath),"Acceleration":attrClamp(ath+1),"Strength":attrClamp(ath-2),"Vertical":attrClamp(ath),"Stamina":attrClamp(ath+2),
+    "Basketball IQ":attrClamp(iq),"Clutch":attrClamp(iq-1),"Consistency":attrClamp(iq)
+   };
+   syncCoreAttrsFromExpanded(p)
+ }else EXPANDED_ATTR_KEYS.forEach(k=>p.expandedAttrs[k]=attrClamp(p.expandedAttrs[k]??60));
+ return p.expandedAttrs
+}
+function expandedAttr(name,p=S.player){const e=ensureExpandedAttributes(p);return attrClamp(e[name]??60)}
+function avgExpanded(keys,p=S.player){const e=ensureExpandedAttributes(p);return Math.round(keys.reduce((sum,k)=>sum+(e[k]||60),0)/Math.max(1,keys.length))}
+function syncCoreAttrsFromExpanded(p=S.player){
+ if(!p||!p.expandedAttrs)return;p.attrs=p.attrs||{};
+ p.attrs.Finishing=avgExpanded(EXPANDED_ATTRIBUTE_GROUPS.Finishing,p);
+ p.attrs.Shooting=avgExpanded(EXPANDED_ATTRIBUTE_GROUPS.Shooting,p);
+ p.attrs.Playmaking=avgExpanded(EXPANDED_ATTRIBUTE_GROUPS.Playmaking,p);
+ p.attrs.Defense=avgExpanded(EXPANDED_ATTRIBUTE_GROUPS.Defense,p);
+ p.attrs.Athleticism=avgExpanded(EXPANDED_ATTRIBUTE_GROUPS.Physicals,p);
+ p.attrs.IQ=avgExpanded(EXPANDED_ATTRIBUTE_GROUPS.Mental,p)
+}
+function expandedGroupRatings(p=S.player){ensureExpandedAttributes(p);const out={};Object.entries(EXPANDED_ATTRIBUTE_GROUPS).forEach(([g,keys])=>out[g]=avgExpanded(keys,p));return out}
+function playerOverall(p=S.player){
+ if(!p)return 0;const r=expandedGroupRatings(p),w=POSITION_GROUP_WEIGHTS[p.position]||POSITION_GROUP_WEIGHTS.SF;
+ return Math.round(Object.keys(w).reduce((sum,k)=>sum+r[k]*w[k],0))
+}
+function ovr(){return playerOverall(S.player)}
+function quickSimDevelopmentProfile(p=S.player){
+ const e=ensureExpandedAttributes(p);
+ return {
+  scoring:e["Three-Point"]*.23+e["Mid-Range"]*.17+e["Driving Layup"]*.17+e["Driving Dunk"]*.13+e["Ball Handle"]*.10+e["Clutch"]*.08+e["Consistency"]*.12,
+  passing:e["Pass Accuracy"]*.48+e["Ball Handle"]*.20+e["Basketball IQ"]*.22+e["Consistency"]*.10,
+  rebounding:e["Defensive Rebound"]*.48+e["Offensive Rebound"]*.24+e["Vertical"]*.16+e["Strength"]*.12,
+  defense:e["Perimeter Defense"]*.30+e["Interior Defense"]*.22+e["Steal"]*.20+e["Block"]*.16+e["Basketball IQ"]*.12,
+  athletic:e["Speed"]*.24+e["Acceleration"]*.22+e["Strength"]*.17+e["Vertical"]*.17+e["Stamina"]*.20
+ }
+}
 function capBreakerSpentTotal(cb){
  return Object.values((cb&&cb.spent)||{}).reduce((sum,v)=>sum+(typeof v==="number"&&v>0?v:0),0)
 }
@@ -1812,9 +1896,11 @@ function awardChampionshipCapBreaker(seasonKey){
  return cb
 }
 function naturalAttributeGain(attr,amount=1){
- const cur=S.player.attrs[attr];if(typeof cur!=="number")return 0;
- if(cur>=NATURAL_ATTR_CAP)return 0;
- const next=Math.min(NATURAL_ATTR_CAP,cur+amount),gain=next-cur;S.player.attrs[attr]=next;return gain
+ amount=Math.max(0,Math.round(amount||0));if(!amount)return 0;
+ const e=ensureExpandedAttributes(),targets=CORE_TO_EXPANDED[attr]||(EXPANDED_ATTR_KEYS.includes(attr)?[attr]:[]);
+ if(!targets.length)return 0;let gain=0;
+ targets.forEach(k=>{const cur=e[k];if(cur>=NATURAL_ATTR_CAP)return;const next=Math.min(NATURAL_ATTR_CAP,cur+amount);gain+=next-cur;e[k]=next});
+ syncCoreAttrsFromExpanded();return Math.round(gain/Math.max(1,targets.length))
 }
 function ensureAttributeUpgradeState(){
  const p=S.player;
@@ -1823,7 +1909,7 @@ function ensureAttributeUpgradeState(){
  if(typeof a.earned!=="number")a.earned=0;
  if(typeof a.available!=="number")a.available=0;
  if(!a.spent||typeof a.spent!=="object")a.spent={};
- Object.keys(p.attrs||{}).forEach(k=>{if(typeof a.spent[k]!=="number")a.spent[k]=0});
+ ensureExpandedAttributes(p);EXPANDED_ATTR_KEYS.forEach(k=>{if(typeof a.spent[k]!=="number")a.spent[k]=0});
  return a
 }
 function awardGameAttributePoints(g){
@@ -1834,22 +1920,22 @@ function awardGameAttributePoints(g){
  return 3
 }
 function useAttributePoint(attr){
- const a=ensureAttributeUpgradeState(),valid=Object.prototype.hasOwnProperty.call(S.player.attrs,attr);if(!valid)return;
- const current=S.player.attrs[attr];
+ const a=ensureAttributeUpgradeState(),e=ensureExpandedAttributes(),valid=EXPANDED_ATTR_KEYS.includes(attr);if(!valid)return;
+ const current=e[attr];
  if(a.available<=0){toast("No Attribute Points available");return}
  if(current>=NATURAL_ATTR_CAP){toast(attr+" is at the natural 99 cap — use a Cap Breaker to go higher");return}
- S.player.attrs[attr]=current+1;a.available--;a.spent[attr]=(a.spent[attr]||0)+1;
- S.news.unshift("Attribute upgraded: "+attr+" "+current+" → "+S.player.attrs[attr]+".");
+ e[attr]=current+1;a.available--;a.spent[attr]=(a.spent[attr]||0)+1;syncCoreAttrsFromExpanded();
+ S.news.unshift("Attribute upgraded: "+attr+" "+current+" → "+e[attr]+".");
  save();render();openAttributeUpgradeModal()
 }
 function attributeUpgradeHTML(){
  const a=ensureAttributeUpgradeState();
- return '<section class="card s12"><div class="row"><div><span class="kicker">GAME REWARDS</span><h3 style="margin:5px 0">Attribute Upgrades</h3></div><span class="pill good">'+a.available+' POINT'+(a.available===1?'':'S')+' AVAILABLE</span></div><p class="muted">Every completed game gives +3 Attribute Points. Spend them however you want across Finishing, Shooting, Playmaking, Defense, Athleticism or IQ. Normal upgrades stop at 99; Cap Breakers are still required above 99.</p><div class="row"><span>Lifetime earned</span><strong>'+a.earned+'</strong></div><div class="row"><span>Lifetime spent</span><strong>'+Object.values(a.spent).reduce((s,v)=>s+(Number(v)||0),0)+'</strong></div><button class="btn primary" data-open-attribute-upgrades="1" '+(a.available<=0?'disabled':'')+'>Upgrade Attributes</button></section>'
+ return '<section class="card s12"><div class="row"><div><span class="kicker">GAME REWARDS</span><h3 style="margin:5px 0">Attribute Upgrades</h3></div><span class="pill good">'+a.available+' POINT'+(a.available===1?'':'S')+' AVAILABLE</span></div><p class="muted">Every completed game gives +3 Attribute Points. Spend them across 24 detailed ratings: finishing, shooting, playmaking, defense, rebounding, physicals and mental skills. Normal upgrades stop at 99; Cap Breakers push individual ratings higher.</p><div class="row"><span>Lifetime earned</span><strong>'+a.earned+'</strong></div><div class="row"><span>Lifetime spent</span><strong>'+Object.values(a.spent).reduce((s,v)=>s+(Number(v)||0),0)+'</strong></div><button class="btn primary" data-open-attribute-upgrades="1" '+(a.available<=0?'disabled':'')+'>Upgrade Attributes</button></section>'
 }
 function openAttributeUpgradeModal(){
- const a=ensureAttributeUpgradeState();
- const rows=Object.entries(S.player.attrs).map(([k,v])=>'<div class="item"><div style="min-width:0;flex:1"><b>'+k+'</b><small>'+v+' / '+NATURAL_ATTR_CAP+(v>=NATURAL_ATTR_CAP?' • Natural cap reached':' • '+(a.spent[k]||0)+' points invested')+'</small><div class="bar" style="margin-top:8px"><i style="width:'+Math.min(100,v)+'%"></i></div></div><button class="btn '+(a.available>0&&v<NATURAL_ATTR_CAP?'primary':'')+'" data-attribute-upgrade="'+k+'" '+(a.available<=0||v>=NATURAL_ATTR_CAP?'disabled':'')+'>+1</button></div>').join("");
- modal('<div class="row"><div><span class="kicker">PLAYER DEVELOPMENT</span><h2 style="margin:5px 0">Upgrade Attributes</h2></div><span class="pill good">'+a.available+' POINT'+(a.available===1?'':'S')+'</span></div><p class="muted">Choose exactly where your game-earned Attribute Points go. Each tap spends 1 point permanently.</p><div class="list">'+rows+'</div><div class="modalFoot"><button class="btn" id="attributeUpgradeClose">Done</button></div>');
+ const a=ensureAttributeUpgradeState(),e=ensureExpandedAttributes();
+ const groups=Object.entries(EXPANDED_ATTRIBUTE_GROUPS).map(([group,keys])=>'<div class="card" style="margin-bottom:10px"><div class="row"><b>'+group+'</b><span class="pill">'+avgExpanded(keys)+'</span></div><div class="list">'+keys.map(k=>{const v=e[k];return '<div class="item"><div style="min-width:0;flex:1"><b>'+k+'</b><small>'+v+' / '+NATURAL_ATTR_CAP+(v>=NATURAL_ATTR_CAP?' • Natural cap reached':' • '+(a.spent[k]||0)+' points invested')+'</small><div class="bar" style="margin-top:8px"><i style="width:'+Math.min(100,v)+'%"></i></div></div><button class="btn '+(a.available>0&&v<NATURAL_ATTR_CAP?'primary':'')+'" data-attribute-upgrade="'+k+'" '+(a.available<=0||v>=NATURAL_ATTR_CAP?'disabled':'')+'>+1</button></div>'}).join("")+'</div></div>').join("");
+ modal('<div class="row"><div><span class="kicker">PLAYER DEVELOPMENT</span><h2 style="margin:5px 0">Upgrade 24 Attributes</h2></div><span class="pill good">'+a.available+' POINT'+(a.available===1?'':'S')+'</span></div><p class="muted">Your OVR is position-weighted now. A PG gets more value from creation and shooting; a center gets more value from interior defense and rebounding.</p>'+groups+'<div class="modalFoot"><button class="btn" id="attributeUpgradeClose">Done</button></div>');
  document.querySelectorAll("[data-attribute-upgrade]").forEach(b=>b.onclick=()=>useAttributePoint(b.dataset.attributeUpgrade));
  if($("attributeUpgradeClose"))$("attributeUpgradeClose").onclick=()=>{closeModal();render()}
 }
@@ -1863,19 +1949,19 @@ function processPlayerLevelUps(){
  return {levels,attributePoints:0,capBreakers:S.player.capBreakers.available-before}
 }
 function useCapBreaker(attr){
- const cb=ensureCapBreakerState(),valid=Object.prototype.hasOwnProperty.call(S.player.attrs,attr);if(!valid)return;
- const current=S.player.attrs[attr];
+ const cb=ensureCapBreakerState(),e=ensureExpandedAttributes(),valid=EXPANDED_ATTR_KEYS.includes(attr);if(!valid)return;
+ const current=e[attr];
  if(cb.available<=0){toast("No Cap Breakers available");return}
  if(current<NATURAL_ATTR_CAP){toast(attr+" must reach 99 before using a Cap Breaker");return}
  if(current>=CAP_BREAKER_ATTR_CAP){toast(attr+" already reached the 110 Cap Breaker ceiling");return}
- cb.spent[attr]=(cb.spent[attr]||0)+1;cb.available--;S.player.attrs[attr]=current+1;
- S.news.unshift("Cap Breaker used on "+attr+" • "+current+" → "+S.player.attrs[attr]+".");
- save();render();toast(attr+" is now "+S.player.attrs[attr])
+ cb.spent[attr]=(cb.spent[attr]||0)+1;cb.available--;e[attr]=current+1;syncCoreAttrsFromExpanded();
+ S.news.unshift("Cap Breaker used on "+attr+" • "+current+" → "+e[attr]+".");
+ save();render();toast(attr+" is now "+e[attr])
 }
 function capBreakerHTML(){
- const cb=ensureCapBreakerState(),next=(Math.floor((S.player.level||1)/10)+1)*10;
- const attrs=Object.entries(S.player.attrs).map(([k,v])=>'<div class="item"><div><b>'+k+' • '+v+'</b><small>'+(v<NATURAL_ATTR_CAP?'Natural development to 99':v>=CAP_BREAKER_ATTR_CAP?'MAX BREAKER CAP':('Eligible for Cap Breaker • '+(cb.spent[k]||0)+' used'))+'</small></div><button class="btn '+(v>=NATURAL_ATTR_CAP&&v<CAP_BREAKER_ATTR_CAP&&cb.available>0?'primary':'')+'" data-cap-breaker="'+k+'" '+(v<NATURAL_ATTR_CAP||v>=CAP_BREAKER_ATTR_CAP||cb.available<=0?'disabled':'')+'>+1</button></div>').join("");
- return '<section class="card s12"><div class="row"><div><span class="kicker">LEVEL + CHAMPIONSHIP REWARDS</span><h3 style="margin:5px 0">Cap Breakers</h3></div><span class="pill good">'+cb.available+' AVAILABLE</span></div><p class="muted">Earn 1 Cap Breaker every 10 levels and 1 more for every NBA championship. Normal development stops at 99; Cap Breakers can push an attribute beyond 99 up to 110.</p><div class="row"><span>Lifetime earned</span><strong>'+cb.earned+'</strong></div><div class="row"><span>From levels</span><strong>'+cb.levelEarned+'</strong></div><div class="row"><span>From championships</span><strong>'+cb.championshipEarned+'</strong></div><div class="row"><span>Already spent</span><strong>'+Object.values(cb.spent||{}).reduce((sum,v)=>sum+(typeof v==="number"?v:0),0)+'</strong></div><div class="row"><span>Next level Cap Breaker</span><strong>Level '+next+'</strong></div><div class="list" style="margin-top:10px">'+attrs+'</div></section>'
+ const cb=ensureCapBreakerState(),next=(Math.floor((S.player.level||1)/10)+1)*10,e=ensureExpandedAttributes();
+ const attrs=Object.entries(EXPANDED_ATTRIBUTE_GROUPS).map(([group,keys])=>'<div class="card" style="margin-bottom:10px"><div class="row"><b>'+group+'</b><span class="pill">'+avgExpanded(keys)+'</span></div><div class="list">'+keys.map(k=>{const v=e[k];return '<div class="item"><div><b>'+k+' • '+v+'</b><small>'+(v<NATURAL_ATTR_CAP?'Natural development to 99':v>=CAP_BREAKER_ATTR_CAP?'MAX BREAKER CAP':('Eligible for Cap Breaker • '+(cb.spent[k]||0)+' used'))+'</small></div><button class="btn '+(v>=NATURAL_ATTR_CAP&&v<CAP_BREAKER_ATTR_CAP&&cb.available>0?'primary':'')+'" data-cap-breaker="'+k+'" '+(v<NATURAL_ATTR_CAP||v>=CAP_BREAKER_ATTR_CAP||cb.available<=0?'disabled':'')+'>+1</button></div>'}).join("")+'</div></div>').join("");
+ return '<section class="card s12"><div class="row"><div><span class="kicker">LEVEL + CHAMPIONSHIP REWARDS</span><h3 style="margin:5px 0">Cap Breakers</h3></div><span class="pill good">'+cb.available+' AVAILABLE</span></div><p class="muted">Earn 1 Cap Breaker every 10 levels and 1 more for every NBA championship. Detailed ratings cap naturally at 99 and can be pushed to 110 individually.</p><div class="row"><span>Lifetime earned</span><strong>'+cb.earned+'</strong></div><div class="row"><span>From levels</span><strong>'+cb.levelEarned+'</strong></div><div class="row"><span>From championships</span><strong>'+cb.championshipEarned+'</strong></div><div class="row"><span>Already spent</span><strong>'+Object.values(cb.spent||{}).reduce((sum,v)=>sum+(typeof v==="number"?v:0),0)+'</strong></div><div class="row"><span>Next level Cap Breaker</span><strong>Level '+next+'</strong></div><div style="margin-top:10px">'+attrs+'</div></section>'
 }
 function ensureBadgeBreakerState(){
  const p=S.player;
@@ -2176,7 +2262,7 @@ function menuHelpModal(){
 const PREVIEW_ORIGIN="https://life-simulator-git-mycareer-sim-preview-nada-f420.vercel.app";
 function previewTransferPack(){const pack={type:"mycareer-preview-transfer",version:1,activeSlot,slots:{}};for(let i=1;i<=SAVE_SLOT_COUNT;i++){const d=slotData(i);if(d)pack.slots[i]=d}return pack}
 function recoverPreviewCareer(){const w=window.open(PREVIEW_ORIGIN+"/#transfer_to_main=1","mycareerPreviewTransfer");if(!w){toast("Allow the preview window, then tap Recover Preview Career again");return}toast("Opening preview save…")}
-function acceptPreviewTransfer(pack){if(!pack||pack.type!=="mycareer-preview-transfer"||!pack.slots)return;let count=0;for(let i=1;i<=SAVE_SLOT_COUNT;i++){const d=pack.slots[i]||pack.slots[String(i)];if(d&&d.created){writeSlot(i,d);count++}}if(!count){toast("No preview career was found on this device");return}activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+pack.activeSlot||1));localStorage.setItem("mycareer-active-slot",String(activeSlot));S=loadSlot(activeSlot);frontMode="main";render();toast(count+" preview career save"+(count===1?"":"s")+" recovered")}
+function acceptPreviewTransfer(pack){if(!pack||pack.type!=="mycareer-preview-transfer"||!pack.slots)return;let count=0;for(let i=1;i<=SAVE_SLOT_COUNT;i++){const d=pack.slots[i]||pack.slots[String(i)];if(d&&d.created){writeSlot(i,validateCareerSave(d));count++}}if(!count){toast("No preview career was found on this device");return}activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+pack.activeSlot||1));localStorage.setItem("mycareer-active-slot",String(activeSlot));S=loadSlot(activeSlot);frontMode="main";render();toast(count+" preview career save"+(count===1?"":"s")+" recovered")}
 window.addEventListener("message",e=>{if(e.origin!==PREVIEW_ORIGIN)return;acceptPreviewTransfer(e.data)});
 function maybeSendPreviewTransfer(){if(location.origin!==PREVIEW_ORIGIN)return;const q=new URLSearchParams(location.hash.replace(/^#/,""));if(q.get("transfer_to_main")!=="1"||!window.opener)return;setTimeout(()=>{window.opener.postMessage(previewTransferPack(),"*");setTimeout(()=>window.close(),450)},250)}
 function bindMainMenu(){
