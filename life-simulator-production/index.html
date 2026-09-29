@@ -2494,7 +2494,8 @@ function rebuildCurrentRegularSeasonStats(){
  return r
 }
 function ensureRegularSeasonStats(){
- if(!S.regularSeasonStats||typeof S.regularSeasonStats!=="object"||S.regularSeasonStats.year!==(S.year||1)){
+ const expectedGames=Math.max(0,Math.min(82,(S.record?.w||0)+(S.record?.l||0)));
+ if(!S.regularSeasonStats||typeof S.regularSeasonStats!=="object"||S.regularSeasonStats.year!==(S.year||1)||((S.stage==="NBA"||S.stage==="Offseason")&&expectedGames>0&&!(Number(S.regularSeasonStats.gp)>0))){
    S.regularSeasonStats=(S.stage==="NBA"||S.stage==="Offseason")?rebuildCurrentRegularSeasonStats():emptyRegularSeasonStats(S.year||1)
  }
  const r=S.regularSeasonStats;["gp","pts","ast","reb","stl","blk","tov","fgm","fga","tpm","tpa","ftm","fta"].forEach(k=>{if(!Number.isFinite(+r[k]))r[k]=0});
