@@ -1823,7 +1823,7 @@ function newestCareerSlot(){
  saves.sort((a,b)=>{const ad=Date.parse(a.data?.saveMeta?.lastSaved||0)||0,bd=Date.parse(b.data?.saveMeta?.lastSaved||0)||0;return bd-ad});
  return saves[0].i
 }
-function continueCareer(){const slot=newestCareerSlot();if(!slot){frontMode="select";render();toast("Create your first career");return}selectSlot(slot)}
+function continueCareer(){const slot=newestCareerSlot();if(!slot){frontMode="select";render();toast("Create your first career");return}stopMenuMusic();selectSlot(slot)}
 function openCareerSelect(){frontMode="select";S=fresh();S.created=false;render();scrollTo({top:0})}
 function openNewCareerSelect(){frontMode="new";S=fresh();S.created=false;render();scrollTo({top:0})}
 function confirmReplaceCareer(slot){
@@ -2911,7 +2911,8 @@ function resumePendingCareerOverlay(){
  requestAnimationFrame(()=>{
    if(frontMode!=="career")return;
    if(S.championshipCelebration){S.championshipCelebration.shown=false;showChampionshipCelebration();return}
-   if(S.postgameMedia&&S.postgameMedia.pending&&!S.postgameMedia.defer)openPostgameInterview()
+   if(S.postgameMedia&&S.postgameMedia.pending&&!S.postgameMedia.defer){openPostgameInterview();return}
+   const vx=ensureV019State();if(vx.seasonRecap&&!vx.seasonRecap.shown)showSeasonRecap()
  })
 }
 function showChampionshipCelebration(){const ch=S.championshipCelebration;if(!ch||ch.shown)return;ch.shown=true;save();modal('<div style="text-align:center"><span class="kicker">NBA CHAMPIONS</span><div style="font-size:58px;margin:8px 0">🏆</div><h1 style="margin:4px 0">CHAMPIONSHIP WON</h1><p class="muted">'+ch.season+' NBA Champions</p><div class="item"><div><b>'+ch.team+'</b><small>Defeated '+ch.opponent+' • Finals '+ch.series+'</small></div><span class="pill good">TITLE #'+ch.titleNumber+'</span></div><p class="muted" style="margin-top:14px">This championship is permanently stored in your Record Books.</p><div class="item"><div><b>Cap Breaker Earned</b><small>Every NBA championship permanently adds exactly 1 Cap Breaker to your player progression.</small></div><span class="pill good">+1</span></div><div class="item"><div><b>Badge Breaker Earned</b><small>Upgrade one Legend badge to the championship-exclusive G.O.A.T. tier.</small></div><span class="pill good">+1</span></div><div class="modalFoot"><button class="btn primary" id="champContinue">Continue to Offseason</button></div></div>');$("champContinue").onclick=()=>{closeModal();S.championshipCelebration=null;save();if(S.postgameMedia&&S.postgameMedia.pending)openPostgameInterview();else render()}}
@@ -3326,7 +3327,9 @@ function tradeRumorHTML(){
 function startOffseason(){
  if(S.stage!=="Offseason"){
    applyBankSeasonInterest();processV018SeasonEnd();
-   evaluateSeasonAwards();evaluateComebackSeason();processSeasonPromisesAndIncentives();updateLeaguePlayerCareers();archivePlayerSeason();archiveCompletedSeason();processLeagueFreeAgency();processContractSeasonEnd();S.nbaWorld.comebackEligible=(S.nbaWorld.loadManagement.missedInjury||0)>=3;
+   evaluateSeasonAwards();evaluateComebackSeason();processSeasonPromisesAndIncentives();updateLeaguePlayerCareers();updateArchetypeEvolution(true);archivePlayerSeason();archiveCompletedSeason();
+   const vx=ensureV019State(),recap=buildSeasonRecapSnapshot();vx.seasonRecap=recap;vx.seasonRecaps.push({...recap,shown:true});vx.seasonRecaps=vx.seasonRecaps.slice(-20);
+   processLeagueFreeAgency();processContractSeasonEnd();S.nbaWorld.comebackEligible=(S.nbaWorld.loadManagement.missedInjury||0)>=3;
    if(S.finance.contract&&S.finance.contract.yearsRemaining===0)S.finance.contract.teamId=S.team;
    S.player.age++
  }
@@ -3811,13 +3814,13 @@ function applyAgingCurve(){
  if(S.player.age<31)return;const protectedByStaff=connectionEffect("injuryReduction")+.25*connectionEffect("athleticTraining"),loss=Math.random()<(Math.max(.2,.72-protectedByStaff))?1:0;
  if(loss){naturalAttributeLoss("Athleticism",1);S.news.unshift("Age-related wear reduced Athleticism by 1.")}naturalAttributeGain("IQ",1)
 }
-function retirementScore(){return championshipCount()*80+S.accolades.length*18+(S.careerStats.nba.pts||0)/500+(S.nbaWorld.records.playoff.titles||0)*40}
+function retirementScore(){return legacyScore()}
 function checkRetirementEligibility(){S.nbaWorld.retirement.eligible=S.player.age>=35||S.year>=16}
 function retireCareer(){
  checkRetirementEligibility();if(!S.nbaWorld.retirement.eligible){toast("Retirement is not available yet");return}
- S.nbaWorld.retirement.retired=true;S.nbaWorld.retirement.hof=retirementScore()>=180;S.nbaWorld.retirement.jerseyRetired=careerPathLevel("franchise")>=4||(S.nbaWorld.records.franchiseTotals[S.team]?.pts||0)>=12000;S.nbaWorld.retirement.statue=S.nbaWorld.retirement.jerseyRetired&&championshipCount()>=2&&S.accolades.includes("MVP");if(S.nbaWorld.retirement.jerseyRetired)S.accolades.push("Jersey Retired");if(S.nbaWorld.retirement.statue)S.accolades.push("Franchise Statue");ensureSuperstarState().legacy.retiredJersey=!!S.nbaWorld.retirement.jerseyRetired;addCareerTimeline("Retirement",S.nbaWorld.retirement.hof?"Hall of Fame career completed":"NBA career completed","LEGACY");S.stage="Retired";save();render()
+ S.nbaWorld.retirement.retired=true;S.nbaWorld.retirement.hof=retirementScore()>=500;S.nbaWorld.retirement.jerseyRetired=careerPathLevel("franchise")>=4||(S.nbaWorld.records.franchiseTotals[S.team]?.pts||0)>=12000;S.nbaWorld.retirement.statue=S.nbaWorld.retirement.jerseyRetired&&championshipCount()>=2&&S.accolades.includes("MVP");if(S.nbaWorld.retirement.jerseyRetired)S.accolades.push("Jersey Retired");if(S.nbaWorld.retirement.statue)S.accolades.push("Franchise Statue");ensureSuperstarState().legacy.retiredJersey=!!S.nbaWorld.retirement.jerseyRetired;addCareerTimeline("Retirement",S.nbaWorld.retirement.hof?"Hall of Fame career completed":"NBA career completed","LEGACY");S.stage="Retired";save();render()
 }
-function retirementHTML(){if(S.stage!=="Retired")return "";const r=S.nbaWorld.retirement;return '<div class="grid"><section class="card s12"><span class="kicker">CAREER COMPLETE</span><h1>'+(r.hof?"HALL OF FAME CAREER":"NBA CAREER RETIRED")+'</h1><p class="muted">'+S.player.name+' • '+S.careerStats.nba.gp+' NBA games • '+S.careerStats.nba.pts+' points • '+championshipCount()+' championship(s)</p><div class="actions">'+["Coach","General Manager","Analyst","Business Owner","Player Agent"].map(x=>'<button class="btn '+(r.postCareer===x?'good':'')+'" data-postcareer="'+x+'">'+x+'</button>').join("")+'</div></section>'+legacyRoomHTML()+recordsHTML()+'</div>'}
+function retirementHTML(){if(S.stage!=="Retired")return "";const r=S.nbaWorld.retirement,ls=legacyScore();return '<div class="grid"><section class="basketArt" style="grid-column:1/-1"><div class="hoop"></div><div class="courtLine"></div><span class="kicker">CAREER COMPLETE</span><h1>'+(r.hof?"HALL OF FAME CAREER":"NBA CAREER RETIRED")+'</h1><p class="muted">'+S.player.name+' • Legacy '+ls.toLocaleString()+' • '+legacyTier(ls)+' • '+championshipCount()+' championship(s)</p><div class="actions">'+["Coach","General Manager","Analyst","Business Owner","Player Agent"].map(x=>'<button class="btn '+(r.postCareer===x?'good':'')+'" data-postcareer="'+x+'">'+x+'</button>').join("")+'</div></section>'+legacyRoomHTML()+recordsHTML()+'</div>'}
 function choosePostCareer(x){if(S.stage!=="Retired")return;S.nbaWorld.retirement.postCareer=x;save();render();toast("Post-career path: "+x)}
 const JERSEY_BASE=[
 {id:"home",name:"Home",kind:"Core",unlock:()=>true},
@@ -5566,10 +5569,7 @@ function announceRetirementTour(){
  if(x.retirementTour.announced){toast("Retirement tour already announced");return}
  x.retirementTour={announced:true,year:S.year,games:0};S.news.unshift("RETIREMENT TOUR • "+S.player.name+" announced this will be the final NBA season.");pushLeagueNews(S.player.name+" announced a retirement tour.");save();render()
 }
-function hofScore(){
- const titles=championshipCount(),acc=S.accolades||[],cs=S.careerStats?.nba||{},x=ensureV018State();
- return Math.min(100,Math.round(titles*14+acc.length*4+(cs.pts||0)/1500+(cs.ast||0)/900+(cs.reb||0)/1000+(x.pressure.score||50)/10))
-}
+function hofScore(){return Math.min(100,Math.round(legacyScore()/12))}
 function chemistryMapHTML(){
  if(S.stage!=="NBA")return "";const mates=teammateContactCandidates().slice(0,5);
  return '<section class="card s12"><h3>Team Chemistry Map</h3><div class="list">'+mates.map(p=>{const v=Math.round(teammateRelationshipValue(p.name));return '<div class="item"><div><b>'+p.name+' • '+p.pos+'</b><small>'+relationshipLabel(v)+' • Chemistry '+v+'</small></div><span class="pill '+(v>=70?'good':v<40?'bad':'')+'">'+v+'</span></div>'}).join("")+'</div></section>'
@@ -5902,13 +5902,13 @@ function liveTvPerformanceBonus(g,spot,aud){
  return bonus
 }
 function enrichGameAdvancedStats(g){
- const pts=Math.max(0,g.pts||0),e=ensureExpandedAttributes(),shoot=Math.max(40,(e["Three-Point"]+e["Mid-Range"]+e["Free Throw"])/3),def=Math.max(40,(e["Perimeter Defense"]+e["Interior Defense"]+e["Steal"]+e["Block"])/4);
- if(!Number.isFinite(g.stl))g.stl=Math.max(0,Math.round((def-55)/22+Math.random()*2));
- if(!Number.isFinite(g.blk))g.blk=Math.max(0,Math.round((def-58)/30+Math.random()*1.5));
- if(!Number.isFinite(g.tov))g.tov=Math.max(0,Math.round(1+Math.random()*3-Math.max(0,(S.player.attrs?.IQ||60)-70)/35));
+ const pts=Math.max(0,g.pts||0),e=ensureExpandedAttributes(),shoot=Math.max(40,(e["Three-Point"]+e["Mid-Range"]+e["Free Throw"])/3),def=Math.max(40,(e["Perimeter Defense"]+e["Interior Defense"]+e["Steal"]+e["Block"])/4),tend=playerTendencies();
+ if(!Number.isFinite(g.stl))g.stl=Math.max(0,Math.round((e.Steal-55)/22+(tend.defend-60)/60+Math.random()*2));
+ if(!Number.isFinite(g.blk))g.blk=Math.max(0,Math.round((e.Block-58)/28+(tend.defend-60)/75+Math.random()*1.5));
+ if(!Number.isFinite(g.tov))g.tov=Math.max(0,Math.round(1+Math.random()*3-Math.max(0,(e["Basketball IQ"]||60)-70)/35-Math.max(0,(e["Ball Handle"]||60)-75)/45));
  if(!Number.isFinite(g.fga)){const eff=.42+Math.min(.18,(shoot-55)/250)+Math.random()*.08;g.fga=Math.max(4,Math.round(pts/Math.max(.75,eff*2.2)));g.fgm=Math.min(g.fga,Math.max(1,Math.round(g.fga*eff)))}
- if(!Number.isFinite(g.tpa)){g.tpa=Math.max(0,Math.min(g.fga,Math.round(g.fga*(.28+Math.min(.22,(shoot-55)/220)))));g.tpm=Math.min(g.tpa,Math.max(0,Math.round(g.tpa*(.31+Math.min(.18,(shoot-55)/250)+Math.random()*.07))))}
- if(!Number.isFinite(g.fta)){g.fta=Math.max(0,Math.round((pts-g.fgm*2-g.tpm)/1.4));g.ftm=Math.min(g.fta,Math.max(0,Math.round(g.fta*(.7+Math.min(.2,(shoot-55)/250)))))}
+ if(!Number.isFinite(g.tpa)){g.tpa=Math.max(0,Math.min(g.fga,Math.round(g.fga*tend.threeRate)));g.tpm=Math.min(g.tpa,Math.max(0,Math.round(g.tpa*(.31+Math.min(.18,(e["Three-Point"]-55)/250)+Math.random()*.07))))}
+ if(!Number.isFinite(g.fta)){g.fta=Math.max(0,Math.round(g.fga*tend.freeThrowRate));g.ftm=Math.min(g.fta,Math.max(0,Math.round(g.fta*(.68+Math.min(.24,(e["Free Throw"]-50)/220)))))}
  g.fgm=Math.max(0,Math.min(g.fga||0,g.fgm||0));g.tpm=Math.max(0,Math.min(g.tpa||0,g.tpm||0));g.ftm=Math.max(0,Math.min(g.fta||0,g.ftm||0));
  return g
 }
