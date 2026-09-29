@@ -2911,7 +2911,16 @@ function currentSeasonLeagueLeaders(){
  const pool=leagueLeaderPool(),top=k=>[...pool].sort((x,y)=>(y[k]||0)-(x[k]||0))[0];
  const out={};["ppg","apg","rpg","spg","bpg"].forEach(k=>{const p=top(k);out[k]={name:p?.name||"—",value:+(p?.[k]||0).toFixed(1)}});return out
 }
-function archiveCompletedSeason(){S.recordBook=S.recordBook||{seasons:seedRecordBook()};const label=nbaSeasonLabel();if(S.recordBook.seasons.some(x=>x.season===label))return;ensureLeagueStandings();ensureLeagueRosters();let fi=finalSeriesInfo(),championId=fi&&fi.winner,runnerUpId=fi&&fi.runnerUp,finals=fi&&fi.finals;if(S.playoffs?.champion){championId=S.team;runnerUpId=S.playoffs.lastFinalsOpponentId||runnerUpId;finals=S.playoffs.finalSeries||"4-0"}if(!championId){const top=[...NBA_TEAMS].sort((a,b)=>(S.leagueStandings[b.id]?.w||0)-(S.leagueStandings[a.id]?.w||0));championId=top[0]?.id||"bos";runnerUpId=top[1]?.id||"sf";finals="4-2"}const best=[...NBA_TEAMS].sort((a,b)=>(S.leagueStandings[b.id]?.w||0)-(S.leagueStandings[a.id]?.w||0))[0],aw=S.seasonAwards||{};S.recordBook.seasons.push({season:label,championId,runnerUpId,finals:finals||"4-2",mvp:aw.mvp||"League Star",dpoy:aw.dpoy||"Defensive Star",roty:aw.roty||"Rookie Star",bestRecord:{teamId:best.id,w:S.leagueStandings[best.id]?.w||0,l:S.leagueStandings[best.id]?.l||0},leaders:currentSeasonLeagueLeaders(),userChampion:championId===S.team&&!!S.playoffs.champion,userStats:{teamId:S.team,gp:S.player.stats.gp||0,ppg:+(S.player.stats.ppg||0).toFixed(1),apg:+(S.player.stats.apg||0).toFixed(1),rpg:+(S.player.stats.rpg||0).toFixed(1),ovr:ovr(),w:S.record.w||0,l:S.record.l||0,year:S.year||1}});S.recordBook.seasons=S.recordBook.seasons.slice(-10)}
+function archiveCompletedSeason(){
+ S.recordBook=S.recordBook||{seasons:seedRecordBook()};const label=nbaSeasonLabel();if(S.recordBook.seasons.some(x=>x.season===label))return;
+ ensureLeagueStandings();ensureLeagueRosters();
+ let fi=finalSeriesInfo(),championId=fi&&fi.winner,runnerUpId=fi&&fi.runnerUp,finals=fi&&fi.finals;
+ if(S.playoffs?.champion){championId=S.team;runnerUpId=S.playoffs.lastFinalsOpponentId||runnerUpId;finals=S.playoffs.finalSeries||"4-0"}
+ if(!championId){const top=[...NBA_TEAMS].sort((a,b)=>(S.leagueStandings[b.id]?.w||0)-(S.leagueStandings[a.id]?.w||0));championId=top[0]?.id||"bos";runnerUpId=top[1]?.id||"sf";finals="4-2"}
+ const best=[...NBA_TEAMS].sort((a,b)=>(S.leagueStandings[b.id]?.w||0)-(S.leagueStandings[a.id]?.w||0))[0],aw=S.seasonAwards||{},rs=regularSeasonLine();
+ S.recordBook.seasons.push({season:label,championId,runnerUpId,finals:finals||"4-2",mvp:aw.mvp||"League Star",dpoy:aw.dpoy||"Defensive Star",roty:aw.roty||"Rookie Star",bestRecord:{teamId:best.id,w:S.leagueStandings[best.id]?.w||0,l:S.leagueStandings[best.id]?.l||0},leaders:currentSeasonLeagueLeaders(),userChampion:championId===S.team&&!!S.playoffs.champion,userStats:{teamId:S.team,gp:rs.gp,ppg:+rs.ppg.toFixed(1),apg:+rs.apg.toFixed(1),rpg:+rs.rpg.toFixed(1),spg:+rs.spg.toFixed(1),bpg:+rs.bpg.toFixed(1),pts:Math.round(rs.pts),ast:Math.round(rs.ast),reb:Math.round(rs.reb),stl:Math.round(rs.stl),blk:Math.round(rs.blk),ovr:ovr(),w:S.record.w||0,l:S.record.l||0,year:S.year||1}});
+ S.recordBook.seasons=S.recordBook.seasons.slice(-10)
+}
 function championshipCount(){const seasons=S.recordBook?.seasons||[],labels=new Set(seasons.filter(x=>x.userChampion).map(x=>x.season));if(S.playoffs?.champion)labels.add(nbaSeasonLabel(S.year||1));const tracked=S.nbaWorld?.records?.playoff?.titles||0;return Math.max(labels.size,tracked)}
 function resumePendingCareerOverlay(){
  if(frontMode!=="career"||!S.created||S.fullGame||S.live)return;
@@ -2923,7 +2932,11 @@ function resumePendingCareerOverlay(){
  })
 }
 function showChampionshipCelebration(){const ch=S.championshipCelebration;if(!ch||ch.shown)return;ch.shown=true;save();modal('<div style="text-align:center"><span class="kicker">NBA CHAMPIONS</span><div style="font-size:58px;margin:8px 0">🏆</div><h1 style="margin:4px 0">CHAMPIONSHIP WON</h1><p class="muted">'+ch.season+' NBA Champions</p><div class="item"><div><b>'+ch.team+'</b><small>Defeated '+ch.opponent+' • Finals '+ch.series+'</small></div><span class="pill good">TITLE #'+ch.titleNumber+'</span></div><p class="muted" style="margin-top:14px">This championship is permanently stored in your Record Books.</p><div class="item"><div><b>Cap Breaker Earned</b><small>Every NBA championship permanently adds exactly 1 Cap Breaker to your player progression.</small></div><span class="pill good">+1</span></div><div class="item"><div><b>Badge Breaker Earned</b><small>Upgrade one Legend badge to the championship-exclusive G.O.A.T. tier.</small></div><span class="pill good">+1</span></div><div class="modalFoot"><button class="btn primary" id="champContinue">Continue to Offseason</button></div></div>');$("champContinue").onclick=()=>{closeModal();S.championshipCelebration=null;save();if(S.postgameMedia&&S.postgameMedia.pending)openPostgameInterview();else render()}}
-function recordBooksHTML(){const seasons=(S.recordBook?.seasons||seedRecordBook()).slice().reverse(),pick=k=>[...seasons].sort((x,y)=>(y.leaders?.[k]?.value||0)-(x.leaders?.[k]?.value||0))[0],p=pick("ppg"),a=pick("apg"),r=pick("rpg"),best=[...seasons].sort((x,y)=>(y.bestRecord?.w||0)-(x.bestRecord?.w||0))[0],tn=id=>teamNameById(id);return '<section class="card s12"><span class="kicker">NBA HISTORY • LAST 10 SEASONS</span><h2 style="margin:6px 0">Record Books</h2><p class="muted">Championships, award winners and league records update automatically every offseason.</p><div class="grid" style="margin-top:12px"><div class="card" style="grid-column:span 3"><small class="muted">SCORING</small><div class="big" style="font-size:22px">'+(p?.leaders?.ppg?.value||"—")+' PPG</div><small>'+(p?.leaders?.ppg?.name||"—")+' • '+(p?.season||"")+'</small></div><div class="card" style="grid-column:span 3"><small class="muted">ASSISTS</small><div class="big" style="font-size:22px">'+(a?.leaders?.apg?.value||"—")+' APG</div><small>'+(a?.leaders?.apg?.name||"—")+' • '+(a?.season||"")+'</small></div><div class="card" style="grid-column:span 3"><small class="muted">REBOUNDS</small><div class="big" style="font-size:22px">'+(r?.leaders?.rpg?.value||"—")+' RPG</div><small>'+(r?.leaders?.rpg?.name||"—")+' • '+(r?.season||"")+'</small></div><div class="card" style="grid-column:span 3"><small class="muted">BEST RECORD</small><div class="big" style="font-size:22px">'+(best?.bestRecord?.w||0)+'-'+(best?.bestRecord?.l||0)+'</div><small>'+(best?tn(best.bestRecord.teamId):"—")+' • '+(best?.season||"")+'</small></div></div><div class="list" style="margin-top:14px">'+seasons.map(x=>'<div class="item"><div><b>'+x.season+' • '+tn(x.championId)+(x.userChampion?' 🏆 YOUR TITLE':'')+'</b><small>Finals '+x.finals+' vs '+tn(x.runnerUpId)+' • MVP '+x.mvp+' • DPOY '+x.dpoy+' • ROY '+x.roty+'</small></div><span class="pill '+(x.userChampion?'good':'')+'">CHAMPION</span></div>').join("")+'</div></section>'}
+function recordBooksHTML(){
+ const seasons=(S.recordBook?.seasons||seedRecordBook()).slice().reverse(),pick=k=>[...seasons].sort((x,y)=>(y.leaders?.[k]?.value||0)-(x.leaders?.[k]?.value||0))[0],p=pick("ppg"),a=pick("apg"),r=pick("rpg"),s=pick("spg"),b=pick("bpg"),best=[...seasons].sort((x,y)=>(y.bestRecord?.w||0)-(x.bestRecord?.w||0))[0],tn=id=>teamNameById(id);
+ const leaderCard=(label,x,key,suffix)=>'<div class="card" style="grid-column:span 2"><small class="muted">'+label+'</small><div class="big" style="font-size:22px">'+(x?.leaders?.[key]?.value??"—")+' '+suffix+'</div><small>'+(x?.leaders?.[key]?.name||"—")+' • '+(x?.season||"")+'</small></div>';
+ return '<section class="card s12"><span class="kicker">NBA HISTORY • LAST 10 SEASONS</span><h2 style="margin:6px 0">Record Books</h2><p class="muted">Championships, award winners and league leaders update automatically every offseason.</p><div class="grid" style="margin-top:12px">'+leaderCard("SCORING",p,"ppg","PPG")+leaderCard("ASSISTS",a,"apg","APG")+leaderCard("REBOUNDS",r,"rpg","RPG")+leaderCard("STEALS",s,"spg","SPG")+leaderCard("BLOCKS",b,"bpg","BPG")+'<div class="card" style="grid-column:span 2"><small class="muted">BEST RECORD</small><div class="big" style="font-size:22px">'+(best?.bestRecord?.w||0)+'-'+(best?.bestRecord?.l||0)+'</div><small>'+(best?tn(best.bestRecord.teamId):"—")+' • '+(best?.season||"")+'</small></div></div><div class="list" style="margin-top:14px">'+seasons.map(x=>'<div class="item"><div><b>'+x.season+' • '+tn(x.championId)+(x.userChampion?' 🏆 YOUR TITLE':'')+'</b><small>Finals '+x.finals+' vs '+tn(x.runnerUpId)+' • MVP '+x.mvp+' • DPOY '+x.dpoy+' • ROY '+x.roty+'</small></div><span class="pill '+(x.userChampion?'good':'')+'">CHAMPION</span></div>').join("")+'</div></section>'
+}
 function playoffRoundName(){if(S.playoffs&&S.playoffs.playIn)return "Play-In Tournament";return ["","First Round","Conference Semifinals","Conference Finals","NBA Finals"][S.playoffs.round]||"Playoffs"}
 function playoffGameNumber(){return Math.min(7,(Math.min(4,S.playoffs.seriesWins||0)+Math.min(4,S.playoffs.seriesLosses||0)+1))}
 function playoffWinsNeeded(){return Math.max(0,4-(S.playoffs.seriesWins||0))}
@@ -3608,7 +3621,7 @@ function updateRecords(g,isPlayoff){
  if((g.pts||0)>=40)r.games40=(r.games40||0)+1;if((g.pts||0)>=50)r.games50=(r.games50||0)+1;if((g.pts||0)>=60)r.games60=(r.games60||0)+1;
  if((g.pts||0)>=10&&(g.ast||0)>=10&&(g.reb||0)>=10)r.tripleDoubles=(r.tripleDoubles||0)+1;
  if(S.team){const ft=r.franchiseTotals[S.team]||{gp:0,pts:0,ast:0,reb:0,stl:0,blk:0};ft.gp++;ft.pts+=g.pts||0;ft.ast+=g.ast||0;ft.reb+=g.reb||0;ft.stl+=g.stl||0;ft.blk+=g.blk||0;r.franchiseTotals[S.team]=ft}
- if(isPlayoff){const p=r.playoff;p.games++;if(g.win)p.wins++;p.pts+=g.pts||0;p.ast+=g.ast||0;p.reb+=g.reb||0;if(S.playoffs.round===4)p.finalsGames++}
+ if(isPlayoff){const p=r.playoff;p.games++;if(g.win)p.wins++;p.pts+=g.pts||0;p.ast+=g.ast||0;p.reb+=g.reb||0;p.stl=(p.stl||0)+(g.stl||0);p.blk=(p.blk||0)+(g.blk||0);if(S.playoffs.round===4)p.finalsGames++}
 }
 function recordsHTML(){
  const r=S.nbaWorld.records,ft=(S.team&&r.franchiseTotals[S.team])||{gp:0,pts:0,ast:0,reb:0,stl:0,blk:0},p=r.playoff,rs=S.regularSeasonCareer||{gp:0,pts:0,ast:0,reb:0,stl:0,blk:0},score=legacyScore();
@@ -4230,7 +4243,9 @@ function addBadgeXP(names,amount){
  list.forEach(name=>{if(BADGES.some(b=>b[0]===name))bp[name]=Math.min(100000,(bp[name]||0)+Math.max(0,Math.round(amount)))})
 }
 function awardBadgePerformanceXP(g){
- if(!g)return;const before={...ensureBadgeProgress()},close=Math.abs((g.team||0)-(g.oppScore||0))<=6,pts=g.pts||0,ast=g.ast||0,reb=g.reb||0,stl=g.stl||0,blk=g.blk||0,tov=g.tov||0,tpm=g.tpm||0;
+ if(!g)return;
+ const before={};BADGES.forEach(b=>before[b[0]]={xp:badgePerformanceXP(b[0]),tier:badgeTierName(b)});
+ const close=Math.abs((g.team||0)-(g.oppScore||0))<=6,pts=g.pts||0,ast=g.ast||0,reb=g.reb||0,stl=g.stl||0,blk=g.blk||0,tov=g.tov||0,tpm=g.tpm||0;
  if(pts>=10)addBadgeXP(["Fearless Finisher","Acrobat","Slithery Finisher","Giant Slayer","Float Game"],4+Math.floor(pts/8));
  if(pts>=20)addBadgeXP(["Posterizer","Bulldozer","Aerial Finisher","Rise Up"],3+Math.floor(pts/10));
  if(tpm>=1)addBadgeXP(["Catch & Shoot","Deadeye","Green Machine","Agent 3","Corner Specialist","Set Shot Specialist","Rhythm Shooter"],4+tpm*3);
@@ -4242,7 +4257,12 @@ function awardBadgePerformanceXP(g){
  if(close||g.playoff)addBadgeXP(["Killer Instinct","Ice in Veins","Big Game Player","Fourth Quarter Focus","Momentum Stopper"],g.win?14:8);
  if(g.win)addBadgeXP(["Relentless Motor","Tireless Engine","Consistency King"],5);
  if(pts>=30&&g.win)addBadgeXP(["Comeback Kid","Road Warrior"],8);
- const after=ensureBadgeProgress();g.badgeXpGains=Object.keys(after).map(name=>({name,gain:(after[name]||0)-(before[name]||0)})).filter(x=>x.gain>0).sort((a,b)=>b.gain-a.gain).slice(0,4)
+ const rank={"Locked":0,"Bronze":1,"Silver":2,"Gold":3,"Legend":4,"G.O.A.T.":5};
+ g.badgeXpGains=BADGES.map(b=>{
+   const old=before[b[0]],xp=badgePerformanceXP(b[0]),tier=badgeTierName(b);
+   return {name:b[0],gain:xp-old.xp,tier,tierUp:(rank[tier]||0)>(rank[old.tier]||0),oldTier:old.tier}
+ }).filter(x=>x.gain>0).sort((a,b)=>(Number(b.tierUp)-Number(a.tierUp))||(b.gain-a.gain)).slice(0,6);
+ g.badgeXpGains.filter(x=>x.tierUp).forEach(x=>S.news.unshift("BADGE UPGRADE • "+x.name+" • "+x.oldTier+" → "+x.tier))
 }
 function badgeScore(b){let v=S.player.attrs[b[2]]*b[3];if(b[4])v+=S.player.attrs[b[4]]*b[5];const xp=badgePerformanceXP(b[0]),perf=Math.min(8,Math.sqrt(xp)/7);return Math.round(v+perf)}
 function tier(v){
@@ -5770,7 +5790,7 @@ function showQuickSimResult(g,payout){
  const tourneyResult=g.collegeTournament?'<div class="item" style="border-color:#ff8d3f"><div><b>Tournament Game '+((g.collegeTournamentRound||0)+1)+' of 4 • '+COLLEGE_TOURNAMENT_ROUNDS[g.collegeTournamentRound]+'</b><small>'+(g.win?'Survive and advance.':'Your college tournament run has ended.')+'</small></div><span class="pill '+(g.win?'good':'bad')+'">'+(g.win?'ADVANCED':'ELIMINATED')+'</span></div>':'';
  const storyUpdate=g.roadPostgame?'<div class="item" style="border-color:#ff8d3f"><div><b>Story Mode Updated</b><small>'+g.roadPostgame.impact+(majorStory?' • Major choice ready — fast sim will stop here.':' • Progress saved without interrupting your sim.')+'</small></div><span class="pill good">'+(majorStory?'ACTION READY':'PROGRESS SAVED')+'</span></div>':'';
  const attrReward=g.attributePointsAwarded?'<div class="item" style="border-color:#2ca86f"><div><b>+3 ATTRIBUTE POINTS EARNED</b><small>'+ensureAttributeUpgradeState().available+' available across your 25 detailed attributes.</small></div><span class="pill good">+3</span></div>':'';
- const badgeProgress=(g.badgeXpGains&&g.badgeXpGains.length)?'<div class="item"><div><b>Badge Progress</b><small>'+g.badgeXpGains.map(x=>x.name+' +'+x.gain+' XP').join(" • ")+'</small></div><span class="pill good">XP</span></div>':'';
+ const badgeProgress=(g.badgeXpGains&&g.badgeXpGains.length)?'<div class="item"><div><b>Badge Progress</b><small>'+g.badgeXpGains.map(x=>x.name+' +'+x.gain+' XP'+(x.tierUp?' • '+x.tier+'!':'')).join(" • ")+'</small></div><span class="pill good">XP</span></div>':'';
  let nextAction='';
  if(g.collegeTournamentCompleted)nextAction='<button class="btn good" id="quickResultCollegeComplete">Continue to NBA Draft Path</button>';
  else if(majorStory)nextAction='<button class="btn good" id="quickResultStory">Open Major Story Choice</button>';
