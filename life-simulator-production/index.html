@@ -2610,6 +2610,7 @@ function currentSeasonAwardsList(){
  if(a.roty===S.player.name)out.push("ROY");
  if(a.allNBA===S.player.name)out.push("All-NBA");
  if(a.allStar===S.player.name||S.nbaWorld?.allStar?.selected)out.push("All-Star");
+ if(a.finalsMvp===S.player.name)out.push("Finals MVP");
  return out
 }
 function currentPlayoffResult(){
@@ -2839,8 +2840,9 @@ function updateArchetypeEvolution(force=false){
  x.archetypeHistory=x.archetypeHistory.slice(-20);S.news.unshift("Archetype evolved: "+current+" → "+next+".")
 }
 function legacyScore(){
- const rs=S.regularSeasonCareer||{gp:0,pts:0,ast:0,reb:0,stl:0,blk:0},r=S.nbaWorld?.records||{},po=r.playoff||{},acc=S.accolades||[];
- const awards={mvp:acc.filter(x=>x==="MVP").length,dpoy:acc.filter(x=>x==="Defensive Player of the Year").length,allnba:acc.filter(x=>x==="All-NBA").length,allstar:S.nbaWorld?.allStarSelections||acc.filter(x=>x==="All-Star").length,fmvp:acc.filter(x=>x==="Finals MVP").length};
+ const rs=S.regularSeasonCareer||{gp:0,pts:0,ast:0,reb:0,stl:0,blk:0},r=S.nbaWorld?.records||{},po=r.playoff||{},seasons=S.careerHistory?.nbaSeasons||[];
+ const count=label=>seasons.filter(x=>(x.awards||[]).includes(label)).length+(S.stage==="NBA"&&currentSeasonAwardsList().includes(label)?1:0);
+ const awards={mvp:count("MVP"),dpoy:count("DPOY"),allnba:count("All-NBA"),allstar:Math.max(S.nbaWorld?.allStarSelections||0,count("All-Star")),fmvp:count("Finals MVP")};
  return Math.max(0,Math.round(championshipCount()*180+awards.mvp*120+awards.fmvp*105+awards.dpoy*85+awards.allnba*35+awards.allstar*18+(rs.pts||0)/85+(rs.ast||0)/65+(rs.reb||0)/75+(rs.stl||0)/22+(rs.blk||0)/18+(po.pts||0)/40+(r.games50||0)*3+(r.games60||0)*6+(r.tripleDoubles||0)*2))
 }
 function legacyTier(score=legacyScore()){return score>=1800?"All-Time Icon":score>=1200?"Hall of Fame Lock":score>=800?"Generational":score>=500?"League Legend":score>=280?"Superstar Legacy":score>=120?"Established Star":"Building Legacy"}
