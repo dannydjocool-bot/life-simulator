@@ -6465,15 +6465,20 @@ function quickSim(){
  const reason=quickSimBlockReason();if(reason){toast(reason);render();return}
  if(S.stage==="NBA"&&!S.playoffs.active&&(S.record.w+S.record.l)>=82){startPlayoffs();render();toast("Regular season complete — playoffs are ready");return}
  skipPendingInterviewForFastSim();
+ const before=JSON.stringify(S);
  quickSimBusy=true;
  try{
   const g=buildQuickSimGame();
   recordGame(g)
  }catch(e){
   console.error("Quick Sim failed",e);
-  S.nbaWorld=S.nbaWorld||{};S.nbaWorld.lastQuickSimError={message:String(e&&e.message||e),year:S.year||1,stage:S.stage||"",round:S.playoffs?.round||0,at:new Date().toISOString()};
-  save();
-  toast("Quick Sim recovered from an error — try again");
+  try{
+   S=validateCareerSave(JSON.parse(before));
+   ensureGameSimulationState();
+   S.nbaWorld.lastQuickSimError={message:String(e&&e.message||e),year:S.year||1,stage:S.stage||"",round:S.playoffs?.round||0,at:new Date().toISOString()};
+   save();render()
+  }catch(recoveryError){console.error("Quick Sim recovery failed",recoveryError)}
+  toast("Quick Sim recovered safely — try again")
  }finally{
   quickSimBusy=false
  }
