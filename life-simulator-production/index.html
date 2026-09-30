@@ -3380,10 +3380,11 @@ function openOffseasonScouting(){
 }
 function runOffseasonDayEvent(day){
  ensureOffseasonFlow();if(S.offseason.events[day])return;
+ if(day===1){processAIExtensions();S.news.unshift("Extension window opened. Teams are locking up core players around the league.");}
  if(day===3){S.news.unshift("Draft Night is here. Watch the first round unfold pick by pick.");pushLeagueNews("NBA Draft Night has begun.");setTimeout(startDraftNightPresentation,80)}
- if(day===4){processLeagueFreeAgency();generateOffseason(true);S.news.unshift("Free agency opened. Contract offers and league signings are now active.");}
- if(day===5){repairRosterTransactionConsistency();S.news.unshift("The first major free-agency signing wave is complete.");}
- if(day===6){S.news.unshift("Teams are making final trade calls and roster adjustments before camp.");}
+ if(day===4){processLeagueFreeAgency();processStarBuildingSigningStories();generateOffseason(true);S.news.unshift("Free agency opened. Contract offers and league signings are now active.");}
+ if(day===5){repairRosterTransactionConsistency();processStarBuildingTrades(3);processStarBuildingSigningStories();S.news.unshift("Teams are reshaping rosters around their franchise stars.");}
+ if(day===6){processStarBuildingTrades(4);S.news.unshift("Trade and roster day is active. Contenders are making final moves around their stars.");}
  if(day===7){S.news.unshift("Final offseason day. Review your roster and contract before beginning the next season.");}
  S.offseason.events[day]=true
 }
@@ -3537,6 +3538,88 @@ function freeAgentDestination(player,currentTeamId){
   if(t.id===currentTeamId)score+=5;return {team:t,score,dir}
  }).sort((a,b)=>b.score-a.score);return teams[0]
 }
+function aiExtensionValue(p){
+ const annual=Math.round(realisticAnnualSalary(p.ovr||75)*(1+Math.max(0,(p.ppg||0)-18)*.012+Math.max(0,(p.apg||0)-5)*.008));
+ const years=(p.age||27)>=32?3:(p.ovr||0)>=90?5:4;
+ return {annual:Math.min(70000000,annual),years}
+}
+function processAIExtensions(){
+ if(S.nbaWorld.aiExtensionsYear===S.year)return;
+ ensureLeagueRosters();
+ NBA_TEAMS.forEach(t=>{
+  const roster=rosterFor(t.id),ranked=[...roster].sort((a,b)=>teamCoreScore(b)-teamCoreScore(a));
+  ranked.slice(0,4).forEach((p,idx)=>{
+   if((p.contractYears||0)!==1)return;
+   const star=(p.ovr||0)>=86||(p.ppg||0)>=20||idx===0;
+   if(!star)return;
+   const chance=idx===0?.9:idx===1?.72:.5;
+   if(Math.random()>chance)return;
+   const v=aiExtensionValue(p);
+   p.pendingAIExtension={years:v.years,annual:v.annual,total:v.annual*v.years,agreedYear:S.year};
+   const msg=p.name+" agreed to a "+v.years+"-year, $"+Math.round((v.annual*v.years)/1000000)+"M extension with "+teamNameById(t.id)+" • $"+Math.round(v.annual/1000000)+"M/yr";
+   S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg)
+  })
+ });
+ S.nbaWorld.aiExtensionsYear=S.year;
+ S.nbaWorld.leagueTransactions=S.nbaWorld.leagueTransactions.slice(0,40)
+}
+function supportPositionsForStar(star){
+ const pos=star?.pos||"SF";
+ if(pos==="PG")return ["SG","SF","C"];
+ if(pos==="SG")return ["PG","SF","C"];
+ if(pos==="SF")return ["PG","PF","C"];
+ if(pos==="PF")return ["PG","SG","C"];
+ return ["PG","SG","SF"]
+}
+function starSupportScore(p,star){
+ const need=supportPositionsForStar(star).includes(p.pos)?12:0;
+ return (p.ovr||0)*1.15+(p.potential||p.ovr||0)*.25+(p.ppg||0)*.45+(p.apg||0)*.35+(p.rpg||0)*.25+need
+}
+function processStarBuildingTrades(maxMoves=5){
+ ensureLeagueRosters();let moves=0;
+ const buyers=[...NBA_TEAMS].sort((a,b)=>{
+   const sa=teamCoreScore(rosterFor(a.id)[0]||{}),sb=teamCoreScore(rosterFor(b.id)[0]||{});
+   return sb-sa
+ });
+ for(const buyer of buyers){
+  if(moves>=maxMoves)break;
+  if(buyer.id===S.team)continue;
+  const br=rosterFor(buyer.id),star=[...br].sort((a,b)=>teamCoreScore(b)-teamCoreScore(a))[0];
+  if(!star||(star.ovr||0)<84)continue;
+  const candidates=[];
+  NBA_TEAMS.filter(t=>t.id!==buyer.id&&t.id!==S.team).forEach(seller=>{
+   rosterFor(seller.id).forEach(p=>{
+    if(p.name===rosterFor(seller.id)[0]?.name)return;
+    if((p.ovr||0)<76||(p.ovr||0)>89)return;
+    candidates.push({sellerId:seller.id,p,score:starSupportScore(p,star)+Math.random()*8})
+   })
+  });
+  candidates.sort((a,b)=>b.score-a.score);
+  const target=candidates[0];if(!target)continue;
+  const pkg=chooseTradeOutgoing(buyer.id,target.p);if(!pkg.length)continue;
+  if(executeAITrade(target.sellerId,buyer.id,target.p,pkg)){
+   const msg="BUILDING AROUND "+star.name+" • "+teamNameById(buyer.id)+" added "+target.p.name+" to strengthen the core.";
+   pushSocialHeadline(msg,"TRADE");pushLeagueNews(msg);moves++
+  }
+ }
+ return moves
+}
+function processStarBuildingSigningStories(){
+ ensureLeagueRosters();
+ NBA_TEAMS.forEach(t=>{
+  if(t.id===S.team)return;
+  const r=rosterFor(t.id),star=[...r].sort((a,b)=>teamCoreScore(b)-teamCoreScore(a))[0];
+  if(!star||(star.ovr||0)<85)return;
+  const recent=(S.nbaWorld.leagueTransactions||[]).find(x=>String(x).includes(" signed with "+teamNameById(t.id)+" "));
+  if(!recent)return;
+  const m=String(recent).match(/^(.+?) signed with /);if(!m)return;
+  const signee=r.find(p=>p.name===m[1]);if(!signee)return;
+  const fit=supportPositionsForStar(star).includes(signee.pos);
+  if(!fit&&(signee.ovr||0)<82)return;
+  const msg=teamNameById(t.id)+" added "+signee.name+" to help build around "+star.name+".";
+  pushSocialHeadline(msg,"FREE AGENCY")
+ })
+}
 function processLeagueFreeAgency(){
  if(S.nbaWorld.leagueFAProcessedYear===S.year)return;ensureLeagueRosters();ensureLeagueStandings();const free=[];
  NBA_TEAMS.forEach(t=>{
@@ -3550,6 +3633,9 @@ function processLeagueFreeAgency(){
        S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg);continue
      }
      p.contractYears=Math.max(0,(p.contractYears||1)-1);
+     if(p.contractYears===0&&p.pendingAIExtension){
+       const ext=p.pendingAIExtension;p.contractYears=ext.years;p.contractValue=ext.total;delete p.pendingAIExtension;continue
+     }
      if(p.contractYears===0){roster.splice(i,1);free.push({p,from:t.id})}
    }
  });
@@ -3609,8 +3695,8 @@ function startOffseason(){
  }
  S.stage="Offseason";
  const locked=isUnderContract();
- S.offseason={active:true,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:locked,draftApplied:false,day:1,events:{1:true}};
- S.live=null;generateOffseason();S.news.unshift("Offseason started. Draft, roster, awards and contract decisions are underway.");save();render();toast("Offseason started")
+ S.offseason={active:true,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:locked,draftApplied:false,day:1,events:{}};
+ S.live=null;generateOffseason();runOffseasonDayEvent(1);S.news.unshift("Offseason started. Draft, roster, awards and contract decisions are underway.");save();render();toast("Offseason started")
 }
 function acceptContract(idx){
  if(!S.offseason||!S.offseason.active)return;
