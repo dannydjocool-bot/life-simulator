@@ -2766,22 +2766,42 @@ function findLeaguePlayerTeam(name){
  for(const t of NBA_TEAMS){if((S.leagueRosters?.[t.id]||[]).some(p=>p.name===name))return t.id}
  return null
 }
+function transactionPlayerStore(){
+ S.nbaWorld.transactionPlayers=S.nbaWorld.transactionPlayers&&typeof S.nbaWorld.transactionPlayers==="object"?S.nbaWorld.transactionPlayers:{};
+ return S.nbaWorld.transactionPlayers
+}
+function transactionPlayerKey(name,teamId,year=S.year){return String(year||1)+"|"+String(teamId||"") +"|"+String(name||"")}
+function snapshotTransactionPlayer(player,teamId,year=S.year){
+ if(!player||!player.name||!teamId)return;
+ const copy=JSON.parse(JSON.stringify(player));transactionPlayerStore()[transactionPlayerKey(player.name,teamId,year)]=copy
+}
+function rebuildMissingSignedPlayer(playerName,targetId,msg){
+ const store=transactionPlayerStore(),exact=store[transactionPlayerKey(playerName,targetId,S.year)];
+ if(exact)return {...exact};
+ const anyKey=Object.keys(store).find(k=>k.endsWith("|"+targetId+"|"+playerName));
+ if(anyKey)return {...store[anyKey]};
+ const money=String(msg||"").match(/•\s*(\d+)\s*years\s*•\s*\$(\d+)M\/yr/i),years=money?Math.max(1,+money[1]):2,annual=money?Math.max(1200000,+money[2]*1000000):3500000;
+ let bestOvr=68,bestDiff=Infinity;
+ for(let o=66;o<=88;o++){const d=Math.abs(realisticAnnualSalary(o)-annual);if(d<bestDiff){bestDiff=d;bestOvr=o}}
+ let seed=0;for(let i=0;i<playerName.length;i++)seed=(seed*31+playerName.charCodeAt(i))>>>0;
+ const pos=["PG","SG","SF","PF","C"][seed%5],age=23+(seed%9),potential=Math.min(92,bestOvr+(age<=25?5:2));
+ const ppg=+(Math.max(5,(bestOvr-60)*.58)+(seed%17)/10).toFixed(1),apg=+(pos==="PG"?3.4+(seed%28)/10:1.2+(seed%17)/10).toFixed(1),rpg=+(pos==="C"||pos==="PF"?4.2+(seed%30)/10:2+(seed%18)/10).toFixed(1),yearsPro=Math.max(1,age-20),gp=yearsPro*72;
+ return {id:"recovered-"+targetId+"-"+seed,name:playerName,pos,age,ovr:bestOvr,potential,personality:"Professional",ppg,apg,rpg,source:"transaction-recovery",yearsPro,contractYears:years,contractValue:annual*years,career:{gp,pts:Math.round(ppg*gp),ast:Math.round(apg*gp),reb:Math.round(rpg*gp),allStars:0,mvps:0,titles:0}}
+}
 function repairRosterTransactionConsistency(){
  ensureLeagueRosters();
- const tx=(S.nbaWorld?.leagueTransactions||[]).slice(0,30);
+ const tx=(S.nbaWorld?.leagueTransactions||[]).slice(0,40);
  let repaired=0;
  tx.forEach(msg=>{
   const m=String(msg||"").match(/^(.+?) signed with (.+?) after leaving (.+?) •/);
   if(!m)return;
-  const playerName=m[1],targetName=m[2];
-  const target=NBA_TEAMS.find(t=>teamNameById(t.id)===targetName);if(!target)return;
+  const playerName=m[1],targetName=m[2],target=NBA_TEAMS.find(t=>teamNameById(t.id)===targetName);if(!target)return;
   if((S.leagueRosters[target.id]||[]).some(p=>p.name===playerName))return;
   let found=null;
   for(const t of NBA_TEAMS){const r=S.leagueRosters[t.id]||[],idx=r.findIndex(p=>p.name===playerName);if(idx>=0){found=r.splice(idx,1)[0];break}}
-  if(!found){
-   for(const t of NBA_TEAMS){const star=(t.stars||[]).find(p=>p.name===playerName);if(star){found={...star,source:"veteran",yearsPro:5,age:29,potential:Math.max(star.ovr||80,90),contractYears:2,contractValue:realisticAnnualSalary(star.ovr||80)*2};break}}
-  }
-  if(found&&addLeagueRosterPlayer(target.id,found,"transaction"))repaired++
+  if(!found){for(const t of NBA_TEAMS){const star=(t.stars||[]).find(p=>p.name===playerName);if(star){found={...star,source:"veteran",yearsPro:5,age:29,potential:Math.max(star.ovr||80,90),contractYears:2,contractValue:realisticAnnualSalary(star.ovr||80)*2};break}}}
+  if(!found)found=rebuildMissingSignedPlayer(playerName,target.id,msg);
+  if(found&&addLeagueRosterPlayer(target.id,found,"transaction-recovery")){snapshotTransactionPlayer(found,target.id,S.year);repaired++}
  });
  return repaired
 }
@@ -3438,6 +3458,7 @@ function processLeagueFreeAgency(){
   let to=choices.find(id=>canTeamAddAnnualSalary(id,annual));
   if(!to)to=from;
   p.contractYears=years;p.contractValue=annual*years;
+  snapshotTransactionPlayer(p,to,S.year);
   const rosterAdded=addLeagueRosterPlayer(to,p,"free-agent");
   if(!rosterAdded){return}
   if(to!==from){const msg=p.name+" signed with "+teamNameById(to)+" after leaving "+teamNameById(from)+" • "+years+" years • $"+Math.round(annual/1000000)+"M/yr";S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg)}
