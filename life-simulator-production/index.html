@@ -6298,7 +6298,6 @@ function fastSimStopReason(){
 }
 function canQuickSimNow(){return !quickSimBlockReason()}
 function showQuickSimResult(g,payout){
- quickSimBusy=false;
  const result=g.win?"WIN":"LOSS",cls=g.win?"good":"bad";
  const score=(g.team||0)+" - "+(g.oppScore||0),blockReason=quickSimBlockReason(),majorStory=!!g.roadPostgame?.chapterUnlocked;
  const earnings=payout>0?'<div class="row"><span>Game earnings</span><strong>$'+Math.round(payout).toLocaleString()+'</strong></div>':'';
@@ -6396,11 +6395,23 @@ function buildQuickSimGame(){
  return g
 }
 function quickSim(){
- if(quickSimBusy){toast("Quick Sim is already processing");return}
+ if(quickSimBusy){
+  if(!(S.fullGame&&S.fullGame.active)&&!S.live){quickSimBusy=false}else{toast("Quick Sim is already processing");return}
+ }
  const reason=quickSimBlockReason();if(reason){toast(reason);render();return}
  if(S.stage==="NBA"&&!S.playoffs.active&&(S.record.w+S.record.l)>=82){startPlayoffs();render();toast("Regular season complete — playoffs are ready");return}
- skipPendingInterviewForFastSim();quickSimBusy=true;
- try{recordGame(buildQuickSimGame())}catch(e){quickSimBusy=false;throw e}
+ skipPendingInterviewForFastSim();
+ quickSimBusy=true;
+ try{
+  const g=buildQuickSimGame();
+  recordGame(g)
+ }catch(e){
+  console.error("Quick Sim failed",e);
+  toast("Quick Sim hit an error and was safely reset");
+  throw e
+ }finally{
+  quickSimBusy=false
+ }
 }
 function quickSimBatch(maxGames=5,mode="count"){
  if(quickSimBusy){toast("Quick Sim is already processing");return}
