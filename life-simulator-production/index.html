@@ -2788,27 +2788,56 @@ function rebuildMissingSignedPlayer(playerName,targetId,msg){
  const ppg=+(Math.max(5,(bestOvr-60)*.58)+(seed%17)/10).toFixed(1),apg=+(pos==="PG"?3.4+(seed%28)/10:1.2+(seed%17)/10).toFixed(1),rpg=+(pos==="C"||pos==="PF"?4.2+(seed%30)/10:2+(seed%18)/10).toFixed(1),yearsPro=Math.max(1,age-20),gp=yearsPro*72;
  return {id:"recovered-"+targetId+"-"+seed,name:playerName,pos,age,ovr:bestOvr,potential,personality:"Professional",ppg,apg,rpg,source:"transaction-recovery",yearsPro,contractYears:years,contractValue:annual*years,career:{gp,pts:Math.round(ppg*gp),ast:Math.round(apg*gp),reb:Math.round(rpg*gp),allStars:0,mvps:0,titles:0}}
 }
+function canonicalRosterAssignments(){
+ const events=[];
+ const social=(S.nbaWorld?.socialFeed||[]).slice().reverse();
+ social.forEach(x=>events.push({text:String(x?.text||""),year:x?.year||S.year||1,source:"social"}));
+ const ledger=(S.nbaWorld?.leagueTransactions||[]).slice().reverse();
+ ledger.forEach(text=>events.push({text:String(text||""),year:S.year||1,source:"ledger"}));
+ const seen=new Set(),assignments=new Map(),retired=new Set();
+ events.forEach(e=>{
+  const msg=e.text.trim();if(!msg||seen.has(msg))return;seen.add(msg);
+  let m=msg.match(/^(.+?) signed with (.+?) after leaving (.+?) •/);
+  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[2]);if(team){assignments.set(m[1],{teamId:team.id,year:e.year,msg});retired.delete(m[1])}return}
+  m=msg.match(/^(.+?) re-signed with (.+?) for /);
+  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[2]);if(team){assignments.set(m[1],{teamId:team.id,year:e.year,msg});retired.delete(m[1])}return}
+  m=msg.match(/^(.+?) acquired (.+?) from (.+?) for /);
+  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[1]);if(team){assignments.set(m[2],{teamId:team.id,year:e.year,msg});retired.delete(m[2])}return}
+  m=msg.match(/^#\d+ pick: (.+?) selected (.+?) •/);
+  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[1]);if(team){assignments.set(m[2],{teamId:team.id,year:e.year,msg});retired.delete(m[2])}return}
+  m=msg.match(/^(.+?) retired from the NBA/);
+  if(m){retired.add(m[1]);assignments.delete(m[1])}
+ });
+ return {assignments,retired}
+}
 function repairRosterTransactionConsistency(){
  ensureLeagueRosters();
- const ledger=(S.nbaWorld?.leagueTransactions||[]).slice(0,60).map(text=>({text,year:S.year||1,source:"ledger"}));
- const social=(S.nbaWorld?.socialFeed||[]).slice(0,100).map(x=>({text:x?.text||"",year:x?.year||S.year||1,source:"social"}));
- const seen=new Set(),tx=[...ledger,...social].filter(x=>{const k=String(x.text||"");if(!k||seen.has(k))return false;seen.add(k);return true});
- let repaired=0;
- tx.forEach(entry=>{
-  const msg=String(entry.text||""),m=msg.match(/^(.+?) signed with (.+?) after leaving (.+?) •/);
-  if(!m)return;
-  const playerName=m[1],targetName=m[2],target=NBA_TEAMS.find(t=>teamNameById(t.id)===targetName);if(!target)return;
-  if((S.leagueRosters[target.id]||[]).some(p=>p.name===playerName))return;
+ const {assignments}=canonicalRosterAssignments(),restored=[];
+ assignments.forEach((a,playerName)=>{
+  const target=NBA_TEAMS.find(t=>t.id===a.teamId);if(!target)return;
+  const current=findLeaguePlayerTeam(playerName);
+  if(current===a.teamId)return;
   let found=null;
-  for(const t of NBA_TEAMS){const r=S.leagueRosters[t.id]||[],idx=r.findIndex(p=>p.name===playerName);if(idx>=0){found=r.splice(idx,1)[0];break}}
-  if(!found){for(const t of NBA_TEAMS){const star=(t.stars||[]).find(p=>p.name===playerName);if(star){found={...star,source:"veteran",yearsPro:5,age:29,potential:Math.max(star.ovr||80,90),contractYears:2,contractValue:realisticAnnualSalary(star.ovr||80)*2};break}}}
-  if(!found){
-   const store=transactionPlayerStore(),exact=store[transactionPlayerKey(playerName,target.id,entry.year)];
-   found=exact?{...exact}:rebuildMissingSignedPlayer(playerName,target.id,msg)
+  if(current){
+   const r=S.leagueRosters[current]||[],idx=r.findIndex(p=>p.name===playerName);
+   if(idx>=0)found=r.splice(idx,1)[0]
   }
-  if(found&&addLeagueRosterPlayer(target.id,found,"transaction-recovery")){snapshotTransactionPlayer(found,target.id,entry.year);repaired++}
+  if(!found){
+   const store=transactionPlayerStore(),exact=store[transactionPlayerKey(playerName,a.teamId,a.year)];
+   if(exact)found={...exact}
+  }
+  if(!found){
+   for(const t of NBA_TEAMS){const star=(t.stars||[]).find(p=>p.name===playerName);if(star){found={...star,source:"veteran",yearsPro:5,age:29,potential:Math.max(star.ovr||80,90),contractYears:2,contractValue:realisticAnnualSalary(star.ovr||80)*2};break}}
+  }
+  if(!found)found=rebuildMissingSignedPlayer(playerName,a.teamId,a.msg);
+  if(found&&addLeagueRosterPlayer(a.teamId,found,"transaction-recovery")){
+   snapshotTransactionPlayer(found,a.teamId,a.year);
+   restored.push(playerName+" → "+teamNameById(a.teamId))
+  }
  });
- return repaired
+ S.nbaWorld.rosterSyncLog=restored.slice(0,12);
+ S.nbaWorld.rosterSyncAt=restored.length?new Date().toISOString():(S.nbaWorld.rosterSyncAt||null);
+ return restored
 }
 function rosterFor(id){ensureLeagueRosters();return S.leagueRosters[id]||[]}
 function teamLeader(t){const r=t?rosterFor(t.id):[];return r[0]||null}
@@ -5378,7 +5407,7 @@ function organizationRosterPlayers(teamId){
 function rosters(){
  ensureLeagueStandings();
  ensureLeagueRosters();
- const rosterRepairs=repairRosterTransactionConsistency();if(rosterRepairs>0){save()}
+ const rosterRepairs=repairRosterTransactionConsistency();if(rosterRepairs.length>0){save()}
  const selected=rosterSelectedTeam(),team=nbaTeamById(selected),players=organizationRosterPlayers(selected),rec=S.leagueStandings[selected]||{w:0,l:0};
  const orgs=NBA_TEAMS.map(t=>{
    const r=S.leagueStandings[t.id]||{w:0,l:0};
@@ -5392,7 +5421,7 @@ function rosters(){
  const payroll=teamPayrollAnnual(selected),capStatus=capStatusForPayroll(payroll),taxBill=taxBillForPayroll(payroll);
  const top=[...players].sort((x,y)=>(y.ppg||0)-(x.ppg||0))[0];
  return '<div class="grid" style="margin-top:0">'+
- '<section class="card s12"><span class="kicker">NBA ORGANIZATIONS</span><h2 style="margin:6px 0">League Rosters</h2><p class="muted">The selected team roster is shown first. Tap any organization below to instantly load its players.</p></section>'+
+ '<section class="card s12"><span class="kicker">NBA ORGANIZATIONS</span><h2 style="margin:6px 0">League Rosters</h2><p class="muted">The selected team roster is shown first. Tap any organization below to instantly load its players.</p>'+(rosterRepairs.length?'<div class="item" style="margin-top:10px;border-color:#2b6b4d"><div><b>Roster Sync Restored</b><small>'+rosterRepairs.join(' • ')+'</small></div><span class="pill good">SYNCED</span></div>':'')+'</section>'+
  '<section class="card s12" id="selectedRosterPanel">'+
  '<div class="row"><div><span class="kicker">'+team.conf.toUpperCase()+' • '+teamDivision(team).toUpperCase()+'</span><h2 style="margin:5px 0">'+team.city+' '+team.name+'</h2><small class="muted">'+team.coach+' • '+rec.w+'-'+rec.l+'</small></div><span class="pill '+(team.id===S.team?'good':'')+'">'+players.length+' PLAYERS</span></div>'+
  '<div class="rosterSummary"><div><small class="muted">AVG OVR</small><b style="display:block;font-size:22px">'+avg+'</b></div><div><small class="muted">ANNUAL PAYROLL</small><b style="display:block;font-size:18px">$'+Math.round(payroll/1000000)+'M</b></div><div><small class="muted">CAP STATUS</small><b style="display:block">'+capStatus.label+'</b></div><div><small class="muted">TEAM</small><b style="display:block">'+team.abbr+'</b></div></div>'+
