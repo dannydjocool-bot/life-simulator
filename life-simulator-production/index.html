@@ -2794,10 +2794,82 @@ function ensureLeagueStandings(){
  if(S.team)S.leagueStandings[S.team]={w:S.record.w,l:S.record.l}
 }
 function teamPower(t){const r=rosterFor(t.id).slice(0,3);if(!r.length)return 50;return r.reduce((sum,p)=>sum+p.ppg+p.apg*.55+p.rpg*.35,0)/r.length}
+function teamCoreScore(p){return (p.ovr||0)*1.15+(p.potential||p.ovr||0)*.35+(p.ppg||0)*.7+(p.apg||0)*.35+(p.rpg||0)*.22}
+function chooseTradeTarget(teamId){
+ const roster=[...rosterFor(teamId)].sort((a,b)=>teamCoreScore(b)-teamCoreScore(a));
+ return roster.find((p,i)=>i>=1&&(p.ovr||0)>=74)||roster[1]||null
+}
+function chooseTradeOutgoing(teamId,target){
+ const roster=[...rosterFor(teamId)].sort((a,b)=>teamCoreScore(a)-teamCoreScore(b));
+ const need=Math.max(60,teamCoreScore(target)*.72),pkg=[];let value=0;
+ for(const p of roster){if(pkg.length>=2)break;if((p.ovr||0)>=90)continue;pkg.push(p);value+=teamCoreScore(p);if(value>=need)break}
+ return pkg
+}
+function executeAITrade(fromId,toId,target,pkg){
+ const from=rosterFor(fromId),to=rosterFor(toId),targetIdx=from.findIndex(p=>p.name===target.name);if(targetIdx<0)return false;
+ from.splice(targetIdx,1);
+ const moved=[];
+ pkg.forEach(p=>{const i=to.findIndex(x=>x.name===p.name);if(i>=0)moved.push(...to.splice(i,1))});
+ moved.forEach(p=>addLeagueRosterPlayer(fromId,p,"trade"));
+ addLeagueRosterPlayer(toId,target,"trade");
+ rebalanceRosterPayroll(from,fromId);rebalanceRosterPayroll(to,toId);
+ const names=moved.map(p=>p.name).join(" + ")||"future assets";
+ const msg=teamNameById(toId)+" acquired "+target.name+" from "+teamNameById(fromId)+" for "+names+".";
+ S.nbaWorld.leagueTransactions.unshift(msg);S.nbaWorld.leagueTransactions=S.nbaWorld.leagueTransactions.slice(0,30);pushLeagueNews(msg);pushSocialHeadline(msg,"TRADE");
+ return true
+}
+function createUserTeamTradeProposal(otherId,target,pkg){
+ S.nbaWorld.pendingTrade={id:"trade-"+(S.year||1)+"-"+(S.game||1)+"-"+Date.now(),otherId,targetName:target.name,packageNames:pkg.map(p=>p.name),createdGame:S.game||1,status:"pending"};
+ S.news.unshift("TRADE OFFER • "+teamNameById(otherId)+" contacted "+currentTeamName()+". Review it in League.")
+}
+function pendingTradeProposal(){return S.nbaWorld?.pendingTrade?.status==="pending"?S.nbaWorld.pendingTrade:null}
+function tradeProposalPlayers(p){
+ const other=rosterFor(p.otherId),ours=rosterFor(S.team);
+ return {target:other.find(x=>x.name===p.targetName)||null,pkg:p.packageNames.map(n=>ours.find(x=>x.name===n)).filter(Boolean)}
+}
+function declineIncomingTrade(){
+ const p=pendingTradeProposal();if(!p)return;p.status="declined";S.news.unshift("You declined the trade offer from "+teamNameById(p.otherId)+".");save();render();toast("Trade declined")
+}
+function acceptIncomingTrade(){
+ const p=pendingTradeProposal();if(!p)return;const x=tradeProposalPlayers(p);
+ if(!x.target||!x.pkg.length){p.status="expired";save();render();toast("Trade is no longer available");return}
+ if(executeAITrade(p.otherId,S.team,x.target,x.pkg)){p.status="accepted";S.player.chemistry=Math.min(100,S.player.chemistry+1);save();render();toast(x.target.name+" acquired")}
+}
+function openIncomingTradeCounter(){
+ const p=pendingTradeProposal();if(!p)return;const x=tradeProposalPlayers(p),ours=[...rosterFor(S.team)].sort((a,b)=>(b.ovr||0)-(a.ovr||0)),selected=new Set(p.packageNames);
+ const rows=ours.map(pl=>'<label class="item tradePlayerRow" style="cursor:pointer"><div><b>'+pl.name+'</b><small>'+pl.pos+' • '+(pl.ovr||0)+' OVR • '+(pl.ppg||0).toFixed(1)+' PPG</small></div><input type="checkbox" data-ai-counter="'+pl.name.replace(/"/g,"&quot;")+'" '+(selected.has(pl.name)?'checked':'')+'></label>').join("");
+ modal('<div class="tradeModal"><span class="kicker">COUNTER OFFER</span><h2>'+currentTeamName()+' ↔ '+teamNameById(p.otherId)+'</h2><p class="muted">Adjust the players your team is willing to send for '+(x.target?.name||p.targetName)+'.</p><div class="list tradeCounterList">'+rows+'</div><div class="modalFoot tradeActions"><button class="btn" id="aiCounterBack">Back</button><button class="btn primary" id="aiCounterSubmit">Submit Counter</button></div></div>');
+ $("aiCounterBack").onclick=()=>{closeModal();openIncomingTradeReview()};
+ $("aiCounterSubmit").onclick=()=>{
+  const names=[...document.querySelectorAll("[data-ai-counter]:checked")].map(e=>e.dataset.aiCounter);if(!names.length){toast("Choose at least one outgoing player");return}
+  const pkg=names.map(n=>rosterFor(S.team).find(x=>x.name===n)).filter(Boolean),need=x.target?teamCoreScore(x.target)*.72:9999,offered=pkg.reduce((s,q)=>s+teamCoreScore(q),0);
+  if(offered<need){toast("Counter offer value is too low");return}
+  p.packageNames=names;closeModal();openIncomingTradeReview();toast("Counter offer updated")
+ }
+}
+function openIncomingTradeReview(){
+ const p=pendingTradeProposal();if(!p){toast("No trade awaiting approval");return}const x=tradeProposalPlayers(p);
+ const outgoing=x.pkg.map(q=>'<div class="row"><span>'+q.name+' • '+q.pos+'</span><strong>'+(q.ovr||0)+' OVR</strong></div>').join("");
+ modal('<div class="tradeModal"><span class="kicker">TRADE APPROVAL</span><h2>'+teamNameById(p.otherId)+' sent an offer</h2><div class="item"><div><b>Incoming</b><small>'+(x.target?x.target.name+" • "+x.target.pos+" • "+(x.target.ovr||0)+" OVR":p.targetName)+'</small></div></div><h3 style="margin-top:14px">Your Team Sends</h3>'+outgoing+'<div class="modalFoot tradeActions"><button class="btn" id="aiTradeCounter">Counter Offer</button><button class="btn danger" id="aiTradeDecline">Decline</button><button class="btn primary" id="aiTradeAccept">Accept Trade</button></div></div>');
+ $("aiTradeCounter").onclick=openIncomingTradeCounter;$("aiTradeDecline").onclick=()=>{closeModal();declineIncomingTrade()};$("aiTradeAccept").onclick=()=>{closeModal();acceptIncomingTrade()}
+}
+function maybeGenerateLeagueTrade(){
+ if(S.stage!=="NBA"||S.playoffs.active||!tradeDeadlineOpen())return;
+ S.nbaWorld.tradePulse=S.nbaWorld.tradePulse||{lastGame:0,count:0};
+ const pulse=S.nbaWorld.tradePulse,game=S.record.w+S.record.l;if(game<6||game-pulse.lastGame<4)return;if(Math.random()>.68)return;
+ pulse.lastGame=game;
+ const teams=NBA_TEAMS.filter(t=>t.id!==S.team),buyer=teams[Math.floor(Math.random()*teams.length)],sellerPool=teams.filter(t=>t.id!==buyer.id),seller=sellerPool[Math.floor(Math.random()*sellerPool.length)];
+ const target=chooseTradeTarget(seller.id);if(target){const pkg=chooseTradeOutgoing(buyer.id,target);if(pkg.length&&executeAITrade(seller.id,buyer.id,target,pkg))pulse.count++}
+ if(!S.nbaWorld.pendingTrade&&Math.random()<.42){
+   const other=teams[Math.floor(Math.random()*teams.length)],theirTarget=chooseTradeTarget(other.id);
+   if(theirTarget){const ourPkg=chooseTradeOutgoing(S.team,theirTarget);if(ourPkg.length)createUserTeamTradeProposal(other.id,theirTarget,ourPkg)}
+ }
+}
 function simulateOtherTeamsOneGame(){
  if(S.stage!=="NBA"||S.playoffs.active)return;
  ensureLeagueStandings();ensureLeagueRosters();
- NBA_TEAMS.filter(t=>t.id!==S.team).forEach(t=>{const r=S.leagueStandings[t.id];if(r.w+r.l>=Math.min(82,S.record.w+S.record.l+1))return;const power=teamPower(t);const win=Math.random()*50+power>57;r[win?"w":"l"]++})
+ NBA_TEAMS.filter(t=>t.id!==S.team).forEach(t=>{const r=S.leagueStandings[t.id];if(r.w+r.l>=Math.min(82,S.record.w+S.record.l+1))return;const power=teamPower(t);const win=Math.random()*50+power>57;r[win?"w":"l"]++});
+ maybeGenerateLeagueTrade()
 }
 function teamDivision(t){
  const conf=NBA_TEAMS.filter(x=>x.conf===t.conf),idx=conf.findIndex(x=>x.id===t.id),slot=Math.max(0,Math.floor(idx/5));
