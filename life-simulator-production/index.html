@@ -2770,6 +2770,23 @@ function transactionPlayerStore(){
  S.nbaWorld.transactionPlayers=S.nbaWorld.transactionPlayers&&typeof S.nbaWorld.transactionPlayers==="object"?S.nbaWorld.transactionPlayers:{};
  return S.nbaWorld.transactionPlayers
 }
+function structuredTradeStore(){
+ S.nbaWorld.structuredTrades=Array.isArray(S.nbaWorld.structuredTrades)?S.nbaWorld.structuredTrades:[];
+ return S.nbaWorld.structuredTrades
+}
+function recordStructuredTrade(fromId,toId,target,moved,msg){
+ const rec={
+  id:"trade-"+(S.year||1)+"-"+Date.now()+"-"+Math.floor(Math.random()*100000),
+  year:S.year||1,fromId,toId,msg,
+  incoming:{name:target.name,teamId:toId,snapshot:JSON.parse(JSON.stringify(target))},
+  outgoing:(moved||[]).map(p=>({name:p.name,teamId:fromId,snapshot:JSON.parse(JSON.stringify(p))}))
+ };
+ structuredTradeStore().unshift(rec);
+ S.nbaWorld.structuredTrades=S.nbaWorld.structuredTrades.slice(0,80);
+ snapshotTransactionPlayer(target,toId,S.year);
+ (moved||[]).forEach(p=>snapshotTransactionPlayer(p,fromId,S.year));
+ return rec
+}
 function transactionPlayerKey(name,teamId,year=S.year){return String(year||1)+"|"+String(teamId||"") +"|"+String(name||"")}
 function snapshotTransactionPlayer(player,teamId,year=S.year){
  if(!player||!player.name||!teamId)return;
@@ -2789,22 +2806,38 @@ function rebuildMissingSignedPlayer(playerName,targetId,msg){
  return {id:"recovered-"+targetId+"-"+seed,name:playerName,pos,age,ovr:bestOvr,potential,personality:"Professional",ppg,apg,rpg,source:"transaction-recovery",yearsPro,contractYears:years,contractValue:annual*years,career:{gp,pts:Math.round(ppg*gp),ast:Math.round(apg*gp),reb:Math.round(rpg*gp),allStars:0,mvps:0,titles:0}}
 }
 function canonicalRosterAssignments(){
+ const assignments=new Map(),retired=new Set();
+ const structured=[...(S.nbaWorld?.structuredTrades||[])].slice().reverse();
+ structured.forEach(tr=>{
+  if(tr?.incoming?.name&&tr?.incoming?.teamId)assignments.set(tr.incoming.name,{teamId:tr.incoming.teamId,year:tr.year||S.year||1,msg:tr.msg||"",snapshot:tr.incoming.snapshot||null,source:"structured-trade"});
+  (tr?.outgoing||[]).forEach(x=>{if(x?.name&&x?.teamId)assignments.set(x.name,{teamId:x.teamId,year:tr.year||S.year||1,msg:tr.msg||"",snapshot:x.snapshot||null,source:"structured-trade"})})
+ });
  const events=[];
  const social=(S.nbaWorld?.socialFeed||[]).slice().reverse();
  social.forEach(x=>events.push({text:String(x?.text||""),year:x?.year||S.year||1,source:"social"}));
  const ledger=(S.nbaWorld?.leagueTransactions||[]).slice().reverse();
  ledger.forEach(text=>events.push({text:String(text||""),year:S.year||1,source:"ledger"}));
- const seen=new Set(),assignments=new Map(),retired=new Set();
+ const seen=new Set();
  events.forEach(e=>{
   const msg=e.text.trim();if(!msg||seen.has(msg))return;seen.add(msg);
   let m=msg.match(/^(.+?) signed with (.+?) after leaving (.+?) •/);
-  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[2]);if(team){assignments.set(m[1],{teamId:team.id,year:e.year,msg});retired.delete(m[1])}return}
+  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[2]);if(team){assignments.set(m[1],{teamId:team.id,year:e.year,msg,source:e.source});retired.delete(m[1])}return}
   m=msg.match(/^(.+?) re-signed with (.+?) for /);
-  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[2]);if(team){assignments.set(m[1],{teamId:team.id,year:e.year,msg});retired.delete(m[1])}return}
-  m=msg.match(/^(.+?) acquired (.+?) from (.+?) for /);
-  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[1]);if(team){assignments.set(m[2],{teamId:team.id,year:e.year,msg});retired.delete(m[2])}return}
+  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[2]);if(team){assignments.set(m[1],{teamId:team.id,year:e.year,msg,source:e.source});retired.delete(m[1])}return}
+  m=msg.match(/^(.+?) acquired (.+?) from (.+?) for (.+?)\.?$/);
+  if(m){
+   const toTeam=NBA_TEAMS.find(t=>teamNameById(t.id)===m[1]),fromTeam=NBA_TEAMS.find(t=>teamNameById(t.id)===m[3]);
+   if(toTeam){assignments.set(m[2],{teamId:toTeam.id,year:e.year,msg,source:e.source});retired.delete(m[2])}
+   if(fromTeam){
+    m[4].split(/\s*\+\s*/).map(x=>x.replace(/[.]$/,"").trim()).filter(Boolean).forEach(name=>{
+     if(name.toLowerCase()==="future assets")return;
+     assignments.set(name,{teamId:fromTeam.id,year:e.year,msg,source:e.source});retired.delete(name)
+    })
+   }
+   return
+  }
   m=msg.match(/^#\d+ pick: (.+?) selected (.+?) •/);
-  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[1]);if(team){assignments.set(m[2],{teamId:team.id,year:e.year,msg});retired.delete(m[2])}return}
+  if(m){const team=NBA_TEAMS.find(t=>teamNameById(t.id)===m[1]);if(team){assignments.set(m[2],{teamId:team.id,year:e.year,msg,source:e.source});retired.delete(m[2])}return}
   m=msg.match(/^(.+?) retired from the NBA/);
   if(m){retired.add(m[1]);assignments.delete(m[1])}
  });
@@ -2822,6 +2855,7 @@ function repairRosterTransactionConsistency(){
    const r=S.leagueRosters[current]||[],idx=r.findIndex(p=>p.name===playerName);
    if(idx>=0)found=r.splice(idx,1)[0]
   }
+  if(!found&&a.snapshot)found=JSON.parse(JSON.stringify(a.snapshot));
   if(!found){
    const store=transactionPlayerStore(),exact=store[transactionPlayerKey(playerName,a.teamId,a.year)];
    if(exact)found={...exact}
@@ -2861,16 +2895,23 @@ function chooseTradeOutgoing(teamId,target){
 }
 function executeAITrade(fromId,toId,target,pkg){
  const from=rosterFor(fromId),to=rosterFor(toId),targetIdx=from.findIndex(p=>p.name===target.name);if(targetIdx<0)return false;
+ const targetSnapshot=JSON.parse(JSON.stringify(from[targetIdx]));
  from.splice(targetIdx,1);
  const moved=[];
  pkg.forEach(p=>{const i=to.findIndex(x=>x.name===p.name);if(i>=0)moved.push(...to.splice(i,1))});
+ if(!moved.length)return false;
  moved.forEach(p=>addLeagueRosterPlayer(fromId,p,"trade"));
- addLeagueRosterPlayer(toId,target,"trade");
- rebalanceRosterPayroll(from,fromId);rebalanceRosterPayroll(to,toId);
- const names=moved.map(p=>p.name).join(" + ")||"future assets";
- const msg=teamNameById(toId)+" acquired "+target.name+" from "+teamNameById(fromId)+" for "+names+".";
- S.nbaWorld.leagueTransactions.unshift(msg);S.nbaWorld.leagueTransactions=S.nbaWorld.leagueTransactions.slice(0,30);pushLeagueNews(msg);pushSocialHeadline(msg,"TRADE");
- return true
+ const addedTarget=addLeagueRosterPlayer(toId,targetSnapshot,"trade");
+ if(!addedTarget)return false;
+ rebalanceRosterPayroll(rosterFor(fromId),fromId);rebalanceRosterPayroll(rosterFor(toId),toId);
+ const names=moved.map(p=>p.name).join(" + ");
+ const msg=teamNameById(toId)+" acquired "+targetSnapshot.name+" from "+teamNameById(fromId)+" for "+names+".";
+ recordStructuredTrade(fromId,toId,targetSnapshot,moved,msg);
+ S.nbaWorld.leagueTransactions.unshift(msg);S.nbaWorld.leagueTransactions=S.nbaWorld.leagueTransactions.slice(0,40);pushLeagueNews(msg);pushSocialHeadline(msg,"TRADE");
+ const incomingOK=findLeaguePlayerTeam(targetSnapshot.name)===toId;
+ const outgoingOK=moved.every(p=>findLeaguePlayerTeam(p.name)===fromId);
+ if(!incomingOK||!outgoingOK){repairRosterTransactionConsistency()}
+ return findLeaguePlayerTeam(targetSnapshot.name)===toId&&moved.every(p=>findLeaguePlayerTeam(p.name)===fromId)
 }
 function createUserTeamTradeProposal(otherId,target,pkg){
  S.nbaWorld.pendingTrade={id:"trade-"+(S.year||1)+"-"+(S.game||1)+"-"+Date.now(),otherId,targetName:target.name,packageNames:pkg.map(p=>p.name),createdGame:S.game||1,status:"pending"};
@@ -5533,7 +5574,7 @@ function reshareLeaguePost(index){
  S.news.unshift("You reshared a "+x.type+" headline and gained "+gain.toLocaleString()+" followers.");
  save();render();toast("Reshared • +"+gain.toLocaleString()+" followers")
 }
-function social(){
+function social(){repairRosterTransactionConsistency();
  S.social.playerFeed=Array.isArray(S.social.playerFeed)?S.social.playerFeed:[];
  S.social.reshared=Array.isArray(S.social.reshared)?S.social.reshared:[];
  const source=socialFeedSource();
