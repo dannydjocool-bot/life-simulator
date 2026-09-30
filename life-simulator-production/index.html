@@ -6683,7 +6683,8 @@ function quickSim(){
  const reason=quickSimBlockReason();if(reason){toast(reason);render();return}
  if(S.stage==="NBA"&&!S.playoffs.active&&(S.record.w+S.record.l)>=82){startPlayoffs();render();toast("Regular season complete — playoffs are ready");return}
  skipPendingInterviewForFastSim();quickSimBusy=true;
- try{recordGame(buildQuickSimGame())}catch(e){quickSimBusy=false;throw e}
+ try{recordGame(buildQuickSimGame())}
+ finally{quickSimBusy=false}
 }
 function quickSimBatch(maxGames=5,mode="count"){
  if(quickSimBusy){toast("Quick Sim is already processing");return}
