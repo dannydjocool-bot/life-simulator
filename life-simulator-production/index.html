@@ -2735,12 +2735,15 @@ function makeRosterDepthPlayer(teamId,index,used){
  return {id:"depth-"+teamId+"-"+index,name,pos,age,ovr,potential,personality:["Loyal","Competitive","Professional","Defensive-Minded","Team-First"][(seed+index)%5],ppg,apg,rpg,source:"depth",yearsPro,contractYears,contractValue,career:{gp,pts:Math.round(ppg*gp),ast:Math.round(apg*gp),reb:Math.round(rpg*gp),allStars:0,mvps:0,titles:0}}
 }
 function ensureLeagueRosters(){
- if(!S.leagueRosters)S.leagueRosters={};
- const used=new Set([S.player?.name].filter(Boolean));NBA_TEAMS.forEach(t=>t.stars.forEach(p=>used.add(p.name)));NBA_TEAMS.forEach(t=>(S.leagueRosters[t.id]||[]).forEach(p=>used.add(p.name)));
+ if(!S.leagueRosters||typeof S.leagueRosters!=="object"||Array.isArray(S.leagueRosters))S.leagueRosters={};
  NBA_TEAMS.forEach(t=>{
-   if(!Array.isArray(S.leagueRosters[t.id]))S.leagueRosters[t.id]=t.stars.map(p=>({...p,source:"veteran",yearsPro:5}));
+  if(Array.isArray(S.leagueRosters[t.id]))S.leagueRosters[t.id]=S.leagueRosters[t.id].filter(p=>p&&typeof p==="object"&&typeof p.name==="string"&&p.name.trim())
+ });
+ const used=new Set([S.player?.name].filter(Boolean));NBA_TEAMS.forEach(t=>t.stars.forEach(p=>used.add(p.name)));NBA_TEAMS.forEach(t=>(S.leagueRosters[t.id]||[]).forEach(p=>{if(p&&p.name)used.add(p.name)}));
+ NBA_TEAMS.forEach(t=>{
+   if(!Array.isArray(S.leagueRosters[t.id])||!S.leagueRosters[t.id].length)S.leagueRosters[t.id]=t.stars.map(p=>({...p,source:"veteran",yearsPro:5}));
    let roster=S.leagueRosters[t.id];roster.forEach(p=>used.add(p.name));while(roster.length<15)roster.push(makeRosterDepthPlayer(t.id,roster.length,used));
-   roster.forEach((p,i)=>{if(typeof p.yearsPro!=="number")p.yearsPro=5;if(typeof p.age!=="number")p.age=24+p.yearsPro;if(typeof p.ovr!=="number")p.ovr=Math.max(68,Math.min(95,Math.round(66+(p.ppg||10)*.75)));if(typeof p.potential!=="number")p.potential=Math.min(96,p.ovr+(p.yearsPro<=5?6:2));if(!p.personality)p.personality=["Loyal","Competitive","Money-Focused","Ring Chaser","Laid Back","Leader"][(i+t.id.length)%6];if(typeof p.contractYears!=="number")p.contractYears=1+((i+t.id.length)%4);if(typeof p.contractValue!=="number")p.contractValue=Math.round(realisticAnnualSalary(p.ovr)*Math.max(1,p.contractYears||1));normalizeContractValue(p);if(!p.career){const gp=p.yearsPro*76;p.career={gp,pts:Math.round((p.ppg||0)*gp),ast:Math.round((p.apg||0)*gp),reb:Math.round((p.rpg||0)*gp),allStars:0,mvps:0,titles:0}}});
+   roster.forEach((p,i)=>{p.ppg=Number(p.ppg)||0;p.apg=Number(p.apg)||0;p.rpg=Number(p.rpg)||0;if(typeof p.yearsPro!=="number")p.yearsPro=5;if(typeof p.age!=="number")p.age=24+p.yearsPro;if(typeof p.ovr!=="number")p.ovr=Math.max(68,Math.min(95,Math.round(66+(p.ppg||10)*.75)));if(typeof p.potential!=="number")p.potential=Math.min(96,p.ovr+(p.yearsPro<=5?6:2));if(!p.personality)p.personality=["Loyal","Competitive","Money-Focused","Ring Chaser","Laid Back","Leader"][(i+t.id.length)%6];if(typeof p.contractYears!=="number")p.contractYears=1+((i+t.id.length)%4);if(typeof p.contractValue!=="number")p.contractValue=Math.round(realisticAnnualSalary(p.ovr)*Math.max(1,p.contractYears||1));normalizeContractValue(p);if(!p.career){const gp=p.yearsPro*76;p.career={gp,pts:Math.round((p.ppg||0)*gp),ast:Math.round((p.apg||0)*gp),reb:Math.round((p.rpg||0)*gp),allStars:0,mvps:0,titles:0}}});
    roster.sort((x,y)=>(y.ovr||0)-(x.ovr||0)||(y.ppg||0)-(x.ppg||0));if(roster.length>15)S.leagueRosters[t.id]=roster.slice(0,15);rebalanceRosterPayroll(S.leagueRosters[t.id],t.id)
  })
 }
@@ -2877,11 +2880,15 @@ function rosterFor(id){ensureLeagueRosters();return S.leagueRosters[id]||[]}
 function teamLeader(t){const r=t?rosterFor(t.id):[];return r[0]||null}
 function currentCoach(){const t=nbaTeamById(S.team);return t?t.coach:"Coach"}
 function ensureLeagueStandings(){
- if(!S.leagueStandings)S.leagueStandings={};
- NBA_TEAMS.forEach(t=>{if(!S.leagueStandings[t.id])S.leagueStandings[t.id]={w:0,l:0}});
- if(S.team)S.leagueStandings[S.team]={w:S.record.w,l:S.record.l}
+ if(!S.leagueStandings||typeof S.leagueStandings!=="object"||Array.isArray(S.leagueStandings))S.leagueStandings={};
+ NBA_TEAMS.forEach(t=>{
+  const r=S.leagueStandings[t.id];
+  if(!r||typeof r!=="object"||Array.isArray(r))S.leagueStandings[t.id]={w:0,l:0};
+  else{r.w=Math.max(0,Number(r.w)||0);r.l=Math.max(0,Number(r.l)||0)}
+ });
+ if(S.team)S.leagueStandings[S.team]={w:Math.max(0,Number(S.record?.w)||0),l:Math.max(0,Number(S.record?.l)||0)}
 }
-function teamPower(t){const r=rosterFor(t.id).slice(0,3);if(!r.length)return 50;return r.reduce((sum,p)=>sum+p.ppg+p.apg*.55+p.rpg*.35,0)/r.length}
+function teamPower(t){if(!t||!t.id)return 50;const r=rosterFor(t.id).filter(Boolean).slice(0,3);if(!r.length)return 50;const power=r.reduce((sum,p)=>sum+(Number(p.ppg)||0)+(Number(p.apg)||0)*.55+(Number(p.rpg)||0)*.35,0)/r.length;return Number.isFinite(power)?power:50}
 function teamCoreScore(p){return (p.ovr||0)*1.15+(p.potential||p.ovr||0)*.35+(p.ppg||0)*.7+(p.apg||0)*.35+(p.rpg||0)*.22}
 function chooseTradeTarget(teamId){
  const roster=[...rosterFor(teamId)].sort((a,b)=>teamCoreScore(b)-teamCoreScore(a));
@@ -3164,6 +3171,37 @@ function recordBooksHTML(){
 function playoffRoundName(){if(S.playoffs&&S.playoffs.playIn)return "Play-In Tournament";return ["","First Round","Conference Semifinals","Conference Finals","NBA Finals"][S.playoffs.round]||"Playoffs"}
 function playoffGameNumber(){return Math.min(7,(Math.min(4,S.playoffs.seriesWins||0)+Math.min(4,S.playoffs.seriesLosses||0)+1))}
 function playoffWinsNeeded(){return Math.max(0,4-(S.playoffs.seriesWins||0))}
+function ensureGameActionState(){
+ if(S.stage!=="NBA")return true;
+ const base=fresh(),isObj=v=>v&&typeof v==="object"&&!Array.isArray(v),clone=v=>JSON.parse(JSON.stringify(v)),num=(v,f=0)=>Number.isFinite(Number(v))?Number(v):f;
+ if(!isObj(S.player))return false;
+ if(!isObj(S.player.stats))S.player.stats={gp:0,ppg:0,apg:0,rpg:0};
+ ["gp","ppg","apg","rpg"].forEach(k=>S.player.stats[k]=Math.max(0,num(S.player.stats[k],0)));
+ S.player.energy=Math.max(0,Math.min(100,num(S.player.energy,100)));S.player.morale=Math.max(0,Math.min(100,num(S.player.morale,75)));S.player.trust=Math.max(0,Math.min(100,num(S.player.trust,50)));S.player.chemistry=Math.max(0,Math.min(100,num(S.player.chemistry,60)));
+ if(!isObj(S.record))S.record={w:0,l:0};S.record.w=Math.max(0,Math.round(num(S.record.w,0)));S.record.l=Math.max(0,Math.round(num(S.record.l,0)));
+ if(!Array.isArray(S.games))S.games=[];if(!Array.isArray(S.news))S.news=[];if(!Array.isArray(S.offers))S.offers=[];if(!Array.isArray(S.accolades))S.accolades=[];
+ if(!isObj(S.social))S.social=clone(base.social);S.social.followers=Math.max(0,num(S.social.followers,100));S.social.fame=Math.max(0,Math.min(100,num(S.social.fame,0)));
+ if(!isObj(S.finance))S.finance=clone(base.finance);["cash","bank","earnings"].forEach(k=>S.finance[k]=Math.max(0,num(S.finance[k],0)));
+ if(!isObj(S.training))S.training=clone(base.training);
+ if(!isObj(S.coach))S.coach=clone(base.coach);if(!isObj(S.coach.lineups))S.coach.lineups={};
+ if(!isObj(S.relationships))S.relationships=clone(base.relationships);
+ if(!isObj(S.playoffs))S.playoffs=clone(base.playoffs);
+ if(!isObj(S.nbaWorld))S.nbaWorld=clone(base.nbaWorld);
+ if(!isObj(S.nbaWorld.rivalries))S.nbaWorld.rivalries={};if(!isObj(S.nbaWorld.relationships))S.nbaWorld.relationships={};
+ if(!isObj(S.nbaWorld.records))S.nbaWorld.records=clone(base.nbaWorld.records);
+ if(!isObj(S.nbaWorld.records.franchiseTotals))S.nbaWorld.records.franchiseTotals={};
+ if(!isObj(S.nbaWorld.records.playoff))S.nbaWorld.records.playoff={games:0,wins:0,pts:0,ast:0,reb:0,stl:0,blk:0,clutchWins:0,finalsGames:0,titles:0};
+ const pr=S.nbaWorld.records.playoff;["games","wins","pts","ast","reb","stl","blk","clutchWins","finalsGames","titles"].forEach(k=>pr[k]=Math.max(0,num(pr[k],0)));
+ if(!isObj(S.nbaWorld.cup))S.nbaWorld.cup=clone(base.nbaWorld.cup);if(!isObj(S.nbaWorld.loadManagement))S.nbaWorld.loadManagement=clone(base.nbaWorld.loadManagement);if(!isObj(S.nbaWorld.allStar))S.nbaWorld.allStar=clone(base.nbaWorld.allStar);
+ if(!Array.isArray(S.nbaWorld.formerTeams))S.nbaWorld.formerTeams=[];if(!Array.isArray(S.nbaWorld.leagueTransactions))S.nbaWorld.leagueTransactions=[];if(!Array.isArray(S.nbaWorld.socialFeed))S.nbaWorld.socialFeed=[];
+ if(!isObj(S.careerStats))S.careerStats=clone(base.careerStats);if(!isObj(S.careerStats.nba))S.careerStats.nba={gp:0,pts:0,ast:0,reb:0};["gp","pts","ast","reb"].forEach(k=>S.careerStats.nba[k]=Math.max(0,num(S.careerStats.nba[k],0)));
+ if(!isObj(S.leagueRosters))S.leagueRosters={};NBA_TEAMS.forEach(t=>{if(Array.isArray(S.leagueRosters[t.id]))S.leagueRosters[t.id]=S.leagueRosters[t.id].filter(p=>p&&typeof p==="object"&&typeof p.name==="string"&&p.name.trim())});
+ if(!S.team||!nbaTeamById(S.team))return false;
+ ensureLeagueRosters();ensureLeagueStandings();
+ if(S.fullGame&&(!isObj(S.fullGame)||!S.fullGame.opp))S.fullGame=null;if(S.live&&!isObj(S.live))S.live=null;
+ if(S.playoffs&&S.playoffs.active){S.playoffs.round=Math.max(0,Math.min(4,num(S.playoffs.round,0)));S.playoffs.seriesWins=Math.max(0,Math.min(4,num(S.playoffs.seriesWins,0)));S.playoffs.seriesLosses=Math.max(0,Math.min(4,num(S.playoffs.seriesLosses,0)));return repairPlayoffGameState()}
+ return true
+}
 function repairPlayoffGameState(){
  if(!(S.stage==="NBA"&&S.playoffs&&S.playoffs.active))return true;
  const p=S.playoffs;
@@ -3218,7 +3256,7 @@ function buildFirstRoundBracket(forceUserSeed){
  const pairs=[[0,7],[3,4],[2,5],[1,6]];
  S.playoffBracket={1:[...pairs.map(x=>makeSeries("East",e[x[0]],e[x[1]])),...pairs.map(x=>makeSeries("West",w[x[0]],w[x[1]]))],2:[],3:[],4:[]}
 }
-function seriesPower(id){const t=nbaTeamById(id),r=S.leagueStandings[id]||{w:0,l:0};return teamPower(t)+r.w*.28}
+function seriesPower(id){const t=nbaTeamById(id),r=(S.leagueStandings&&S.leagueStandings[id])||{w:0,l:0};return teamPower(t)+(Number(r.w)||0)*.28}
 function simulateSeries(s){if(s.winner)return s.winner;const pa=seriesPower(s.a),pb=seriesPower(s.b),aWins=Math.random()*100<50+(pa-pb)*1.2;s.winner=aWins?s.a:s.b;const loserWins=Math.floor(Math.random()*4);s.wA=aWins?4:loserWins;s.wB=aWins?loserWins:4;return s.winner}
 function currentUserBracketSeries(){if(!S.playoffBracket)return null;return (S.playoffBracket[S.playoffs.round]||[]).find(s=>s.a===S.team||s.b===S.team)||null}
 function syncUserBracketSeries(){const s=currentUserBracketSeries();if(!s)return;if(s.a===S.team){s.wA=S.playoffs.seriesWins;s.wB=S.playoffs.seriesLosses}else{s.wB=S.playoffs.seriesWins;s.wA=S.playoffs.seriesLosses}if(S.playoffs.seriesWins>=4)s.winner=S.team;else if(S.playoffs.seriesLosses>=4)s.winner=S.playoffs.opponentId}
@@ -4352,7 +4390,7 @@ function relationshipGameDayHTML(){
  const p=currentPartner();if(!p)return "";
  return '<section class="card s12"><span class="kicker">RELATIONSHIP BOOST • '+p.type.toUpperCase()+'</span><div class="row"><span><b>'+p.name+' • '+S.relationships.status+'</b><small class="muted" style="display:block">'+relationshipBoostText()+'</small></span><span class="pill good">'+Math.round(relationshipStrength())+' BOND</span></div></section>'
 }
-function games(){if(S.stage==="College")initializeCollegeTournament();if(S.stage==="College"&&ensureCollegeTournamentState().completed)return collegePostseasonCompleteHTML();if(S.stage==="Retired")return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">CAREER COMPLETE</span><h2>No games remaining</h2><p class="muted">Your playing career is over. Open Career to view your retirement legacy and post-career path.</p><button class="btn primary" data-go="career">View Retirement Legacy</button></section></div>';ensureAllStarBreakState();if(S.stage==="NBA"&&S.nbaWorld.allStar?.breakActive&&!S.nbaWorld.allStar.completed)return '<div class="grid" style="margin-top:0">'+allStarWeekendHTML()+'</div>';if(S.playoffs&&S.playoffs.active&&((S.playoffs.seriesWins||0)>=4||(S.playoffs.seriesLosses||0)>=4)){advancePlayoffRound();return '<div class="grid"><section class="card s12"><h3>Playoff series complete</h3><p class="muted">Advancing to the next round...</p></section></div>'}if(S.stage==="Draft Combine")return '<div class="grid" style="margin-top:0"><section class="card s12"><h3>Draft Combine</h3><p class="muted">Finish combine events from Career before Draft Night.</p><button class="btn primary" data-go="career">Open Draft Combine</button></section></div>';if(S.stage==="Offseason"){generateOffseason();return '<div class="grid" style="margin-top:0"><section class="card s12"><h3>Offseason</h3><p class="muted">No games until roster and contract decisions are complete.</p><button class="btn primary" data-go="career">Open Offseason Hub</button></section></div>'}if(S.fullGame&&S.fullGame.active)return fullGameView();if(S.live)return liveGame();if(S.playoffs&&S.playoffs.active)repairPlayoffGameState();const opp=nextOpp(),team=currentTeamName(),playoff=S.playoffs&&S.playoffs.active;if(S.stage==="NBA"&&!playoff&&(S.record.w+S.record.l)>=82){startPlayoffs();return '<div class="grid"><section class="card s12"><h3>Regular Season Complete</h3><p class="muted">Playoff seeding is being finalized.</p></section></div>'}if(S.stage==="NBA"&&isInjured()&&!S.player.injury.playThroughNext)return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="pill bad">INJURED • '+String(S.player.injury.severity||"minor").toUpperCase()+'</span><h2>'+S.player.injury.name+'</h2><p class="muted">'+S.player.injury.gamesLeft+' game(s) remaining • Durability '+durabilityRating()+'. Sit out to recover or play through eligible injuries with a temporary performance penalty.</p><div class="actions"><button class="btn primary" id="recoverInjuryBtn">Sit Out Next Game</button>'+(canPlayThroughInjury()?'<button class="btn danger" id="playThroughInjuryBtn">Play Through Injury</button>':'')+'</div></section></div>';updateRole();updateCaptaincy();const gameJerseyLabel=S.stage==="NBA"?activeJersey().name:"";return '<div class="grid" style="margin-top:0">'+(playoff?playoffCommandCenter():'')+pregameHTML()+relationshipGameDayHTML()+collegeTournamentHTML()+(playoff?playoffBanner():'')+(S.stage==="NBA"?storylineHTML()+loadManagementDisciplineHTML()+tradeRumorHTML()+allStarWeekendHTML()+lockerEventHTML():'')+careerStoryHTML(true)+'<section class="card s8"><h3>'+(collegeTournamentActive()?collegeTournamentStageLabel():playoff?playoffRoundName()+" • Game "+playoffGameNumber():"Next Matchup")+'</h3><div class="item"><div><b>'+team+' vs '+opp+'</b><small>'+(collegeTournamentActive()?'Single Elimination • #'+ensureCollegeTournamentState().seed+' Seed':playoff?'Series '+S.playoffs.seriesWins+'-'+S.playoffs.seriesLosses:S.stage+' • Game '+S.game+' • '+nextGameLocation())+' • Energy '+S.player.energy+'</small></div><span class="pill '+(playoff?"good":"")+'">'+(collegeTournamentActive()?"TOURNAMENT":playoff?"PLAYOFFS":nextGameLocation())+'</span></div><div class="actions"><button class="btn primary" id="fullGameBtn">Play Full Game</button><button class="btn" id="keyMom">Play Key Moment</button><button class="btn" id="quickSim">Quick Sim</button>'+(S.stage!=="College"&&!playoff?'<button class="btn good" id="quickSimFive">Sim 5 Games</button>':'')+(S.stage==="NBA"&&!playoff?'<button class="btn good" id="quickSimImportant">Sim to Important Event</button><button class="btn good" id="quickSimSeason">Sim Regular Season</button>':'')+(collegeTournamentActive()?'<button class="btn good" id="quickSimCollegeTournament">Quick Sim Tournament</button>':'')+''+(S.stage==="College"&&!collegeTournamentActive()&&collegeRegularSeasonGames()<40?'<button class="btn good" id="quickSimCollegeSeason">Quick Sim Regular Season</button>':'')+''+(S.stage==="NBA"&&!playoff?'<button class="btn" id="loadManageBtn">Load Manage</button>':'')+(S.stage==="NBA"?'<button class="btn" id="talkCoachBtn">Talk to Coach</button>':'')+'</div></section><section class="card"><h3>Your Team</h3><div class="big" style="font-size:22px">'+team+'</div><p class="muted">'+(playoff?'Series '+S.playoffs.seriesWins+'-'+S.playoffs.seriesLosses:S.record.w+'-'+S.record.l)+'</p><p class="muted">'+S.player.role+' • '+S.player.minutes+' MPG</p>'+(gameJerseyLabel?'<p class="muted">Jersey: '+gameJerseyLabel+'</p>':'')+'<p class="muted">Trust '+Math.round(S.player.trust)+' • Chemistry '+Math.round(S.player.chemistry)+'</p>'+(S.stage==="NBA"?'<p class="muted"><b>Starting 5:</b> '+currentStartingFive().map(p=>p.name).join(", ")+'</p>':'')+(S.stage==="NBA"?'<p class="muted">'+(tradeDeadlineOpen()?'Trade deadline open':'Trade deadline passed')+'</p>':'')+'</section><section class="card s12"><h3>Your Stats</h3>'+statLineCard()+'</section><section class="card s12"><h3>Results</h3><div class="list">'+(S.games.length?S.games.filter(g=>!g.stage||g.stage===S.stage||g.playoff).slice(0,8).map(g=>'<div class="item"><div><b>'+(g.homeAway?g.homeAway+' • ':'')+g.opp+'</b><small>'+g.pts+' PTS • '+g.ast+' AST • '+g.reb+' REB</small></div><span class="pill '+(g.win?"good":"bad")+'">'+(g.win?"W ":"L ")+g.team+"-"+g.oppScore+'</span></div>').join(""):'<div class="item"><div><b>No games played</b><small>Your next matchup is ready.</small></div></div>')+'</div></section></div>'}
+function games(){if(S.stage==="College")initializeCollegeTournament();if(S.stage==="College"&&ensureCollegeTournamentState().completed)return collegePostseasonCompleteHTML();if(S.stage==="Retired")return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="kicker">CAREER COMPLETE</span><h2>No games remaining</h2><p class="muted">Your playing career is over. Open Career to view your retirement legacy and post-career path.</p><button class="btn primary" data-go="career">View Retirement Legacy</button></section></div>';ensureAllStarBreakState();if(S.stage==="NBA"&&S.nbaWorld.allStar?.breakActive&&!S.nbaWorld.allStar.completed)return '<div class="grid" style="margin-top:0">'+allStarWeekendHTML()+'</div>';if(S.playoffs&&S.playoffs.active&&((S.playoffs.seriesWins||0)>=4||(S.playoffs.seriesLosses||0)>=4)){advancePlayoffRound();return '<div class="grid"><section class="card s12"><h3>Playoff series complete</h3><p class="muted">Advancing to the next round...</p></section></div>'}if(S.stage==="Draft Combine")return '<div class="grid" style="margin-top:0"><section class="card s12"><h3>Draft Combine</h3><p class="muted">Finish combine events from Career before Draft Night.</p><button class="btn primary" data-go="career">Open Draft Combine</button></section></div>';if(S.stage==="Offseason"){generateOffseason();return '<div class="grid" style="margin-top:0"><section class="card s12"><h3>Offseason</h3><p class="muted">No games until roster and contract decisions are complete.</p><button class="btn primary" data-go="career">Open Offseason Hub</button></section></div>'}if(S.fullGame&&S.fullGame.active)return fullGameView();if(S.live)return liveGame();if(S.playoffs&&S.playoffs.active)ensureGameActionState();const opp=nextOpp(),team=currentTeamName(),playoff=S.playoffs&&S.playoffs.active;if(S.stage==="NBA"&&!playoff&&(S.record.w+S.record.l)>=82){startPlayoffs();return '<div class="grid"><section class="card s12"><h3>Regular Season Complete</h3><p class="muted">Playoff seeding is being finalized.</p></section></div>'}if(S.stage==="NBA"&&isInjured()&&!S.player.injury.playThroughNext)return '<div class="grid" style="margin-top:0"><section class="card s12"><span class="pill bad">INJURED • '+String(S.player.injury.severity||"minor").toUpperCase()+'</span><h2>'+S.player.injury.name+'</h2><p class="muted">'+S.player.injury.gamesLeft+' game(s) remaining • Durability '+durabilityRating()+'. Sit out to recover or play through eligible injuries with a temporary performance penalty.</p><div class="actions"><button class="btn primary" id="recoverInjuryBtn">Sit Out Next Game</button>'+(canPlayThroughInjury()?'<button class="btn danger" id="playThroughInjuryBtn">Play Through Injury</button>':'')+'</div></section></div>';updateRole();updateCaptaincy();const gameJerseyLabel=S.stage==="NBA"?activeJersey().name:"";return '<div class="grid" style="margin-top:0">'+(playoff?playoffCommandCenter():'')+pregameHTML()+relationshipGameDayHTML()+collegeTournamentHTML()+(playoff?playoffBanner():'')+(S.stage==="NBA"?storylineHTML()+loadManagementDisciplineHTML()+tradeRumorHTML()+allStarWeekendHTML()+lockerEventHTML():'')+careerStoryHTML(true)+'<section class="card s8"><h3>'+(collegeTournamentActive()?collegeTournamentStageLabel():playoff?playoffRoundName()+" • Game "+playoffGameNumber():"Next Matchup")+'</h3><div class="item"><div><b>'+team+' vs '+opp+'</b><small>'+(collegeTournamentActive()?'Single Elimination • #'+ensureCollegeTournamentState().seed+' Seed':playoff?'Series '+S.playoffs.seriesWins+'-'+S.playoffs.seriesLosses:S.stage+' • Game '+S.game+' • '+nextGameLocation())+' • Energy '+S.player.energy+'</small></div><span class="pill '+(playoff?"good":"")+'">'+(collegeTournamentActive()?"TOURNAMENT":playoff?"PLAYOFFS":nextGameLocation())+'</span></div><div class="actions"><button class="btn primary" id="fullGameBtn">Play Full Game</button><button class="btn" id="keyMom">Play Key Moment</button><button class="btn" id="quickSim">Quick Sim</button>'+(S.stage!=="College"&&!playoff?'<button class="btn good" id="quickSimFive">Sim 5 Games</button>':'')+(S.stage==="NBA"&&!playoff?'<button class="btn good" id="quickSimImportant">Sim to Important Event</button><button class="btn good" id="quickSimSeason">Sim Regular Season</button>':'')+(collegeTournamentActive()?'<button class="btn good" id="quickSimCollegeTournament">Quick Sim Tournament</button>':'')+''+(S.stage==="College"&&!collegeTournamentActive()&&collegeRegularSeasonGames()<40?'<button class="btn good" id="quickSimCollegeSeason">Quick Sim Regular Season</button>':'')+''+(S.stage==="NBA"&&!playoff?'<button class="btn" id="loadManageBtn">Load Manage</button>':'')+(S.stage==="NBA"?'<button class="btn" id="talkCoachBtn">Talk to Coach</button>':'')+'</div></section><section class="card"><h3>Your Team</h3><div class="big" style="font-size:22px">'+team+'</div><p class="muted">'+(playoff?'Series '+S.playoffs.seriesWins+'-'+S.playoffs.seriesLosses:S.record.w+'-'+S.record.l)+'</p><p class="muted">'+S.player.role+' • '+S.player.minutes+' MPG</p>'+(gameJerseyLabel?'<p class="muted">Jersey: '+gameJerseyLabel+'</p>':'')+'<p class="muted">Trust '+Math.round(S.player.trust)+' • Chemistry '+Math.round(S.player.chemistry)+'</p>'+(S.stage==="NBA"?'<p class="muted"><b>Starting 5:</b> '+currentStartingFive().map(p=>p.name).join(", ")+'</p>':'')+(S.stage==="NBA"?'<p class="muted">'+(tradeDeadlineOpen()?'Trade deadline open':'Trade deadline passed')+'</p>':'')+'</section><section class="card s12"><h3>Your Stats</h3>'+statLineCard()+'</section><section class="card s12"><h3>Results</h3><div class="list">'+(S.games.length?S.games.filter(g=>!g.stage||g.stage===S.stage||g.playoff).slice(0,8).map(g=>'<div class="item"><div><b>'+(g.homeAway?g.homeAway+' • ':'')+g.opp+'</b><small>'+g.pts+' PTS • '+g.ast+' AST • '+g.reb+' REB</small></div><span class="pill '+(g.win?"good":"bad")+'">'+(g.win?"W ":"L ")+g.team+"-"+g.oppScore+'</span></div>').join(""):'<div class="item"><div><b>No games played</b><small>Your next matchup is ready.</small></div></div>')+'</div></section></div>'}
 
 function gameGradeLetter(v){return v>=92?"A+":v>=88?"A":v>=84?"A-":v>=80?"B+":v>=76?"B":v>=72?"B-":v>=68?"C+":v>=64?"C":v>=60?"C-":v>=55?"D+":"D"}
 function fullClock(sec){sec=Math.max(0,Math.round(sec));return Math.floor(sec/60)+":"+String(sec%60).padStart(2,"0")}
@@ -4407,6 +4445,7 @@ function answerBackFull(type){
  g.turn="defense";fullAdvance(34+Math.floor(Math.random()*16));save();render()
 }
 function startFullGame(){
+ if(!ensureGameActionState()){toast("Game state could not be restored");return}
  if(S.stage==="NBA"&&isInjured()&&!S.player.injury.playThroughNext){toast("You are injured");return}
  const opp=nextOpp(),target=fullTargetMinutes(),playoff=!!(S.playoffs&&S.playoffs.active),collegeTourney=collegeTournamentActive(),spot=S.stage==="NBA"?currentGameSpotlight():{mult:collegeTourney?2.4:1,title:collegeTourney?collegeTournamentRoundName():S.stage+" Game"},base=collegeTourney?collegeTournamentAudience(ensureCollegeTournamentState().round):broadcastBaseAudience(S.stage,playoff,S.playoffs&&S.playoffs.round||0)*spot.mult;
  const pb=pregameBoost();S.player.energy=Math.max(35,Math.min(100,S.player.energy+pb.energy));S.player.trust=Math.min(100,S.player.trust+pb.trust);const gameJersey=S.stage==="NBA"?activeJersey():null;S.fullGame={active:true,opp,stage:S.stage,playoff,collegeTournament:collegeTourney,collegeTournamentRound:collegeTourney?ensureCollegeTournamentState().round:null,collegeTournamentGame:collegeTourney?collegeTournamentGameNumber():null,jersey:gameJersey?{id:gameJersey.id,name:gameJersey.name,colors:jerseyColors(gameJersey)}:null,homeAway:playoff?"PLAYOFF":nextGameLocation(),quarter:1,clock:720,team:0,oppScore:0,turn:"offense",onCourt:true,minutesPlayed:0,targetMinutes:target,grade:70,energy:S.player.energy,halftimeDone:false,adjustment:null,stint:0,benchTrips:0,fouledOut:false,intro:true,pendingAnswer:null,hype:35,viewers:Math.round(base),viewerFloor:Math.round(base*.55),peakViewers:Math.round(base),broadcastLine:"Pregame coverage is live.",lastMessage:"Opening tip. Coach wants a composed first possession.",stats:{pts:0,ast:0,reb:0,stl:0,blk:0,tov:0,pf:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,plusMinus:0},log:["Opening tip vs "+opp+"."]};
@@ -6191,6 +6230,7 @@ function opponentAnswerChance(){
  return Math.max(25,Math.min(72,Math.round(62-stop)))
 }
 function startMoment(){
+ if(!ensureGameActionState()){toast("Game state could not be restored");return}
  if(S.stage==="NBA"&&isInjured()&&!S.player.injury.playThroughNext){toast("You are injured");return}
  const opp=nextOpp(),playoff=!!(S.playoffs&&S.playoffs.active),nba=S.stage==="NBA",collegeTourney=collegeTournamentActive(),spot=nba?currentGameSpotlight():null;
  const base=nba?(playoff?100:104):(S.stage==="College"?68:58),team=base+Math.floor(Math.random()*(nba?15:10)),gap=1+Math.floor(Math.random()*4);
@@ -6395,20 +6435,26 @@ function buildQuickSimGame(){
  return g
 }
 function quickSim(){
+ if(!ensureGameActionState()){toast("Game state could not be restored");return}
  if(quickSimBusy){
   if(!(S.fullGame&&S.fullGame.active)&&!S.live){quickSimBusy=false}else{toast("Quick Sim is already processing");return}
  }
  const reason=quickSimBlockReason();if(reason){toast(reason);render();return}
  if(S.stage==="NBA"&&!S.playoffs.active&&(S.record.w+S.record.l)>=82){startPlayoffs();render();toast("Regular season complete — playoffs are ready");return}
  skipPendingInterviewForFastSim();
+ const before=JSON.stringify(S);
  quickSimBusy=true;
  try{
   const g=buildQuickSimGame();
   recordGame(g)
  }catch(e){
   console.error("Quick Sim failed",e);
-  toast("Quick Sim hit an error and was safely reset");
-  throw e
+  try{
+   S=validateCareerSave(JSON.parse(before));ensureGameActionState();
+   S.nbaWorld.lastQuickSimError={message:String(e&&e.message||e),year:S.year||1,stage:S.stage||"",round:S.playoffs?.round||0,at:new Date().toISOString()};
+   save();render()
+  }catch(recoveryError){console.error("Quick Sim recovery failed",recoveryError)}
+  toast("Quick Sim recovered safely — try again")
  }finally{
   quickSimBusy=false
  }
