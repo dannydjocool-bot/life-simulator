@@ -2744,6 +2744,47 @@ function ensureLeagueRosters(){
    roster.sort((x,y)=>(y.ovr||0)-(x.ovr||0)||(y.ppg||0)-(x.ppg||0));if(roster.length>15)S.leagueRosters[t.id]=roster.slice(0,15);rebalanceRosterPayroll(S.leagueRosters[t.id],t.id)
  })
 }
+function addLeagueRosterPlayer(teamId,player,reason="transaction"){
+ ensureLeagueRosters();
+ if(!teamId||!player)return false;
+ NBA_TEAMS.forEach(t=>{const r=S.leagueRosters[t.id]||[];for(let i=r.length-1;i>=0;i--){if(r[i]&&r[i].name===player.name)r.splice(i,1)}});
+ const roster=S.leagueRosters[teamId]||[];
+ while(roster.length>=15){
+  let candidates=roster.map((p,i)=>({p,i,score:(p.source==="depth"?0:p.source==="rookie"?1:2)*100+(p.ovr||0)}));
+  candidates.sort((a,b)=>a.score-b.score);
+  const cut=candidates[0];
+  if(!cut)break;
+  roster.splice(cut.i,1);
+ }
+ player.source=player.source||reason;
+ roster.push(player);
+ roster.sort((a,b)=>(b.ovr||0)-(a.ovr||0)||(b.ppg||0)-(a.ppg||0));
+ S.leagueRosters[teamId]=roster.slice(0,15);
+ return S.leagueRosters[teamId].some(p=>p.name===player.name)
+}
+function findLeaguePlayerTeam(name){
+ for(const t of NBA_TEAMS){if((S.leagueRosters?.[t.id]||[]).some(p=>p.name===name))return t.id}
+ return null
+}
+function repairRosterTransactionConsistency(){
+ ensureLeagueRosters();
+ const tx=(S.nbaWorld?.leagueTransactions||[]).slice(0,30);
+ let repaired=0;
+ tx.forEach(msg=>{
+  const m=String(msg||"").match(/^(.+?) signed with (.+?) after leaving (.+?) •/);
+  if(!m)return;
+  const playerName=m[1],targetName=m[2];
+  const target=NBA_TEAMS.find(t=>teamNameById(t.id)===targetName);if(!target)return;
+  if((S.leagueRosters[target.id]||[]).some(p=>p.name===playerName))return;
+  let found=null;
+  for(const t of NBA_TEAMS){const r=S.leagueRosters[t.id]||[],idx=r.findIndex(p=>p.name===playerName);if(idx>=0){found=r.splice(idx,1)[0];break}}
+  if(!found){
+   for(const t of NBA_TEAMS){const star=(t.stars||[]).find(p=>p.name===playerName);if(star){found={...star,source:"veteran",yearsPro:5,age:29,potential:Math.max(star.ovr||80,90),contractYears:2,contractValue:realisticAnnualSalary(star.ovr||80)*2};break}}
+  }
+  if(found&&addLeagueRosterPlayer(target.id,found,"transaction"))repaired++
+ });
+ return repaired
+}
 function rosterFor(id){ensureLeagueRosters();return S.leagueRosters[id]||[]}
 function teamLeader(t){const r=t?rosterFor(t.id):[];return r[0]||null}
 function currentCoach(){const t=nbaTeamById(S.team);return t?t.coach:"Coach"}
@@ -3325,7 +3366,8 @@ function processLeagueFreeAgency(){
   let to=choices.find(id=>canTeamAddAnnualSalary(id,annual));
   if(!to)to=from;
   p.contractYears=years;p.contractValue=annual*years;
-  rosterFor(to).push(p);
+  const rosterAdded=addLeagueRosterPlayer(to,p,"free-agent");
+  if(!rosterAdded){return}
   if(to!==from){const msg=p.name+" signed with "+teamNameById(to)+" after leaving "+teamNameById(from)+" • "+years+" years • $"+Math.round(annual/1000000)+"M/yr";S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg)}
   else if((p.ovr||0)>=82){const msg=p.name+" re-signed with "+teamNameById(from)+" for "+years+" years • $"+Math.round(annual/1000000)+"M/yr.";S.nbaWorld.leagueTransactions.unshift(msg);pushLeagueNews(msg)}
  });
@@ -3400,7 +3442,7 @@ function acceptContract(idx){
  S.news.unshift("Signed with "+teamNameById(offer.teamId)+" for $"+offer.total.toLocaleString()+".");addCareerTimeline("Signed Contract",teamNameById(offer.teamId)+" • "+offer.years+" years • $"+offer.total.toLocaleString(),"CONTRACT");pushLeagueNews(S.player.name+" signed with "+teamNameById(offer.teamId)+".");
  save();render();toast("Contract signed");setTimeout(()=>freeAgencyReveal(offer.teamId,offer,previousTeam),80)
 }
-function applyRookieDraft(){if(S.offseason.draftApplied)return;ensureLeagueRosters();S.offseason.teamDrafts.forEach((d,i)=>{const r=rosterFor(d.teamId);r.push({...d.player,draftPick:i+1});r.sort((a,b)=>(b.ovr||0)-(a.ovr||0)||b.ppg-a.ppg);if(i<10)pushSocialHeadline("#"+(i+1)+" pick: "+teamNameById(d.teamId)+" selected "+d.player.name+" • "+d.player.pos+" • "+d.player.tier,"DRAFT")});NBA_TEAMS.forEach(t=>rebalanceRosterPayroll(rosterFor(t.id),t.id));S.offseason.draftApplied=true}
+function applyRookieDraft(){if(S.offseason.draftApplied)return;ensureLeagueRosters();S.offseason.teamDrafts.forEach((d,i)=>{const rookie={...d.player,draftPick:i+1,source:"rookie"};const added=addLeagueRosterPlayer(d.teamId,rookie,"rookie");if(added&&i<10)pushSocialHeadline("#"+(i+1)+" pick: "+teamNameById(d.teamId)+" selected "+d.player.name+" • "+d.player.pos+" • "+d.player.tier,"DRAFT")});NBA_TEAMS.forEach(t=>rebalanceRosterPayroll(rosterFor(t.id),t.id));S.offseason.draftApplied=true}
 function startNextSeason(){
  if(!S.offseason.active)return;repairContractState();if(isFreeAgent()&&!S.offseason.decisionMade){toast("Choose a contract before next season");return}if(isFreeAgent()){toast("You must sign a contract before starting the season");return}if(S.finance.contract.teamId!==S.team)S.finance.contract.teamId=S.team;if(S.careerPaths.lastTeamId===S.team)addCareerPathXP("franchise",30);else S.careerPaths.lastTeamId=S.team;if((S.year||1)>=4)addCareerPathXP("veteran",25);applyRookieDraft();developLeaguePlayers();S.stage="NBA";S.year++;S.record={w:0,l:0};S.game=1;S.leagueStandings=null;ensureLeagueStandings();S.playoffs={active:false,qualified:false,round:0,seriesWins:0,seriesLosses:0,opponentId:null,seed:null,opponentSeed:null,champion:false,eliminated:false};S.playoffBracket=null;S.offseason={active:false,generated:false,draftClass:[],teamDrafts:[],contractOffers:[],decisionMade:false,draftApplied:false};ensureV019State().seasonRecap=null;resetSeasonStatLine();resetNBARegularSeasonStats(S.year);S.player.injury=null;applyAgingCurve();checkRetirementEligibility();S.nbaWorld.loadManagement.missedInjury=0;S.nbaWorld.loadManagement.cleanGames=0;S.nbaWorld.loadManagement.abuseScore=Math.max(0,Math.floor((S.nbaWorld.loadManagement.abuseScore||0)/2));S.nbaWorld.loadManagement.highestFineTier=S.nbaWorld.loadManagement.abuseScore>=4?Math.min(S.nbaWorld.loadManagement.highestFineTier||0,2):0;S.nbaWorld.allStar={year:S.year,selected:false,pending:false,breakActive:false,completed:false,events:{},captains:[],teams:[],pool:[]};S.nbaWorld.cup={year:S.year,w:0,l:0,qualified:false,champion:false};resetTrainingCycle();S.social.posted=false;resetHomeCycle();if(S.relationships)S.relationships.actionsThisCycle=0;S.seasonAwards=null;updateRole();updateLeagueEvolution();updateLeagueEra();ensureSuperstarState().pregame={choice:null,game:0,applied:false};S.news.unshift("NBA Year "+S.year+" begins with "+currentTeamName()+".");pushLeagueNews("NBA Year "+S.year+" tipped off.");save();setScreen("home");toast("New NBA season started")
 }
@@ -5238,6 +5280,7 @@ function organizationRosterPlayers(teamId){
 function rosters(){
  ensureLeagueStandings();
  ensureLeagueRosters();
+ const rosterRepairs=repairRosterTransactionConsistency();if(rosterRepairs>0){save()}
  const selected=rosterSelectedTeam(),team=nbaTeamById(selected),players=organizationRosterPlayers(selected),rec=S.leagueStandings[selected]||{w:0,l:0};
  const orgs=NBA_TEAMS.map(t=>{
    const r=S.leagueStandings[t.id]||{w:0,l:0};
