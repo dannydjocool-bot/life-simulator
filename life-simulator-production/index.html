@@ -2790,18 +2790,23 @@ function rebuildMissingSignedPlayer(playerName,targetId,msg){
 }
 function repairRosterTransactionConsistency(){
  ensureLeagueRosters();
- const tx=(S.nbaWorld?.leagueTransactions||[]).slice(0,40);
+ const ledger=(S.nbaWorld?.leagueTransactions||[]).slice(0,60).map(text=>({text,year:S.year||1,source:"ledger"}));
+ const social=(S.nbaWorld?.socialFeed||[]).slice(0,100).map(x=>({text:x?.text||"",year:x?.year||S.year||1,source:"social"}));
+ const seen=new Set(),tx=[...ledger,...social].filter(x=>{const k=String(x.text||"");if(!k||seen.has(k))return false;seen.add(k);return true});
  let repaired=0;
- tx.forEach(msg=>{
-  const m=String(msg||"").match(/^(.+?) signed with (.+?) after leaving (.+?) •/);
+ tx.forEach(entry=>{
+  const msg=String(entry.text||""),m=msg.match(/^(.+?) signed with (.+?) after leaving (.+?) •/);
   if(!m)return;
   const playerName=m[1],targetName=m[2],target=NBA_TEAMS.find(t=>teamNameById(t.id)===targetName);if(!target)return;
   if((S.leagueRosters[target.id]||[]).some(p=>p.name===playerName))return;
   let found=null;
   for(const t of NBA_TEAMS){const r=S.leagueRosters[t.id]||[],idx=r.findIndex(p=>p.name===playerName);if(idx>=0){found=r.splice(idx,1)[0];break}}
   if(!found){for(const t of NBA_TEAMS){const star=(t.stars||[]).find(p=>p.name===playerName);if(star){found={...star,source:"veteran",yearsPro:5,age:29,potential:Math.max(star.ovr||80,90),contractYears:2,contractValue:realisticAnnualSalary(star.ovr||80)*2};break}}}
-  if(!found)found=rebuildMissingSignedPlayer(playerName,target.id,msg);
-  if(found&&addLeagueRosterPlayer(target.id,found,"transaction-recovery")){snapshotTransactionPlayer(found,target.id,S.year);repaired++}
+  if(!found){
+   const store=transactionPlayerStore(),exact=store[transactionPlayerKey(playerName,target.id,entry.year)];
+   found=exact?{...exact}:rebuildMissingSignedPlayer(playerName,target.id,msg)
+  }
+  if(found&&addLeagueRosterPlayer(target.id,found,"transaction-recovery")){snapshotTransactionPlayer(found,target.id,entry.year);repaired++}
  });
  return repaired
 }
