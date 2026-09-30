@@ -2641,7 +2641,7 @@ function playerCareerStatsHTML(){
 function stageStats(){const key=(S.stage==="NBA"||S.stage==="Offseason"||S.stage==="Retired")?"nba":S.stage==="College"?"college":"highSchool";return S.careerStats[key]}
 function statLineCard(){const st=S.player.stats,cs=stageStats();return '<div class="row"><span>Season</span><strong>'+st.ppg.toFixed(1)+' PPG • '+st.apg.toFixed(1)+' APG • '+st.rpg.toFixed(1)+' RPG</strong></div><div class="row"><span>Career '+S.stage+'</span><strong>'+cs.gp+' GP • '+cs.pts+' PTS • '+cs.ast+' AST • '+cs.reb+' REB</strong></div>'}
 function offseasonCareerView(){
- generateOffseason();repairContractState();const con=S.finance.contract,aw=S.seasonAwards||{},under=isUnderContract(),extEligible=isExtensionEligible(),free=isFreeAgent(),pending=con&&con.pendingExtension;
+ generateOffseason();repairContractState();ensureOffseasonLeagueActivity();const con=S.finance.contract,aw=S.seasonAwards||{},under=isUnderContract(),extEligible=isExtensionEligible(),free=isFreeAgent(),pending=con&&con.pendingExtension;
  const money=n=>"$"+Math.round(n||0).toLocaleString();
  const contractCard=under
    ?'<div class="item"><div><b>'+currentTeamName()+' • '+(con.type||con.label||"NBA Contract")+'</b><small>'+contractYearsRemaining()+' year(s) remaining • '+money(con.total)+' total • '+money(con.perGame)+' / game • Expires after '+contractExpirationLabel()+(con.option?' • '+con.option:'')+(con.noTrade?' • No-Trade Clause':'')+'</small></div><span class="pill good">LOCKED IN</span></div>'
@@ -3603,6 +3603,16 @@ function processStarBuildingTrades(maxMoves=5){
   }
  }
  return moves
+}
+function ensureOffseasonLeagueActivity(){
+ if(S.stage!=="Offseason"||!S.offseason?.active)return;
+ const day=ensureOffseasonFlow()?.day||1;
+ processAIExtensions();
+ S.nbaWorld.offseasonActivity=S.nbaWorld.offseasonActivity&&typeof S.nbaWorld.offseasonActivity==="object"?S.nbaWorld.offseasonActivity:{};
+ const a=S.nbaWorld.offseasonActivity;
+ if(day>=4&&a.signingStoriesYear!==S.year){processStarBuildingSigningStories();a.signingStoriesYear=S.year}
+ if(day>=5&&a.starTradeWave1Year!==S.year){processStarBuildingTrades(3);a.starTradeWave1Year=S.year}
+ if(day>=6&&a.starTradeWave2Year!==S.year){processStarBuildingTrades(4);a.starTradeWave2Year=S.year}
 }
 function processStarBuildingSigningStories(){
  ensureLeagueRosters();
