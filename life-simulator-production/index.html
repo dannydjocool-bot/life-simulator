@@ -4672,9 +4672,41 @@ function playoffQuickBoxScoreHTML(r){
  return '<div class="row"><div><span class="kicker">FULL BOX SCORE • PLAYOFF GAME '+r.gameNumber+'</span><h2 style="margin:5px 0">'+r.teamName+' '+r.teamScore+' — '+r.oppScore+' '+r.opp+'</h2></div><span class="pill '+(r.win?"good":"bad")+'">'+(r.win?"WIN":"LOSS")+'</span></div><div class="list" style="margin-top:14px"><div class="row"><span>Points</span><strong>'+r.pts+'</strong></div><div class="row"><span>Assists</span><strong>'+r.ast+'</strong></div><div class="row"><span>Rebounds</span><strong>'+r.reb+'</strong></div><div class="row"><span>Steals</span><strong>'+r.stl+'</strong></div><div class="row"><span>Blocks</span><strong>'+r.blk+'</strong></div><div class="row"><span>Turnovers</span><strong>'+r.tov+'</strong></div><div class="row"><span>Personal Fouls</span><strong>'+r.pf+'</strong></div><div class="row"><span>Field Goals</span><strong>'+fg+'</strong></div><div class="row"><span>3-Pointers</span><strong>'+three+'</strong></div><div class="row"><span>Free Throws</span><strong>'+ft+'</strong></div></div>'
 }
 function closePlayoffQuickResultModal(){
- S.pendingQuickSimResult=null;save();closeModal();
- const m=$("modal");if(m)m.innerHTML=""
+ S.pendingQuickSimResult=null;S.lastPlayoffQuickResult=null;
+ const host=$("livePlayoffQuickResultHost");if(host){host.innerHTML="";host.classList.add("hidden")}
+ save();closeModal();const m=$("modal");if(m)m.innerHTML="";
+ render()
 }
+let playoffQuickResultActionBusy=false;
+function playoffQuickNextGame(){
+ if(playoffQuickResultActionBusy)return;
+ playoffQuickResultActionBusy=true;
+ try{
+   S.pendingQuickSimResult=null;S.lastPlayoffQuickResult=null;
+   skipPendingInterviewForFastSim();
+   const host=$("livePlayoffQuickResultHost");if(host){host.innerHTML="";host.classList.add("hidden")}
+   save();closeModal();const m=$("modal");if(m)m.innerHTML="";
+   render();
+   setTimeout(()=>{playoffQuickResultActionBusy=false;quickSim()},80)
+ }catch(e){playoffQuickResultActionBusy=false;recordClientFailure("playoffQuickNextGame",e);recoverAfterActionError("playoffQuickNextGame",e)}
+}
+function bindPlayoffQuickResultActions(r){
+ const box=$("livePlayoffBoxScore"),next=$("livePlayoffQuickNext"),interview=$("livePlayoffInterview"),close=$("livePlayoffClose");
+ if(box)box.onclick=()=>showPlayoffQuickBoxScore(r);
+ if(next)next.onclick=playoffQuickNextGame;
+ if(interview)interview.onclick=()=>{S.pendingQuickSimResult=null;S.lastPlayoffQuickResult=null;save();closeModal();setTimeout(()=>openPostgameInterview(),35)};
+ if(close)close.onclick=closePlayoffQuickResultModal;
+ guardInteractiveHandlers()
+}
+function showPlayoffQuickBoxScore(r){
+ const canNext=!!(S.playoffs&&S.playoffs.active&&!S.playoffs.eliminated&&!S.playoffs.champion);
+ modal(playoffQuickBoxScoreHTML(r)+'<div class="modalFoot"><button class="btn" id="livePlayoffBackResults">Back to Results</button>'+(canNext?'<button class="btn good" id="livePlayoffQuickNextBox">Quick Sim Next Game</button>':'')+'<button class="btn primary" id="livePlayoffCloseBox">Close</button></div>');
+ if($("livePlayoffBackResults"))$("livePlayoffBackResults").onclick=()=>showPlayoffQuickResultNow(r);
+ if($("livePlayoffQuickNextBox"))$("livePlayoffQuickNextBox").onclick=playoffQuickNextGame;
+ if($("livePlayoffCloseBox"))$("livePlayoffCloseBox").onclick=closePlayoffQuickResultModal;
+ guardInteractiveHandlers()
+}
+
 function showPlayoffQuickResultNow(r){
  if(!r)return;
  const host=$("livePlayoffQuickResultHost");
@@ -4682,15 +4714,7 @@ function showPlayoffQuickResultNow(r){
  const canNext=!!(S.playoffs&&S.playoffs.active&&!S.playoffs.eliminated&&!S.playoffs.champion);
  const interview=S.postgameMedia?.pending?'<button class="btn" id="livePlayoffInterview">Optional Interview</button>':'';
  modal(playoffQuickLiveHTML(r)+'<div class="modalFoot"><button class="btn" id="livePlayoffBoxScore">View Full Box Score</button>'+(canNext?'<button class="btn good" id="livePlayoffQuickNext">Quick Sim Next Game</button>':'')+interview+'<button class="btn primary" id="livePlayoffClose">Close</button></div>');
- if($("livePlayoffBoxScore"))$("livePlayoffBoxScore").onclick=()=>{
-   modal(playoffQuickBoxScoreHTML(r)+'<div class="modalFoot"><button class="btn" id="livePlayoffBackResults">Back to Results</button>'+(canNext?'<button class="btn good" id="livePlayoffQuickNextBox">Quick Sim Next Game</button>':'')+'<button class="btn primary" id="livePlayoffCloseBox">Close</button></div>');
-   if($("livePlayoffBackResults"))$("livePlayoffBackResults").onclick=()=>showPlayoffQuickResultNow(r);
-   if($("livePlayoffQuickNextBox"))$("livePlayoffQuickNextBox").onclick=()=>{S.pendingQuickSimResult=null;S.lastPlayoffQuickResult=null;save();closeModal();setTimeout(()=>quickSim(),35)};
-   if($("livePlayoffCloseBox"))$("livePlayoffCloseBox").onclick=closePlayoffQuickResultModal
- };
- if($("livePlayoffQuickNext"))$("livePlayoffQuickNext").onclick=()=>{S.pendingQuickSimResult=null;S.lastPlayoffQuickResult=null;save();closeModal();setTimeout(()=>quickSim(),35)};
- if($("livePlayoffInterview"))$("livePlayoffInterview").onclick=()=>{S.pendingQuickSimResult=null;save();closeModal();setTimeout(()=>openPostgameInterview(),35)};
- if($("livePlayoffClose"))$("livePlayoffClose").onclick=closePlayoffQuickResultModal
+ bindPlayoffQuickResultActions(r)
 }
 function playoffLastQuickResultHTML(){
  const r=S.lastPlayoffQuickResult;if(!r)return "";
@@ -6904,7 +6928,11 @@ function rest(){
 }
 function declareDraft(){const t=ensureCollegeTournamentState();if(S.stage!=="College"||!t.completed||S.player.draft<55){toast(!t.completed?"Finish the National College Tournament first":"You need at least 55 Draft Stock");return}S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[]};S.careerHistory.collegeSeasons=S.careerHistory.collegeSeasons||[];const projection=calculateDraftProjection();S.careerHistory.collegeSeasons.push({school:S.college,year:S.year,record:{w:S.record.w,l:S.record.l},games:S.game-1,stats:{...S.player.stats},level:S.player.level,ovr:ovr(),draft:S.player.draft,awards:[...ensureDraftProjectionState().collegeAwards],projection:{min:projection.min,max:projection.max,consensus:projection.consensus}});S.stage="Draft Combine";S.draftProcess={declared:true,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null,collegeProjection:{min:projection.min,max:projection.max,consensus:projection.consensus}};updateDraftProjectionHistory("Declared for Draft");roadToNBATransition("combine_arrival");S.live=null;S.news.unshift("You declared for the NBA Draft. Next stop: NBA Draft Combine.");resetTrainingCycle();save();setScreen("career");toast("NBA Draft Combine unlocked")}
 function collegeModal(){if(S.college){toast("Already committed to "+S.college);return}if(!S.offers.length){toast("You need a scholarship offer first");return}modal('<h2>Choose College</h2><p class="muted">This is a one-time commitment. Your player level, XP, attributes, badges, draft stock, and career game history will carry into college.</p><div class="list">'+S.offers.map(c=>'<button class="btn" data-college="'+c+'">'+c+'</button>').join("")+'</div><div class="modalFoot"><button class="btn" id="ccancel">Cancel</button></div>');document.querySelectorAll("[data-college]").forEach(b=>b.onclick=()=>{if(S.college){toast("College already selected");closeModal();return}const school=b.dataset.college;S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[]};S.careerHistory.highSchool={record:{w:S.record.w,l:S.record.l},games:S.game-1,stats:{...S.player.stats},level:S.player.level,ovr:ovr(),draft:S.player.draft};S.college=school;S.stage="College";S.year=1;S.record={w:0,l:0};S.game=1;resetSeasonStatLine();roadToNBATransition("college_arrival");S.live=null;S.news.unshift("Committed to "+S.college+". Your high-school career is saved and your college season begins.");save();closeModal();setScreen("home");toast("Committed to "+S.college)});$("ccancel").onclick=closeModal}
-window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEventListener("error",e=>{recordClientFailure(lastClientAction?.action||"window",e.error||e.message);console.error("MYCAREER error",e.error||e.message);const content=$("content");if(content&&!content.innerHTML.trim())content.innerHTML='<section class="card s12"><h3>MYCAREER recovered from an error</h3><p class="muted">Tap New Career again. Your save has not been deleted.</p><button class="btn primary" id="recoverBtn">Return Home</button></section>';const r=$("recoverBtn");if(r)r.onclick=()=>{S.screen="home";render()}});window.addEventListener("unhandledrejection",e=>recordClientFailure(lastClientAction?.action||"promise",e.reason||"Unhandled promise rejection"));document.addEventListener("click",e=>{const b=e.target&&e.target.closest?e.target.closest("button"):null;if(b)recordClientAction(b)},true);$("profileBtn").onclick=()=>frontMode==="career"&&S.created?openAppearance():null;$("modalWrap").onclick=e=>{if(e.target===$("modalWrap"))closeModal()};render();maybeSendPreviewTransfer();
+window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEventListener("error",e=>{recordClientFailure(lastClientAction?.action||"window",e.error||e.message);console.error("MYCAREER error",e.error||e.message);const content=$("content");if(content&&!content.innerHTML.trim())content.innerHTML='<section class="card s12"><h3>MYCAREER recovered from an error</h3><p class="muted">Tap New Career again. Your save has not been deleted.</p><button class="btn primary" id="recoverBtn">Return Home</button></section>';const r=$("recoverBtn");if(r)r.onclick=()=>{S.screen="home";render()}});window.addEventListener("unhandledrejection",e=>recordClientFailure(lastClientAction?.action||"promise",e.reason||"Unhandled promise rejection"));document.addEventListener("click",e=>{const b=e.target&&e.target.closest?e.target.closest("button"):null;if(b)recordClientAction(b)},true);document.addEventListener("click",e=>{
+ const b=e.target&&e.target.closest?e.target.closest("button"):null;if(!b)return;
+ if(b.id==="livePlayoffClose"||b.id==="livePlayoffCloseBox"){e.preventDefault();e.stopPropagation();closePlayoffQuickResultModal()}
+ if(b.id==="livePlayoffQuickNext"||b.id==="livePlayoffQuickNextBox"){e.preventDefault();e.stopPropagation();playoffQuickNextGame()}
+},false);/*data-playoff-result-delegated*/$("profileBtn").onclick=()=>frontMode==="career"&&S.created?openAppearance():null;$("modalWrap").onclick=e=>{if(e.target===$("modalWrap"))closeModal()};render();maybeSendPreviewTransfer();
 </script>
 </body>
 </html>
