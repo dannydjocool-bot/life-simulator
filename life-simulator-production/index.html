@@ -7059,7 +7059,17 @@ window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEvent
  const b=e.target&&e.target.closest?e.target.closest("button"):null;if(!b)return;
  if(b.id==="fullQuickSimBtn"){e.preventDefault();e.stopImmediatePropagation();fullSimRestOfGame();return}
  if(b.id==="fullToMomentBtn"){e.preventDefault();e.stopImmediatePropagation();fullJumpToCrucialMoment();return}
-},true);/*full-game-special-action-capture*/window.playoffQuickNextGame=playoffQuickNextGame;window.closePlayoffQuickResultModal=closePlayoffQuickResultModal;$("profileBtn").onclick=()=>frontMode==="career"&&S.created?openAppearance():null;$("modalWrap").onclick=e=>{if(e.target===$("modalWrap"))closeModal()};render();maybeSendPreviewTransfer();
+ if(b.id==="livePlayoffQuickNext"||b.id==="livePlayoffQuickNextBox"){e.preventDefault();e.stopImmediatePropagation();playoffQuickNextGame();return}
+ if(b.id==="livePlayoffClose"||b.id==="livePlayoffCloseBox"){
+   e.preventDefault();e.stopImmediatePropagation();
+   const champion=!!(S.championshipCelebration||S.playoffs?.champion||S.playoffPostgame?.champion);
+   S.pendingQuickSimResult=null;save();closeModal();
+   const m=$("modal");if(m)m.innerHTML="";
+   if(champion&&S.championshipCelebration){S.championshipCelebration.deferQuickSim=false;S.championshipCelebration.shown=false;setTimeout(()=>showChampionshipCelebration(),35)}
+   else render();
+   return
+ }
+},true);/*full-game-and-playoff-quick-action-capture*/window.playoffQuickNextGame=playoffQuickNextGame;window.closePlayoffQuickResultModal=closePlayoffQuickResultModal;$("profileBtn").onclick=()=>frontMode==="career"&&S.created?openAppearance():null;$("modalWrap").onclick=e=>{if(e.target===$("modalWrap"))closeModal()};render();maybeSendPreviewTransfer();
 </script>
 </body>
 </html>
