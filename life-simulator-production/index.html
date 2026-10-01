@@ -4676,12 +4676,13 @@ function playoffQuickBoxScoreHTML(r){
 function closePlayoffQuickResultModal(){
  try{
    S.pendingQuickSimResult=null;
-   if(S.stage==="NBA"&&S.playoffs?.active)restoreLatestPlayoffQuickResultState();
+   S.lastPlayoffQuickResult=null;
+   if(S.postgameMedia&&S.postgameMedia.pending){S.postgameMedia.pending=false;S.postgameMedia.defer=false;S.postgameMedia.skipped=true}
    save()
  }catch(e){recordClientFailure("closePlayoffQuickResultModal",e)}
  closeModal();
  const m=$("modal");if(m)m.innerHTML="";
- render()
+ const host=$("livePlayoffQuickResultHost");if(host){host.innerHTML="";host.classList.add("hidden")}
 }
 let playoffQuickResultActionBusy=false;
 function playoffQuickNextGame(){
@@ -7068,7 +7069,12 @@ window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEvent
    }
    playoffQuickNextGame();return
  }
- if(b.id==="livePlayoffClose"||b.id==="livePlayoffCloseBox"||b.id==="quickResultDone"){
+ if(b.id==="livePlayoffClose"||b.id==="livePlayoffCloseBox"){
+   e.preventDefault();e.stopImmediatePropagation();
+   closePlayoffQuickResultModal();
+   return
+ }
+ if(b.id==="quickResultDone"){
    e.preventDefault();e.stopImmediatePropagation();
    const champion=!!(S.championshipCelebration||S.playoffs?.champion||S.playoffPostgame?.champion);
    S.pendingQuickSimResult=null;
