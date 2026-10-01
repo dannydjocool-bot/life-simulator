@@ -6947,7 +6947,17 @@ function quickSim(){
  try{
    g=buildQuickSimGame();if(!g||!g.opp)throw new Error("Quick Sim could not build a valid game");
    recordGame(g);
-   if(wasPlayoff&&S.lastPlayoffQuickResult)showPlayoffQuickResultNow(S.lastPlayoffQuickResult)
+   if(wasPlayoff&&S.lastPlayoffQuickResult){
+     const r=S.lastPlayoffQuickResult;
+     if(S.playoffs&&S.playoffs.active&&!r.transition?.advanced&&!r.transition?.champion&&!r.transition?.eliminated){
+       S.playoffs.seriesWins=Math.max(0,Math.min(4,Number(r.seriesWinsAfter)||0));
+       S.playoffs.seriesLosses=Math.max(0,Math.min(4,Number(r.seriesLossesAfter)||0));
+       syncUserBracketSeries()
+     }
+     save();
+     render();
+     showPlayoffQuickResultNow(r)
+   }
  }catch(e){
    recordClientFailure("quickSim",e);
    if(wasPlayoff&&S.lastPlayoffQuickResult){showPlayoffQuickResultNow(S.lastPlayoffQuickResult);return}
