@@ -985,7 +985,7 @@ body.boxGlass .card,body.boxGlass .heroBox{background:linear-gradient(145deg,rgb
 .seasonCardButton .seasonBody{padding:13px}
 .badgeXpBar{height:5px;border-radius:99px;background:#26354b;overflow:hidden;margin-top:7px}.badgeXpBar i{display:block;height:100%;background:linear-gradient(90deg,#ff7724,#ffd45d)}
 @media(max-width:700px){.basketArt h3,.basketArt p,.basketArt .kicker{max-width:72%}}
-</style>
+@media(max-width:900px){.fullGameUtilityActions{position:relative;z-index:76}.fullGameUtilityActions .btn{position:relative;z-index:77;touch-action:manipulation;pointer-events:auto}}</style>
 </head>
 <body>
 <div class="app">
@@ -4851,33 +4851,62 @@ function fullGameLockerRoom(){
 function fullSimRestOfGame(){
  if(!repairFullGameState())return;
  const g=S.fullGame;if(!g||!g.active)return;
- const remainingGameSeconds=Math.max(0,(4-g.quarter)*720+g.clock),chunks=Math.max(1,Math.round(remainingGameSeconds/36));
- for(let i=0;i<chunks;i++){fullScoreOther("team");fullScoreOther("opp")}
- const remainingMinutes=Math.max(0,(g.targetMinutes||22)-(g.minutesPlayed||0));
- if(remainingMinutes>0){
-   const pace=remainingMinutes/Math.max(1,g.targetMinutes||22);
-   g.stats.pts+=Math.max(0,Math.round(((Number(S.player.stats.ppg)||ovr()/3)*pace)*(0.75+Math.random()*.5)));
-   g.stats.ast+=Math.max(0,Math.round(((Number(S.player.stats.apg)||S.player.attrs.Playmaking/18)*pace)*(0.75+Math.random()*.5)));
-   g.stats.reb+=Math.max(0,Math.round(((Number(S.player.stats.rpg)||S.player.attrs.Athleticism/22)*pace)*(0.75+Math.random()*.5)));
-   g.minutesPlayed=Math.min(g.targetMinutes||40,(g.minutesPlayed||0)+remainingMinutes)
+ try{
+   if(typeof setPhoneEditMode==="function"&&phoneEditMode)setPhoneEditMode(false);
+   if(g.playoff){
+     g.playoffRoundBefore=Number(S.playoffs?.round)||1;
+     g.playoffGameBefore=playoffGameNumber()
+   }
+   const remainingGameSeconds=Math.max(0,(4-g.quarter)*720+g.clock),chunks=Math.max(1,Math.round(remainingGameSeconds/36));
+   for(let i=0;i<chunks;i++){fullScoreOther("team");fullScoreOther("opp")}
+   const remainingMinutes=Math.max(0,(g.targetMinutes||22)-(g.minutesPlayed||0));
+   if(remainingMinutes>0){
+     const pace=remainingMinutes/Math.max(1,g.targetMinutes||22);
+     g.stats.pts+=Math.max(0,Math.round(((Number(S.player.stats.ppg)||ovr()/3)*pace)*(0.75+Math.random()*.5)));
+     g.stats.ast+=Math.max(0,Math.round(((Number(S.player.stats.apg)||S.player.attrs.Playmaking/18)*pace)*(0.75+Math.random()*.5)));
+     g.stats.reb+=Math.max(0,Math.round(((Number(S.player.stats.rpg)||S.player.attrs.Athleticism/22)*pace)*(0.75+Math.random()*.5)));
+     g.minutesPlayed=Math.min(g.targetMinutes||40,(g.minutesPlayed||0)+remainingMinutes)
+   }
+   g.quarter=4;g.clock=0;g.intro=false;g.onCourt=false;g.pendingAnswer=null;g.quickSimRest=true;
+   fullLog("The rest of the game was quick simulated.");
+   const wasPlayoff=!!g.playoff;
+   finishFullGame();
+   if(wasPlayoff&&S.lastPlayoffQuickResult){
+     S.screen="games";save();render();
+     showPlayoffQuickResultNow(S.lastPlayoffQuickResult)
+   }
+ }catch(e){
+   recordClientFailure("fullSimRestOfGame",e);
+   toast("Quick Sim Rest failed — game state restored");
+   if(S.fullGame)repairFullGameState();
+   save();render()
  }
- g.quarter=4;g.clock=0;g.intro=false;g.onCourt=false;g.pendingAnswer=null;g.quickSimRest=true;
- fullLog("The rest of the game was quick simulated.");finishFullGame()
 }
 function fullJumpToCrucialMoment(){
  if(!repairFullGameState())return;
  const g=S.fullGame;if(!g||!g.active)return;
- const playedRatio=Math.max(0,Math.min(1,(g.minutesPlayed||0)/Math.max(1,g.targetMinutes||22)));
- const simRatio=Math.max(.35,1-playedRatio);
- const extraPts=Math.max(0,Math.round((S.player.stats.ppg||ovr()/3)*simRatio*(.55+Math.random()*.45)));
- const extraAst=Math.max(0,Math.round((S.player.stats.apg||S.player.attrs.Playmaking/18)*simRatio*(.5+Math.random()*.5)));
- const extraReb=Math.max(0,Math.round((S.player.stats.rpg||S.player.attrs.Athleticism/22)*simRatio*(.5+Math.random()*.5)));
- const base=S.stage==="NBA"?(g.playoff?103:106):(S.stage==="College"?68:58);
- const team=Math.max(g.team||0,base+Math.floor(Math.random()*10));
- const gap=1+Math.floor(Math.random()*4);
- S.player.energy=Math.max(35,Math.round(g.energy||S.player.energy));
- S.live={opp:g.opp,stage:g.stage,playoff:!!g.playoff,collegeTournament:!!g.collegeTournament,collegeTournamentRound:g.collegeTournamentRound,collegeTournamentGame:g.collegeTournamentGame,storyline:g.stage==="NBA"?currentGameSpotlight().title:null,homeAway:g.homeAway||nextGameLocation(),team,oppScore:team+gap,pts:(g.stats.pts||0)+extraPts,ast:(g.stats.ast||0)+extraAst,reb:(g.stats.reb||0)+extraReb,clutchPossessions:0,response:false,lastType:null,lastMessage:"Jumped ahead to the final crucial possessions."};
- S.fullGame=null;save();render();requestAnimationFrame(()=>{const el=document.getElementById("keyMomentDecision");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});else scrollTo({top:0,behavior:"smooth"})});toast("Crucial moment ready")
+ try{
+   if(typeof setPhoneEditMode==="function"&&phoneEditMode)setPhoneEditMode(false);
+   const playedRatio=Math.max(0,Math.min(1,(g.minutesPlayed||0)/Math.max(1,g.targetMinutes||22)));
+   const simRatio=Math.max(.35,1-playedRatio);
+   const extraPts=Math.max(0,Math.round((S.player.stats.ppg||ovr()/3)*simRatio*(.55+Math.random()*.45)));
+   const extraAst=Math.max(0,Math.round((S.player.stats.apg||S.player.attrs.Playmaking/18)*simRatio*(.5+Math.random()*.5)));
+   const extraReb=Math.max(0,Math.round((S.player.stats.rpg||S.player.attrs.Athleticism/22)*simRatio*(.5+Math.random()*.5)));
+   const base=S.stage==="NBA"?(g.playoff?103:106):(S.stage==="College"?68:58);
+   const team=Math.max(g.team||0,base+Math.floor(Math.random()*10));
+   const gap=1+Math.floor(Math.random()*4);
+   S.player.energy=Math.max(35,Math.round(g.energy||S.player.energy));
+   const spot=g.stage==="NBA"?currentGameSpotlight():null;
+   S.live={opp:g.opp,stage:g.stage,playoff:!!g.playoff,collegeTournament:!!g.collegeTournament,collegeTournamentRound:g.collegeTournamentRound,collegeTournamentGame:g.collegeTournamentGame,storyline:spot?.title||null,homeAway:g.homeAway||nextGameLocation(),team,oppScore:team+gap,pts:(g.stats.pts||0)+extraPts,ast:(g.stats.ast||0)+extraAst,reb:(g.stats.reb||0)+extraReb,clutchPossessions:0,response:false,lastType:null,lastMessage:"Jumped ahead to the final crucial possessions."};
+   S.fullGame=null;S.screen="games";save();closeModal();render();
+   requestAnimationFrame(()=>{const el=document.getElementById("keyMomentDecision");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});else scrollTo({top:0,behavior:"smooth"})});
+   toast("Crucial moment ready")
+ }catch(e){
+   recordClientFailure("fullJumpToCrucialMoment",e);
+   toast("Could not jump to crucial moment");
+   if(S.fullGame)repairFullGameState();
+   save();render()
+ }
 }
 
 function fullLog(msg){const g=S.fullGame;g.lastMessage=msg;g.log.unshift("Q"+g.quarter+" "+fullClock(g.clock)+" • "+msg);g.log=g.log.slice(0,12)}
@@ -5003,10 +5032,10 @@ function fullDefense(type){
 function fullGameView(){
  const g=S.fullGame;if(!g)return "";
  const s=g.stats,on=g.onCourt,close=Math.abs(g.team-g.oppScore)<=8&&g.quarter===4&&g.clock<=120;const uniformLine=g.jersey?'<p class="muted">Uniform: '+g.jersey.name+'</p>':'';
- if(g.intro){return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+starIntroHTML()+'<section class="card s12"><p class="muted">'+g.broadcastLine+'</p><div class="actions"><button class="btn primary" id="tipoffStartBtn">Start Tipoff</button><button class="btn" id="pregameLockerBtn">Visit Locker Room</button><button class="btn" id="fullToMomentBtn">Play Crucial Moment</button><button class="btn" id="fullQuickSimBtn">Quick Sim Game</button><button class="btn" id="cancelFullGameBtn">Back to Game Options</button></div></section></div>'}
+ if(g.intro){return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+starIntroHTML()+'<section class="card s12"><p class="muted">'+g.broadcastLine+'</p><div class="actions"><button class="btn primary" id="tipoffStartBtn">Start Tipoff</button><button class="btn" id="pregameLockerBtn">Visit Locker Room</button><button type="button" class="btn" id="fullToMomentBtn">Play Crucial Moment</button><button type="button" class="btn" id="fullQuickSimBtn">Quick Sim Game</button><button class="btn" id="cancelFullGameBtn">Back to Game Options</button></div></section></div>'}
  const answer=g.pendingAnswer?'<section class="card s12"><span class="kicker">STAR CHALLENGE • LIVE SPORTS</span><h2>'+g.pendingAnswer.leader+' just scored. Answer back?</h2><p class="muted">Taking the challenge costs extra energy, but a successful response boosts Game Grade, Fame, broadcast hype and live viewers.</p><div class="actions"><button class="btn primary" data-answer-full="drive">Answer at the Rim</button><button class="btn" data-answer-full="three">Answer with a Three</button><button class="btn" data-answer-full="playmake">Answer by Creating</button><button class="btn" id="declineAnswerBtn">Stay in the Flow</button></div></section>':'';
  const actions=g.pendingAnswer?'':on?(g.turn==="offense"?'<div class="list"><button class="btn" data-full-off="drive">Attack Rim</button><button class="btn" data-full-off="mid">Pull-Up Jumper</button><button class="btn" data-full-off="three">Shoot Three</button><button class="btn" data-full-off="pnr">Run Pick-and-Roll</button><button class="btn" data-full-off="pass">Create for Teammate</button></div>':'<div class="list"><button class="btn" data-full-def="pressure">Pressure Ball Handler</button><button class="btn" data-full-def="steal">Go for Steal</button><button class="btn" data-full-def="help">Help Defense</button><button class="btn" data-full-def="rebound">Protect Paint / Rebound</button></div>'):'<button class="btn primary" id="simBenchBtn">Sim Until Subbed In</button>';
- return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+(g.playoff?playoffBanner():'')+answer+'<section class="card s8"><div class="row"><span class="pill '+(close?"bad":"good")+'">Q'+g.quarter+' • '+fullClock(g.clock)+' • '+(on?(g.turn==="offense"?"OFFENSE":"DEFENSE"):"BENCH")+'</span><span class="pill bad">● LIVE '+formatAudience(g.viewers)+'</span></div><h2 style="margin:12px 0">'+currentTeamName()+' '+g.team+' — '+g.oppScore+' '+g.opp+'</h2>'+uniformLine+'<p class="muted">'+g.lastMessage+'</p>'+actions+'<div class="actions" style="margin-top:14px"><button class="btn" id="fullToMomentBtn">Jump to Crucial Moment</button><button class="btn" id="fullQuickSimBtn">Quick Sim Rest of Game</button></div>'+(close?'<div class="item" style="margin-top:12px"><div><b>CLUTCH TIME</b><small>Every possession matters in the final two minutes.</small></div><span class="pill bad">LIVE</span></div>':'')+'</section><section class="card"><h3>Broadcast Hype</h3><div class="big">'+Math.round(g.hype)+'</div>'+meter("Hype",g.hype)+row("Watching Now",formatAudience(g.viewers))+row("Peak Audience",formatAudience(g.peakViewers))+'<p class="muted">'+g.broadcastLine+'</p></section><section class="card"><h3>Game Grade</h3><div class="big">'+gameGradeLetter(g.grade)+'</div>'+meter("Grade",g.grade)+row("Minutes",g.minutesPlayed.toFixed(1)+" / "+g.targetMinutes)+row("Energy",Math.round(g.energy))+'</section><section class="card s6"><h3>Live Box Score</h3>'+row("PTS",s.pts)+row("REB",s.reb)+row("AST",s.ast)+row("STL",s.stl)+row("BLK",s.blk)+row("TOV",s.tov)+row("PF",s.pf)+'</section><section class="card s6"><h3>Shooting</h3>'+row("FG",s.fgm+"/"+s.fga)+row("3PT",s.tpm+"/"+s.tpa)+row("FT",s.ftm+"/"+s.fta)+row("Role",S.player.role)+'</section><section class="card s12"><h3>Game Feed</h3><div class="list">'+g.log.slice(0,8).map(x=>'<div class="item"><small>'+x+'</small></div>').join("")+'</div></section></div>'
+ return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+(g.playoff?playoffBanner():'')+answer+'<section class="card s8"><div class="row"><span class="pill '+(close?"bad":"good")+'">Q'+g.quarter+' • '+fullClock(g.clock)+' • '+(on?(g.turn==="offense"?"OFFENSE":"DEFENSE"):"BENCH")+'</span><span class="pill bad">● LIVE '+formatAudience(g.viewers)+'</span></div><h2 style="margin:12px 0">'+currentTeamName()+' '+g.team+' — '+g.oppScore+' '+g.opp+'</h2>'+uniformLine+'<p class="muted">'+g.lastMessage+'</p>'+actions+'<div class="actions fullGameUtilityActions" style="margin-top:14px"><button type="button" class="btn" id="fullToMomentBtn">Jump to Crucial Moment</button><button type="button" class="btn" id="fullQuickSimBtn">Quick Sim Rest of Game</button></div>'+(close?'<div class="item" style="margin-top:12px"><div><b>CLUTCH TIME</b><small>Every possession matters in the final two minutes.</small></div><span class="pill bad">LIVE</span></div>':'')+'</section><section class="card"><h3>Broadcast Hype</h3><div class="big">'+Math.round(g.hype)+'</div>'+meter("Hype",g.hype)+row("Watching Now",formatAudience(g.viewers))+row("Peak Audience",formatAudience(g.peakViewers))+'<p class="muted">'+g.broadcastLine+'</p></section><section class="card"><h3>Game Grade</h3><div class="big">'+gameGradeLetter(g.grade)+'</div>'+meter("Grade",g.grade)+row("Minutes",g.minutesPlayed.toFixed(1)+" / "+g.targetMinutes)+row("Energy",Math.round(g.energy))+'</section><section class="card s6"><h3>Live Box Score</h3>'+row("PTS",s.pts)+row("REB",s.reb)+row("AST",s.ast)+row("STL",s.stl)+row("BLK",s.blk)+row("TOV",s.tov)+row("PF",s.pf)+'</section><section class="card s6"><h3>Shooting</h3>'+row("FG",s.fgm+"/"+s.fga)+row("3PT",s.tpm+"/"+s.tpa)+row("FT",s.ftm+"/"+s.fta)+row("Role",S.player.role)+'</section><section class="card s12"><h3>Game Feed</h3><div class="list">'+g.log.slice(0,8).map(x=>'<div class="item"><small>'+x+'</small></div>').join("")+'</div></section></div>'
 }
 function gradeValue(letter){return {"A+":5,"A":4.5,"A-":4,"B+":3.5,"B":3,"B-":2.5,"C+":2,"C":1.5,"C-":1,"D+":.5,"D":0}[letter]||0}
 function fullGameFollowerGain(g,out){
@@ -6990,7 +7019,11 @@ function rest(){
 }
 function declareDraft(){const t=ensureCollegeTournamentState();if(S.stage!=="College"||!t.completed||S.player.draft<55){toast(!t.completed?"Finish the National College Tournament first":"You need at least 55 Draft Stock");return}S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[]};S.careerHistory.collegeSeasons=S.careerHistory.collegeSeasons||[];const projection=calculateDraftProjection();S.careerHistory.collegeSeasons.push({school:S.college,year:S.year,record:{w:S.record.w,l:S.record.l},games:S.game-1,stats:{...S.player.stats},level:S.player.level,ovr:ovr(),draft:S.player.draft,awards:[...ensureDraftProjectionState().collegeAwards],projection:{min:projection.min,max:projection.max,consensus:projection.consensus}});S.stage="Draft Combine";S.draftProcess={declared:true,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null,collegeProjection:{min:projection.min,max:projection.max,consensus:projection.consensus}};updateDraftProjectionHistory("Declared for Draft");roadToNBATransition("combine_arrival");S.live=null;S.news.unshift("You declared for the NBA Draft. Next stop: NBA Draft Combine.");resetTrainingCycle();save();setScreen("career");toast("NBA Draft Combine unlocked")}
 function collegeModal(){if(S.college){toast("Already committed to "+S.college);return}if(!S.offers.length){toast("You need a scholarship offer first");return}modal('<h2>Choose College</h2><p class="muted">This is a one-time commitment. Your player level, XP, attributes, badges, draft stock, and career game history will carry into college.</p><div class="list">'+S.offers.map(c=>'<button class="btn" data-college="'+c+'">'+c+'</button>').join("")+'</div><div class="modalFoot"><button class="btn" id="ccancel">Cancel</button></div>');document.querySelectorAll("[data-college]").forEach(b=>b.onclick=()=>{if(S.college){toast("College already selected");closeModal();return}const school=b.dataset.college;S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[]};S.careerHistory.highSchool={record:{w:S.record.w,l:S.record.l},games:S.game-1,stats:{...S.player.stats},level:S.player.level,ovr:ovr(),draft:S.player.draft};S.college=school;S.stage="College";S.year=1;S.record={w:0,l:0};S.game=1;resetSeasonStatLine();roadToNBATransition("college_arrival");S.live=null;S.news.unshift("Committed to "+S.college+". Your high-school career is saved and your college season begins.");save();closeModal();setScreen("home");toast("Committed to "+S.college)});$("ccancel").onclick=closeModal}
-window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEventListener("error",e=>{recordClientFailure(lastClientAction?.action||"window",e.error||e.message);console.error("MYCAREER error",e.error||e.message);const content=$("content");if(content&&!content.innerHTML.trim())content.innerHTML='<section class="card s12"><h3>MYCAREER recovered from an error</h3><p class="muted">Tap New Career again. Your save has not been deleted.</p><button class="btn primary" id="recoverBtn">Return Home</button></section>';const r=$("recoverBtn");if(r)r.onclick=()=>{S.screen="home";render()}});window.addEventListener("unhandledrejection",e=>recordClientFailure(lastClientAction?.action||"promise",e.reason||"Unhandled promise rejection"));document.addEventListener("click",e=>{const b=e.target&&e.target.closest?e.target.closest("button"):null;if(b)recordClientAction(b)},true);window.playoffQuickNextGame=playoffQuickNextGame;window.closePlayoffQuickResultModal=closePlayoffQuickResultModal;$("profileBtn").onclick=()=>frontMode==="career"&&S.created?openAppearance():null;$("modalWrap").onclick=e=>{if(e.target===$("modalWrap"))closeModal()};render();maybeSendPreviewTransfer();
+window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEventListener("error",e=>{recordClientFailure(lastClientAction?.action||"window",e.error||e.message);console.error("MYCAREER error",e.error||e.message);const content=$("content");if(content&&!content.innerHTML.trim())content.innerHTML='<section class="card s12"><h3>MYCAREER recovered from an error</h3><p class="muted">Tap New Career again. Your save has not been deleted.</p><button class="btn primary" id="recoverBtn">Return Home</button></section>';const r=$("recoverBtn");if(r)r.onclick=()=>{S.screen="home";render()}});window.addEventListener("unhandledrejection",e=>recordClientFailure(lastClientAction?.action||"promise",e.reason||"Unhandled promise rejection"));document.addEventListener("click",e=>{const b=e.target&&e.target.closest?e.target.closest("button"):null;if(b)recordClientAction(b)},true);document.addEventListener("click",e=>{
+ const b=e.target&&e.target.closest?e.target.closest("button"):null;if(!b)return;
+ if(b.id==="fullQuickSimBtn"){e.preventDefault();e.stopImmediatePropagation();fullSimRestOfGame();return}
+ if(b.id==="fullToMomentBtn"){e.preventDefault();e.stopImmediatePropagation();fullJumpToCrucialMoment();return}
+},true);/*full-game-special-action-capture*/window.playoffQuickNextGame=playoffQuickNextGame;window.closePlayoffQuickResultModal=closePlayoffQuickResultModal;$("profileBtn").onclick=()=>frontMode==="career"&&S.created?openAppearance():null;$("modalWrap").onclick=e=>{if(e.target===$("modalWrap"))closeModal()};render();maybeSendPreviewTransfer();
 </script>
 </body>
 </html>
