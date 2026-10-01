@@ -4849,62 +4849,59 @@ function fullGameLockerRoom(){
  openLockerRoom()
 }
 function fullSimRestOfGame(){
- if(!repairFullGameState())return;
- const g=S.fullGame;if(!g||!g.active)return;
  try{
+   if(typeof sanitizeSubsystemShapes==="function")sanitizeSubsystemShapes(S);
+   if(typeof ensureGameActionState==="function")ensureGameActionState();
+   if(!repairFullGameState())throw new Error("Full Game state could not be repaired");
+   const g=S.fullGame;if(!g||!g.active)return;
    if(typeof setPhoneEditMode==="function"&&phoneEditMode)setPhoneEditMode(false);
-   if(g.playoff){
-     g.playoffRoundBefore=Number(S.playoffs?.round)||1;
-     g.playoffGameBefore=playoffGameNumber()
-   }
+   if(g.playoff){g.playoffRoundBefore=Number(S.playoffs?.round)||1;g.playoffGameBefore=playoffGameNumber()}
    const remainingGameSeconds=Math.max(0,(4-g.quarter)*720+g.clock),chunks=Math.max(1,Math.round(remainingGameSeconds/36));
    for(let i=0;i<chunks;i++){fullScoreOther("team");fullScoreOther("opp")}
    const remainingMinutes=Math.max(0,(g.targetMinutes||22)-(g.minutesPlayed||0));
    if(remainingMinutes>0){
      const pace=remainingMinutes/Math.max(1,g.targetMinutes||22);
      g.stats.pts+=Math.max(0,Math.round(((Number(S.player.stats.ppg)||ovr()/3)*pace)*(0.75+Math.random()*.5)));
-     g.stats.ast+=Math.max(0,Math.round(((Number(S.player.stats.apg)||S.player.attrs.Playmaking/18)*pace)*(0.75+Math.random()*.5)));
-     g.stats.reb+=Math.max(0,Math.round(((Number(S.player.stats.rpg)||S.player.attrs.Athleticism/22)*pace)*(0.75+Math.random()*.5)));
+     g.stats.ast+=Math.max(0,Math.round(((Number(S.player.stats.apg)||Number(S.player.attrs.Playmaking)||60)/18*pace)*(0.75+Math.random()*.5)));
+     g.stats.reb+=Math.max(0,Math.round(((Number(S.player.stats.rpg)||Number(S.player.attrs.Athleticism)||60)/22*pace)*(0.75+Math.random()*.5)));
      g.minutesPlayed=Math.min(g.targetMinutes||40,(g.minutesPlayed||0)+remainingMinutes)
    }
    g.quarter=4;g.clock=0;g.intro=false;g.onCourt=false;g.pendingAnswer=null;g.quickSimRest=true;
    fullLog("The rest of the game was quick simulated.");
    const wasPlayoff=!!g.playoff;
    finishFullGame();
-   if(wasPlayoff&&S.lastPlayoffQuickResult){
-     S.screen="games";save();render();
-     showPlayoffQuickResultNow(S.lastPlayoffQuickResult)
-   }
+   if(wasPlayoff&&S.lastPlayoffQuickResult){S.screen="games";save();render();showPlayoffQuickResultNow(S.lastPlayoffQuickResult)}
  }catch(e){
    recordClientFailure("fullSimRestOfGame",e);
-   toast("Quick Sim Rest failed — game state restored");
-   if(S.fullGame)repairFullGameState();
+   if(S.fullGame){try{repairFullGameState()}catch(_){}}
+   toast("Quick Sim Rest could not complete");
    save();render()
  }
 }
 function fullJumpToCrucialMoment(){
- if(!repairFullGameState())return;
- const g=S.fullGame;if(!g||!g.active)return;
  try{
+   if(typeof sanitizeSubsystemShapes==="function")sanitizeSubsystemShapes(S);
+   if(typeof ensureGameActionState==="function")ensureGameActionState();
+   if(!repairFullGameState())throw new Error("Full Game state could not be repaired");
+   const g=S.fullGame;if(!g||!g.active)return;
    if(typeof setPhoneEditMode==="function"&&phoneEditMode)setPhoneEditMode(false);
-   const playedRatio=Math.max(0,Math.min(1,(g.minutesPlayed||0)/Math.max(1,g.targetMinutes||22)));
-   const simRatio=Math.max(.35,1-playedRatio);
-   const extraPts=Math.max(0,Math.round((S.player.stats.ppg||ovr()/3)*simRatio*(.55+Math.random()*.45)));
-   const extraAst=Math.max(0,Math.round((S.player.stats.apg||S.player.attrs.Playmaking/18)*simRatio*(.5+Math.random()*.5)));
-   const extraReb=Math.max(0,Math.round((S.player.stats.rpg||S.player.attrs.Athleticism/22)*simRatio*(.5+Math.random()*.5)));
-   const base=S.stage==="NBA"?(g.playoff?103:106):(S.stage==="College"?68:58);
-   const team=Math.max(g.team||0,base+Math.floor(Math.random()*10));
-   const gap=1+Math.floor(Math.random()*4);
-   S.player.energy=Math.max(35,Math.round(g.energy||S.player.energy));
-   const spot=g.stage==="NBA"?currentGameSpotlight():null;
-   S.live={opp:g.opp,stage:g.stage,playoff:!!g.playoff,collegeTournament:!!g.collegeTournament,collegeTournamentRound:g.collegeTournamentRound,collegeTournamentGame:g.collegeTournamentGame,storyline:spot?.title||null,homeAway:g.homeAway||nextGameLocation(),team,oppScore:team+gap,pts:(g.stats.pts||0)+extraPts,ast:(g.stats.ast||0)+extraAst,reb:(g.stats.reb||0)+extraReb,clutchPossessions:0,response:false,lastType:null,lastMessage:"Jumped ahead to the final crucial possessions."};
+   const playedRatio=Math.max(0,Math.min(1,(g.minutesPlayed||0)/Math.max(1,g.targetMinutes||22))),simRatio=Math.max(.35,1-playedRatio);
+   const extraPts=Math.max(0,Math.round((Number(S.player.stats.ppg)||ovr()/3)*simRatio*(.55+Math.random()*.45)));
+   const extraAst=Math.max(0,Math.round((Number(S.player.stats.apg)||Number(S.player.attrs.Playmaking)/18||3)*simRatio*(.5+Math.random()*.5)));
+   const extraReb=Math.max(0,Math.round((Number(S.player.stats.rpg)||Number(S.player.attrs.Athleticism)/22||3)*simRatio*(.5+Math.random()*.5)));
+   const base=g.stage==="NBA"?(g.playoff?103:106):(g.stage==="College"?68:58),team=Math.max(Number(g.team)||0,base+Math.floor(Math.random()*10)),gap=1+Math.floor(Math.random()*4);
+   S.player.energy=Math.max(35,Math.round(Number(g.energy)||S.player.energy||50));
+   let storyline=null;
+   if(g.playoff){try{storyline=playoffRoundName()}catch(_){storyline="Playoffs"}}
+   else if(g.stage==="NBA")storyline="Regular Season";
+   S.live={opp:g.opp,stage:g.stage,playoff:!!g.playoff,collegeTournament:!!g.collegeTournament,collegeTournamentRound:g.collegeTournamentRound,collegeTournamentGame:g.collegeTournamentGame,storyline,homeAway:g.homeAway||"AWAY",team,oppScore:team+gap,pts:(Number(g.stats.pts)||0)+extraPts,ast:(Number(g.stats.ast)||0)+extraAst,reb:(Number(g.stats.reb)||0)+extraReb,clutchPossessions:0,response:false,lastType:null,lastMessage:"Jumped ahead to the final crucial possessions."};
    S.fullGame=null;S.screen="games";save();closeModal();render();
    requestAnimationFrame(()=>{const el=document.getElementById("keyMomentDecision");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});else scrollTo({top:0,behavior:"smooth"})});
    toast("Crucial moment ready")
  }catch(e){
    recordClientFailure("fullJumpToCrucialMoment",e);
+   if(S.fullGame){try{repairFullGameState()}catch(_){}}
    toast("Could not jump to crucial moment");
-   if(S.fullGame)repairFullGameState();
    save();render()
  }
 }
@@ -5133,17 +5130,23 @@ function resolvePostgameInterview(tone){
 }
 
 function finishFullGame(){
+ if(typeof sanitizeSubsystemShapes==="function")sanitizeSubsystemShapes(S);
+ if(typeof ensureGameActionState==="function")ensureGameActionState();
+ if(!repairFullGameState())return;
  const g=S.fullGame;if(!g||!g.active)return;
  if(g.team===g.oppScore){const edge=ovr()+g.grade*.18+Math.random()*24,other=82+Math.random()*24;if(edge>=other)g.team+=2+Math.floor(Math.random()*4);else g.oppScore+=2+Math.floor(Math.random()*4)}
  g.win=g.team>g.oppScore;normalizeFinalScore(g);g.active=false;
  const quickSimRest=!!g.quickSimRest;
- const out={quickSim:quickSimRest,quickSimRest,opp:g.opp,stage:g.stage,playoff:g.playoff,collegeTournament:!!g.collegeTournament,collegeTournamentRound:g.collegeTournamentRound,collegeTournamentGame:g.collegeTournamentGame,homeAway:g.homeAway,pts:g.stats.pts,ast:g.stats.ast,reb:g.stats.reb,stl:g.stats.stl,blk:g.stats.blk,tov:g.stats.tov,pf:g.stats.pf,fgm:g.stats.fgm,fga:g.stats.fga,tpm:g.stats.tpm,tpa:g.stats.tpa,ftm:g.stats.ftm,fta:g.stats.fta,grade:gameGradeLetter(g.grade),viewers:g.viewers,peakViewers:g.peakViewers,hype:Math.round(g.hype),team:g.team,oppScore:g.oppScore,win:g.team>g.oppScore};
- const followersGain=fullGameFollowerGain(g,out);S.social.followers=(Number(S.social.followers)||0)+followersGain;S.social.fame=Math.min(100,(Number(S.social.fame)||0)+Math.min(3,g.hype/70));
- const interview=postgameInterviewEligible(out,out);preparePostgameInterview(out,followersGain,true);
- if(g.peakViewers>=8000000)pushLeagueNews(S.player.name+" drew "+formatAudience(g.peakViewers)+" peak viewers on LIVE SPORTS.");
- S.fullGame=null;S.player.energy=Math.max(35,Math.round(g.energy));recordGame(out);
+ const out={quickSim:quickSimRest,quickSimRest,playoffRoundBefore:Number(g.playoffRoundBefore)||undefined,playoffGameBefore:Number(g.playoffGameBefore)||undefined,opp:g.opp,stage:g.stage,playoff:!!g.playoff,collegeTournament:!!g.collegeTournament,collegeTournamentRound:g.collegeTournamentRound,collegeTournamentGame:g.collegeTournamentGame,homeAway:g.homeAway,pts:Number(g.stats.pts)||0,ast:Number(g.stats.ast)||0,reb:Number(g.stats.reb)||0,stl:Number(g.stats.stl)||0,blk:Number(g.stats.blk)||0,tov:Number(g.stats.tov)||0,pf:Number(g.stats.pf)||0,fgm:Number(g.stats.fgm)||0,fga:Number(g.stats.fga)||0,tpm:Number(g.stats.tpm)||0,tpa:Number(g.stats.tpa)||0,ftm:Number(g.stats.ftm)||0,fta:Number(g.stats.fta)||0,grade:gameGradeLetter(g.grade),viewers:Number(g.viewers)||0,peakViewers:Number(g.peakViewers)||0,hype:Math.round(Number(g.hype)||0),team:Number(g.team)||0,oppScore:Number(g.oppScore)||0,win:g.team>g.oppScore};
+ let followersGain=0,interview=false;
+ try{followersGain=fullGameFollowerGain(g,out)}catch(e){recordClientFailure("fullGameFollowerGain",e)}
+ try{S.social=S.social||{followers:0,fame:0};S.social.followers=(Number(S.social.followers)||0)+followersGain;S.social.fame=Math.min(100,(Number(S.social.fame)||0)+Math.min(3,(Number(g.hype)||0)/70))}catch(e){recordClientFailure("fullGameSocial",e)}
+ try{interview=postgameInterviewEligible(out,out);preparePostgameInterview(out,followersGain,true)}catch(e){recordClientFailure("fullGameInterviewPrepare",e);S.postgameMedia=null}
+ try{if((Number(g.peakViewers)||0)>=8000000)pushLeagueNews(S.player.name+" drew "+formatAudience(g.peakViewers)+" peak viewers on LIVE SPORTS.")}catch(e){recordClientFailure("fullGameBroadcastNews",e)}
+ S.fullGame=null;S.player.energy=Math.max(35,Math.round(Number(g.energy)||S.player.energy||50));
+ recordGame(out);
  if(quickSimRest)return;
- if(interview&&!S.championshipCelebration){if(S.postgameMedia)S.postgameMedia.defer=false;openPostgameInterview()}
+ if(interview&&!S.championshipCelebration&&S.postgameMedia?.pending){S.postgameMedia.defer=false;openPostgameInterview()}
 }
 function liveGame(){const g=S.live;return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+'<section class="card s8" id="keyMomentDecision"><span class="pill bad">4TH • CLUTCH</span><h3 style="margin-top:14px">'+currentTeamName()+' '+g.team+' — '+g.oppScore+' '+g.opp+'</h3><p class="muted">'+(g.lastMessage||"Coach puts the ball in your hands.")+' Choose your action.</p><div class="list"><button class="btn" data-moment="iso">Attack the switch • Finishing + Athleticism • Quick First Step</button><button class="btn" data-moment="three">Hunt the three • Shooting • Clutch Shooter / Deadeye</button><button class="btn" data-moment="pnr">Run pick-and-roll • Playmaking + IQ • Dimer / Needle Threader</button><button class="btn" data-moment="team">Make the team play • IQ + Trust • Floor General</button></div></section><section class="card"><h3>Your Line</h3><div class="big">'+g.pts+'</div>'+row("Assists",g.ast)+row("Rebounds",g.reb)+row("Energy",S.player.energy)+row("Clutch chance",Math.min(MAX_CLUTCH_POSSESSIONS,(g.clutchPossessions||0)+1)+"/"+MAX_CLUTCH_POSSESSIONS)+'</section></div>'}
 function recentStatTrend(key){
