@@ -7059,11 +7059,22 @@ window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEvent
  const b=e.target&&e.target.closest?e.target.closest("button"):null;if(!b)return;
  if(b.id==="fullQuickSimBtn"){e.preventDefault();e.stopImmediatePropagation();fullSimRestOfGame();return}
  if(b.id==="fullToMomentBtn"){e.preventDefault();e.stopImmediatePropagation();fullJumpToCrucialMoment();return}
- if(b.id==="livePlayoffQuickNext"||b.id==="livePlayoffQuickNextBox"){e.preventDefault();e.stopImmediatePropagation();playoffQuickNextGame();return}
- if(b.id==="livePlayoffClose"||b.id==="livePlayoffCloseBox"){
+ if(b.id==="livePlayoffQuickNext"||b.id==="livePlayoffQuickNextBox"||b.id==="quickResultNext"){
+   e.preventDefault();e.stopImmediatePropagation();
+   if(b.id==="quickResultNext"){
+     S.pendingQuickSimResult=null;skipPendingInterviewForFastSim();S.playoffPostgame=null;save();closeModal();
+     const m=$("modal");if(m)m.innerHTML="";
+     setTimeout(()=>quickSim(),35);return
+   }
+   playoffQuickNextGame();return
+ }
+ if(b.id==="livePlayoffClose"||b.id==="livePlayoffCloseBox"||b.id==="quickResultDone"){
    e.preventDefault();e.stopImmediatePropagation();
    const champion=!!(S.championshipCelebration||S.playoffs?.champion||S.playoffPostgame?.champion);
-   S.pendingQuickSimResult=null;save();closeModal();
+   S.pendingQuickSimResult=null;
+   skipPendingInterviewForFastSim();
+   if(!champion)S.playoffPostgame=null;
+   save();closeModal();
    const m=$("modal");if(m)m.innerHTML="";
    if(champion&&S.championshipCelebration){S.championshipCelebration.deferQuickSim=false;S.championshipCelebration.shown=false;setTimeout(()=>showChampionshipCelebration(),35)}
    else render();
