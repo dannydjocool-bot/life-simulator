@@ -4658,6 +4658,20 @@ function playoffGamesView(){
  const recent=(Array.isArray(S.games)?S.games:[]).filter(g=>g&&g.playoff).slice(0,8).map(g=>'<div class="item"><div><b>'+g.opp+'</b><small>'+((g.pts||0))+' PTS • '+((g.ast||0))+' AST • '+((g.reb||0))+' REB</small></div><span class="pill '+(g.win?'good':'bad')+'">'+(g.win?'W ':'L ')+(g.team||0)+'-'+(g.oppScore||0)+'</span></div>').join("");
  return '<div class="grid" style="margin-top:0">'+playoffCommandCenter()+(ok?playoffBanner():'')+'<section class="card s6"><h3>Current Matchup</h3><div class="item"><div><b>'+team+' vs '+oppName+'</b><small>'+playoffRoundName()+' • Game '+playoffGameNumber()+'</small></div><span class="pill good">PLAYOFFS</span></div><p class="muted">Playoff controls stay at the top so you do not need to scroll through regular-season functions.</p></section><section class="card s6"><h3>Your Player</h3>'+statLineCard()+'</section><section class="card s12"><h3>Playoff Results</h3><div class="list">'+(recent||'<div class="item"><small>No playoff games recorded yet.</small></div>')+'</div></section></div>'
 }
+function refreshPlayoffGamesViewLive(){
+ if(frontMode!=="career"||S.screen!=="games")return false;
+ const content=$("content");if(!content)return false;
+ try{
+   content.innerHTML=playoffGamesView();
+   try{bindDynamic()}catch(e){recordClientFailure("refreshPlayoffGamesViewLive bindDynamic",e)}
+   bindCoreFallbackControls();
+   guardInteractiveHandlers();
+   return true
+ }catch(e){
+   recordClientFailure("refreshPlayoffGamesViewLive",e);
+   return false
+ }
+}
 function playoffQuickLiveHTML(r){
  if(!r)return "";
  const result=r.win?"WIN":"LOSS",cls=r.win?"good":"bad",t=r.transition||null;
@@ -4683,6 +4697,7 @@ function closePlayoffQuickResultModal(){
  closeModal();
  const m=$("modal");if(m)m.innerHTML="";
  const host=$("livePlayoffQuickResultHost");if(host){host.innerHTML="";host.classList.add("hidden")}
+ refreshPlayoffGamesViewLive()
 }
 let playoffQuickResultActionBusy=false;
 function playoffQuickNextGame(){
@@ -6955,7 +6970,7 @@ function quickSim(){
        syncUserBracketSeries()
      }
      save();
-     render();
+     if(!refreshPlayoffGamesViewLive())render();
      showPlayoffQuickResultNow(r)
    }
  }catch(e){
