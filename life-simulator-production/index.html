@@ -4690,44 +4690,40 @@ function playoffQuickNextGame(){
  playoffQuickResultActionBusy=true;
  try{
    if(S.championshipCelebration||S.playoffs?.champion||S.playoffPostgame?.champion){
-     playoffQuickResultActionBusy=false;
-     S.pendingQuickSimResult=null;save();closeModal();
+     S.pendingQuickSimResult=null;S.lastPlayoffQuickResult=null;
+     playoffQuickResultActionBusy=false;quickSimBusy=false;
+     save();closeModal();
+     const m=$("modal");if(m)m.innerHTML="";
      showChampionshipCelebration();return
    }
    if(!(S.playoffs&&S.playoffs.active)){
-     playoffQuickResultActionBusy=false;toast("Playoffs are complete");return
+     playoffQuickResultActionBusy=false;quickSimBusy=false;
+     toast("Playoffs are complete");return
    }
-   S.pendingQuickSimResult=null;S.lastPlayoffQuickResult=null;S.playoffPostgame=null;
-   if(S.postgameMedia&&S.postgameMedia.pending){S.postgameMedia.pending=false;S.postgameMedia.defer=false;S.postgameMedia.skipped=true}
-   if(typeof sanitizeSubsystemShapes==="function")sanitizeSubsystemShapes(S);
-   if(typeof sanitizeTransientGameState==="function")sanitizeTransientGameState(S);
-   repairPlayoffGameState();
-   quickSimBusy=false;
-   save();closeModal();
+   S.pendingQuickSimResult=null;
+   S.lastPlayoffQuickResult=null;
+   S.playoffPostgame=null;
+   if(S.postgameMedia&&S.postgameMedia.pending){
+     S.postgameMedia.pending=false;S.postgameMedia.defer=false;S.postgameMedia.skipped=true
+   }
+   save();
+   closeModal();
    const m=$("modal");if(m)m.innerHTML="";
-   render();
+   const host=$("livePlayoffQuickResultHost");if(host){host.innerHTML="";host.classList.add("hidden")}
+   quickSimBusy=false;
+   playoffQuickResultActionBusy=false;
    setTimeout(()=>{
-     try{
-       if(!(S.playoffs&&S.playoffs.active))throw new Error("Playoffs are no longer active");
-       S.playoffPostgame=null;
-       const g=buildQuickSimGame();
-       if(!g||!g.opp)throw new Error("Could not build next playoff game");
-       g.quickSim=true;g.playoff=true;
-       if(!Number.isFinite(Number(g.playoffRoundBefore)))g.playoffRoundBefore=Number(S.playoffs.round)||1;
-       if(!Number.isFinite(Number(g.playoffGameBefore)))g.playoffGameBefore=playoffGameNumber();
-       recordGame(g);
-       if(S.lastPlayoffQuickResult)showPlayoffQuickResultNow(S.lastPlayoffQuickResult)
-     }catch(e){
+     try{quickSim()}
+     catch(e){
        recordClientFailure("playoffQuickNextGame",e);
-       toast("Could not start the next playoff game");
-       render()
-     }finally{
-       quickSimBusy=false;playoffQuickResultActionBusy=false
+       quickSimBusy=false;playoffQuickResultActionBusy=false;
+       toast("Could not quick sim the next playoff game")
      }
-   },50)
+   },0)
  }catch(e){
    playoffQuickResultActionBusy=false;quickSimBusy=false;
-   recordClientFailure("playoffQuickNextGame",e);toast("Could not start the next playoff game");render()
+   recordClientFailure("playoffQuickNextGame",e);
+   toast("Could not quick sim the next playoff game")
  }
 }
 function bindPlayoffQuickResultActions(r){
