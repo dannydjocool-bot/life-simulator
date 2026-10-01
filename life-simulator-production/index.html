@@ -3340,9 +3340,11 @@ function resumePendingCareerOverlay(){
  })
 }
 function showChampionshipCelebration(){
- const ch=S.championshipCelebration;if(!ch||ch.shown)return;ch.deferQuickSim=false;ch.shown=true;save();
- modal('<div style="text-align:center"><span class="kicker">NBA CHAMPIONS</span><div style="font-size:58px;margin:8px 0">🏆 💍</div><h1 style="margin:4px 0">CHAMPIONSHIP WON</h1><p class="muted">'+ch.season+' NBA Champions</p><div class="item"><div><b>'+ch.team+'</b><small>Defeated '+ch.opponent+' • Finals '+ch.series+'</small></div><span class="pill good">TITLE #'+ch.titleNumber+'</span></div><div class="item" style="border-color:#d9b95b"><div><b>Championship Ring Earned</b><small>Ring #'+ch.titleNumber+' is permanently attached to your career championship history.</small></div><span class="pill good">💍 RING #'+ch.titleNumber+'</span></div><p class="muted" style="margin-top:14px">This championship is permanently stored in your Record Books.</p><div class="item"><div><b>Cap Breaker Earned</b><small>Every NBA championship permanently adds exactly 1 Cap Breaker to your player progression.</small></div><span class="pill good">+1</span></div><div class="item"><div><b>Badge Breaker Earned</b><small>Upgrade one Legend badge to the championship-exclusive G.O.A.T. tier.</small></div><span class="pill good">+1</span></div><div class="modalFoot"><button class="btn primary" id="champContinue">Continue to Offseason</button></div></div>');
- $("champContinue").onclick=()=>{closeModal();S.championshipCelebration=null;S.playoffPostgame=null;save();if(S.postgameMedia&&S.postgameMedia.pending)openPostgameInterview();else render()}
+ const ch=S.championshipCelebration;if(!ch)return;
+ ch.deferQuickSim=false;ch.shown=true;save();
+ modal('<div style="text-align:center"><span class="kicker">NBA CHAMPIONS</span><div style="font-size:58px;margin:8px 0">🏆 💍</div><h1 style="margin:4px 0">CHAMPIONSHIP WON</h1><p class="muted">'+ch.season+' NBA Champions</p><div class="item"><div><b>'+ch.team+'</b><small>Defeated '+ch.opponent+' • Finals '+ch.series+'</small></div><span class="pill good">TITLE #'+ch.titleNumber+'</span></div><div class="item" style="border-color:#d9b95b"><div><b>Championship Ring Earned</b><small>Ring #'+ch.titleNumber+' is permanently attached to your career championship history.</small></div><span class="pill good">💍 RING #'+ch.titleNumber+'</span></div><p class="muted" style="margin-top:14px">This championship is permanently stored in your Record Books.</p><div class="item"><div><b>Cap Breaker Earned</b><small>Every NBA championship permanently adds exactly 1 Cap Breaker to your player progression.</small></div><span class="pill good">+1</span></div><div class="item"><div><b>Badge Breaker Earned</b><small>Upgrade one Legend badge to the championship-exclusive G.O.A.T. tier.</small></div><span class="pill good">+1</span></div><div class="modalFoot"><button type="button" class="btn primary" id="champContinue">Continue to Offseason</button></div></div>');
+ const b=$("champContinue");if(b)b.onclick=()=>{closeModal();S.championshipCelebration=null;S.playoffPostgame=null;S.pendingQuickSimResult=null;S.lastPlayoffQuickResult=null;save();render()};
+ guardInteractiveHandlers()
 }
 function recordBooksHTML(){
  const seasons=(S.recordBook?.seasons||seedRecordBook()).slice().reverse(),pick=k=>[...seasons].sort((x,y)=>(y.leaders?.[k]?.value||0)-(x.leaders?.[k]?.value||0))[0],p=pick("ppg"),a=pick("apg"),r=pick("rpg"),s=pick("spg"),b=pick("bpg"),best=[...seasons].sort((x,y)=>(y.bestRecord?.w||0)-(x.bestRecord?.w||0))[0],tn=id=>teamNameById(id);
@@ -4686,21 +4688,45 @@ function playoffQuickNextGame(){
  if(playoffQuickResultActionBusy)return;
  playoffQuickResultActionBusy=true;
  try{
-   S.pendingQuickSimResult=null;
-   S.lastPlayoffQuickResult=null;
+   if(S.championshipCelebration||S.playoffs?.champion||S.playoffPostgame?.champion){
+     playoffQuickResultActionBusy=false;
+     S.pendingQuickSimResult=null;save();closeModal();
+     showChampionshipCelebration();return
+   }
+   if(!(S.playoffs&&S.playoffs.active)){
+     playoffQuickResultActionBusy=false;toast("Playoffs are complete");return
+   }
+   S.pendingQuickSimResult=null;S.lastPlayoffQuickResult=null;S.playoffPostgame=null;
    if(S.postgameMedia&&S.postgameMedia.pending){S.postgameMedia.pending=false;S.postgameMedia.defer=false;S.postgameMedia.skipped=true}
-   save();
-   closeModal();
+   if(typeof sanitizeSubsystemShapes==="function")sanitizeSubsystemShapes(S);
+   if(typeof sanitizeTransientGameState==="function")sanitizeTransientGameState(S);
+   repairPlayoffGameState();
+   quickSimBusy=false;
+   save();closeModal();
    const m=$("modal");if(m)m.innerHTML="";
-   quickSimBusy=false;
-   playoffQuickResultActionBusy=false;
-   quickSim()
+   render();
+   setTimeout(()=>{
+     try{
+       if(!(S.playoffs&&S.playoffs.active))throw new Error("Playoffs are no longer active");
+       S.playoffPostgame=null;
+       const g=buildQuickSimGame();
+       if(!g||!g.opp)throw new Error("Could not build next playoff game");
+       g.quickSim=true;g.playoff=true;
+       if(!Number.isFinite(Number(g.playoffRoundBefore)))g.playoffRoundBefore=Number(S.playoffs.round)||1;
+       if(!Number.isFinite(Number(g.playoffGameBefore)))g.playoffGameBefore=playoffGameNumber();
+       recordGame(g);
+       if(S.lastPlayoffQuickResult)showPlayoffQuickResultNow(S.lastPlayoffQuickResult)
+     }catch(e){
+       recordClientFailure("playoffQuickNextGame",e);
+       toast("Could not start the next playoff game");
+       render()
+     }finally{
+       quickSimBusy=false;playoffQuickResultActionBusy=false
+     }
+   },50)
  }catch(e){
-   playoffQuickResultActionBusy=false;
-   quickSimBusy=false;
-   recordClientFailure("playoffQuickNextGame",e);
-   toast("Could not start the next playoff game");
-   render()
+   playoffQuickResultActionBusy=false;quickSimBusy=false;
+   recordClientFailure("playoffQuickNextGame",e);toast("Could not start the next playoff game");render()
  }
 }
 function bindPlayoffQuickResultActions(r){
@@ -4712,26 +4738,33 @@ function bindPlayoffQuickResultActions(r){
  guardInteractiveHandlers()
 }
 function showPlayoffQuickBoxScore(r){
- const canNext=!!(S.playoffs&&S.playoffs.active&&!S.playoffs.eliminated&&!S.playoffs.champion);
- modal(playoffQuickBoxScoreHTML(r)+'<div class="modalFoot"><button type="button" class="btn" id="livePlayoffBackResults">Back to Results</button>'+(canNext?'<button type="button" class="btn good" id="livePlayoffQuickNextBox">Quick Sim Next Game</button>':'')+'<button type="button" class="btn primary" id="livePlayoffCloseBox">Close</button></div>');
- const back=$("livePlayoffBackResults"),next=$("livePlayoffQuickNextBox"),close=$("livePlayoffCloseBox");
- if(back)back.addEventListener("click",()=>showPlayoffQuickResultNow(r),{once:true});
- if(next)next.addEventListener("click",playoffQuickNextGame,{once:true});
- if(close)close.addEventListener("click",closePlayoffQuickResultModal,{once:true})
+ const champion=!!(r?.transition?.champion||S.championshipCelebration||S.playoffs?.champion);
+ const canNext=!!(!champion&&S.playoffs&&S.playoffs.active&&!S.playoffs.eliminated);
+ modal(playoffQuickBoxScoreHTML(r)+'<div class="modalFoot"><button type="button" class="btn" id="livePlayoffBackResults">Back to Results</button>'+(champion?'<button type="button" class="btn good" id="livePlayoffChampionshipBox">View Championship Ring</button>':'')+(canNext?'<button type="button" class="btn good" id="livePlayoffQuickNextBox">Quick Sim Next Game</button>':'')+'<button type="button" class="btn primary" id="livePlayoffCloseBox">Close</button></div>');
+ const back=$("livePlayoffBackResults"),next=$("livePlayoffQuickNextBox"),close=$("livePlayoffCloseBox"),champ=$("livePlayoffChampionshipBox");
+ if(back)back.onclick=()=>showPlayoffQuickResultNow(r);
+ if(next)next.onclick=playoffQuickNextGame;
+ if(champ)champ.onclick=()=>{S.pendingQuickSimResult=null;save();closeModal();if(S.championshipCelebration){S.championshipCelebration.deferQuickSim=false;S.championshipCelebration.shown=false;showChampionshipCelebration()}else render()};
+ if(close)close.onclick=()=>{S.pendingQuickSimResult=null;save();closeModal();if(champion&&S.championshipCelebration){S.championshipCelebration.deferQuickSim=false;S.championshipCelebration.shown=false;setTimeout(()=>showChampionshipCelebration(),35)}else render()};
+ guardInteractiveHandlers()
 }
 
 function showPlayoffQuickResultNow(r){
  if(!r)return;
  const host=$("livePlayoffQuickResultHost");
  if(host){host.innerHTML=playoffQuickLiveHTML(r);host.classList.remove("hidden");host.scrollIntoView({behavior:"smooth",block:"center"})}
- const canNext=!!(S.playoffs&&S.playoffs.active&&!S.playoffs.eliminated&&!S.playoffs.champion);
+ const champion=!!(r.transition?.champion||S.championshipCelebration||S.playoffs?.champion);
+ const canNext=!!(!champion&&S.playoffs&&S.playoffs.active&&!S.playoffs.eliminated);
  const interview=S.postgameMedia?.pending?'<button type="button" class="btn" id="livePlayoffInterview">Optional Interview</button>':'';
- modal(playoffQuickLiveHTML(r)+'<div class="modalFoot"><button type="button" class="btn" id="livePlayoffBoxScore">View Full Box Score</button>'+(canNext?'<button type="button" class="btn good" id="livePlayoffQuickNext">Quick Sim Next Game</button>':'')+interview+'<button type="button" class="btn primary" id="livePlayoffClose">Close</button></div>');
- const box=$("livePlayoffBoxScore"),next=$("livePlayoffQuickNext"),inter=$("livePlayoffInterview"),close=$("livePlayoffClose");
- if(box)box.addEventListener("click",()=>showPlayoffQuickBoxScore(r),{once:true});
- if(next)next.addEventListener("click",playoffQuickNextGame,{once:true});
- if(inter)inter.addEventListener("click",()=>{S.pendingQuickSimResult=null;save();closeModal();openPostgameInterview()},{once:true});
- if(close)close.addEventListener("click",closePlayoffQuickResultModal,{once:true})
+ const championship=champion?'<button type="button" class="btn good" id="livePlayoffChampionship">View Championship Ring & Celebration</button>':'';
+ modal(playoffQuickLiveHTML(r)+'<div class="modalFoot"><button type="button" class="btn" id="livePlayoffBoxScore">View Full Box Score</button>'+championship+(canNext?'<button type="button" class="btn good" id="livePlayoffQuickNext">Quick Sim Next Game</button>':'')+interview+'<button type="button" class="btn primary" id="livePlayoffClose">Close</button></div>');
+ const box=$("livePlayoffBoxScore"),next=$("livePlayoffQuickNext"),inter=$("livePlayoffInterview"),close=$("livePlayoffClose"),champ=$("livePlayoffChampionship");
+ if(box)box.onclick=()=>showPlayoffQuickBoxScore(r);
+ if(next)next.onclick=playoffQuickNextGame;
+ if(champ)champ.onclick=()=>{S.pendingQuickSimResult=null;save();closeModal();if(S.championshipCelebration){S.championshipCelebration.deferQuickSim=false;S.championshipCelebration.shown=false;showChampionshipCelebration()}else render()};
+ if(inter)inter.onclick=()=>{S.pendingQuickSimResult=null;save();closeModal();openPostgameInterview()};
+ if(close)close.onclick=()=>{S.pendingQuickSimResult=null;save();closeModal();if(champion&&S.championshipCelebration){S.championshipCelebration.deferQuickSim=false;S.championshipCelebration.shown=false;setTimeout(()=>showChampionshipCelebration(),35)}else render()};
+ guardInteractiveHandlers()
 }
 function playoffLastQuickResultHTML(){
  const r=S.lastPlayoffQuickResult;if(!r)return "";
@@ -7007,7 +7040,7 @@ function updateAdvancedTotals(g){
  if(doubles>=3){p.seasonAdvanced.tripleDoubles++;p.careerAdvanced.tripleDoubles++}
 }
 function recordGame(g){g.year=S.year||1;if(S.stage==="College"&&collegeTournamentActive()){g.collegeTournament=true;g.collegeTournamentRound=ensureCollegeTournamentState().round;if(!g.viewers){g.viewers=Math.round(collegeTournamentAudience(g.collegeTournamentRound));g.peakViewers=Math.round(g.viewers*(1.12+Math.random()*.25));g.tv="National College TV";}}enrichGameAdvancedStats(g);normalizeFinalScore(g);if(S.stage==="NBA"){coolLoadManagementScrutiny();const js=ensureTeamJerseyState();js.games++;updateJerseyUnlocks()}const gameNo=S.game||1,oppId=opponentTeamIdFromName(g.opp)||S.playoffs?.opponentId||null,gameSpot=(S.stage==="NBA"?currentGameSpotlight():null);if(S.stage==="NBA"){const aud=gameBroadcastAudience(g,gameSpot);g.viewers=aud.live;g.peakViewers=aud.peak;g.tv=gameSpot.tv;g.broadcastTitle=gameSpot.title;const tvBonus=liveTvPerformanceBonus(g,gameSpot,aud);g.tvPerformanceBonus=tvBonus;if(tvBonus>0){S.finance.cash+=tvBonus;S.finance.earnings+=tvBonus;S.news.unshift("LIVE TV performance bonus: +$"+tvBonus.toLocaleString()+" • "+gameSpot.tv+" • Peak "+formatAudience(aud.peak)+".");S.social.followers+=Math.round(tvBonus/18)}const rivalryBonus=rivalryPerformanceBonus(g,oppId);g.rivalryBonus=rivalryBonus;if(rivalryBonus>0){S.finance.cash+=rivalryBonus;S.finance.earnings+=rivalryBonus;S.social.fame=Math.min(100,S.social.fame+1);S.news.unshift("RIVALRY NIGHT bonus: +$"+rivalryBonus.toLocaleString()+" • Heat "+rivalryHeat(oppId)+".")}}S.games.unshift(g);const isPlayoff=!!(S.playoffs&&S.playoffs.active&&S.stage==="NBA");updateRecords(g,isPlayoff);if(S.stage==="NBA"&&!isPlayoff)updateNBARegularSeasonStats(g);if(!isPlayoff){S.record[g.win?"w":"l"]++;S.game++}const st=S.player.stats,old=st.gp;st.gp++;const ckey=S.stage==="NBA"?"nba":S.stage==="College"?"college":"highSchool";S.careerStats=S.careerStats||{highSchool:{gp:0,pts:0,ast:0,reb:0},college:{gp:0,pts:0,ast:0,reb:0},nba:{gp:0,pts:0,ast:0,reb:0}};const cst=S.careerStats[ckey];cst.gp++;cst.pts+=g.pts;cst.ast+=g.ast;cst.reb+=g.reb;updateAdvancedTotals(g);awardBadgePerformanceXP(g);st.ppg=(st.ppg*old+g.pts)/st.gp;st.apg=(st.apg*old+g.ast)/st.gp;st.rpg=(st.rpg*old+g.reb)/st.gp;S.player.energy=Math.max(35,S.player.energy-(hasStaff("trainer")?7:10));if(hasStaff("chef"))S.player.morale=Math.min(100,S.player.morale+1);S.player.xp+=90+g.pts*3+g.ast*4+g.reb*2;if(S.stage!=="NBA")S.player.draft=Math.min(99,S.player.draft+(g.pts>=22?3:g.pts>=15?1:0));if(S.stage==="NBA"){S.player.trust=Math.min(100,S.player.trust+coachTrustGain(g)+pathBonus("coachTrust"));updateTeammateRelationships(g);updateCaptaincy();if(oppId)addRivalryHeat(oppId,(isPlayoff?8:0)+(g.pts>=30?3:1)+(Math.abs((g.team||0)-(g.oppScore||0))<=5?3:0));if(g.pts>=30)addCareerPathXP("superstar",g.pts>=40?10:6);if(g.win&&g.pts>=25)addCareerPathXP("superstar",3);if(g.ast>=8)addCareerPathXP("dynasty",2);if((S.year||1)>=5)addCareerPathXP("veteran",2);S.player.chemistry=Math.max(20,Math.min(100,S.player.chemistry+(g.win?2:-1)+(g.ast>=6?1:0)));updateRole();updateArchetypeEvolution();updateLegacyMilestones()}else if(g.win)S.player.trust=Math.min(100,S.player.trust+1);if(g.win)S.player.morale=Math.min(100,S.player.morale+3);else S.player.morale=Math.max(20,S.player.morale-2);processPlayerLevelUps();g.attributePointsAwarded=awardGameAttributePoints(g);checkCareerMilestones(g);updateCareerClassics(g);processV018Game(g,oppId,isPlayoff,gameSpot);if([2,4,6,8,10,12].includes(st.gp)&&S.offers.length<COLLEGES.length&&!S.college){const pool=COLLEGES.filter(c=>!S.offers.includes(c));S.offers.push(pool[Math.floor(Math.random()*pool.length)])}processRoadToNBAAfterGame(g);maybeCreateCollegeSpotlightInvite(g);processCollegeTournamentGame(g);if(g.collegeTournament&&ensureCollegeTournamentState().completed){g.collegeTournamentCompleted=true;g.collegeChampion=!!ensureCollegeTournamentState().champion}if(!S.postgameMedia?.pending&&!S.bulkCollegeSim&&!S.bulkCollegeTournament&&!S.bulkFastSim)preparePostgameInterview(g,0,!!g.quickSim);if(S.postgameMedia?.pending&&S.postgameMedia.opp===g.opp){S.postgameMedia.roadPostgame=g.roadPostgame||null;S.postgameMedia.collegeTournamentCompleted=!!g.collegeTournamentCompleted;S.postgameMedia.collegeChampion=!!g.collegeChampion;S.postgameMedia.question=postgameQuestionFor({...S.postgameMedia,collegeTournamentCompleted:!!g.collegeTournamentCompleted,collegeChampion:!!g.collegeChampion})}if(S.stage==="College"&&!collegeTournamentActive())initializeCollegeTournament();if(S.stage==="College")updateDraftProjectionHistory(g.collegeTournament?(g.win?"Tournament Win":"Tournament Loss"):"College Game "+collegeRegularSeasonGames());if(S.stage==="NBA"&&!isPlayoff)maybeTriggerAllStarBreak();if(isPlayoff){if(g.win&&g.pts>=25&&Math.abs(g.team-g.oppScore)<=5)S.nbaWorld.records.playoff.clutchWins=(S.nbaWorld.records.playoff.clutchWins||0)+1;if(S.playoffs.playIn){finishPlayInGame(g)}else{const seriesKey=g.win?"seriesWins":"seriesLosses";S.playoffs[seriesKey]=Math.min(4,(S.playoffs[seriesKey]||0)+1);S.news.unshift((g.win?"Playoff win":"Playoff loss")+" vs "+g.opp+" • Series "+S.playoffs.seriesWins+"-"+S.playoffs.seriesLosses);syncUserBracketSeries();try{advancePlayoffRound(!!g.quickSim)}catch(e){recordClientFailure("playoffRoundAdvance",e);repairPlayoffGameState()}}}else{S.news.unshift((g.win?"Win":"Loss")+" vs "+g.opp+": "+g.pts+" PTS, "+g.ast+" AST, "+g.reb+" REB.");if(S.stage==="NBA"){simulateOtherTeamsOneGame();ensureLeagueStandings();S.leagueStandings[S.team]={w:S.record.w,l:S.record.l};if(g.pts>=30)pushLeagueNews(S.player.name+" scored "+g.pts+" in "+currentTeamName()+"'s "+(g.win?"win":"loss")+".");updateCup(g,gameNo);maybeCreateLockerEvent();maybeInjury()}}if(isPlayoff&&g.quickSim){
- const transition=S.playoffPostgame?{...S.playoffPostgame}:null;
+ const transition=S.playoffPostgame?{...S.playoffPostgame}:(S.championshipCelebration?{finishedRound:4,finishedRoundName:"NBA Finals",champion:true,ringNumber:Number(S.championshipCelebration.titleNumber)||championshipCount(),seriesWins:4,seriesLosses:Number(S.playoffs?.seriesLosses)||0}:null);
  const stillActive=!!(S.playoffs&&S.playoffs.active);
  S.lastPlayoffQuickResult={gameNumber:Number(g.playoffGameBefore)||1,roundBefore:Number(g.playoffRoundBefore)||1,teamName:currentTeamName(),opp:g.opp,teamScore:Number(g.team)||0,oppScore:Number(g.oppScore)||0,win:!!g.win,pts:Number(g.pts)||0,ast:Number(g.ast)||0,reb:Number(g.reb)||0,stl:Number(g.stl)||0,blk:Number(g.blk)||0,tov:Number(g.tov)||0,pf:Number(g.pf)||0,fgm:Number(g.fgm)||0,fga:Number(g.fga)||0,tpm:Number(g.tpm)||0,tpa:Number(g.tpa)||0,ftm:Number(g.ftm)||0,fta:Number(g.fta)||0,seriesWinsAfter:stillActive?Number(S.playoffs.seriesWins)||0:(transition?Number(transition.seriesWins)||0:0),seriesLossesAfter:stillActive?Number(S.playoffs.seriesLosses)||0:(transition?Number(transition.seriesLosses)||0:0),nextGameNumber:stillActive?playoffGameNumber():null,transition,at:Date.now()}
 }
