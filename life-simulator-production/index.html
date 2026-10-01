@@ -2000,7 +2000,30 @@ function confirmReplaceCareer(slot){
  modal('<h2>Replace Slot '+slot+'?</h2><p class="muted">This will replace <b>'+d.player.name+'</b> once you finish creating the new player. Canceling player creation keeps the existing save untouched.</p><div class="modalFoot"><button class="btn" id="replaceCancel">Cancel</button><button class="btn danger" id="replaceConfirm">Create New Career</button></div>');
  $("replaceCancel").onclick=closeModal;$("replaceConfirm").onclick=()=>{closeModal();newCareerInSlot(slot)}
 }
-function returnToMainMenu(){if(S&&S.created){if(S.championshipCelebration)S.championshipCelebration.shown=false;save()}closeModal();frontMode="main";S=fresh();S.created=false;render();scrollTo({top:0})}
+function returnToMainMenu(){
+ try{
+  if(S&&S.created){
+   if(S.championshipCelebration)S.championshipCelebration.shown=false;
+   save()
+  }
+  try{if(typeof setPhoneEditMode==="function"&&phoneEditMode)setPhoneEditMode(false)}catch(_){}
+  try{repairInteractionBlockers()}catch(_){}
+  closeModal();
+  const m=$("modal");if(m)m.innerHTML="";
+  frontMode="main";
+  S=fresh();S.created=false;
+  render();
+  try{window.scrollTo({top:0,left:0,behavior:"auto"})}catch(_){scrollTo(0,0)}
+  return true
+ }catch(e){
+  recordClientFailure("returnToMainMenu",e);
+  try{
+   closeModal();frontMode="main";S=fresh();S.created=false;renderFrontEnd();
+   window.scrollTo(0,0)
+  }catch(recoveryError){recordClientFailure("returnToMainMenu recovery",recoveryError)}
+  return false
+ }
+}
 function slotOvr(d){if(!d||!d.player||!d.player.attrs)return 0;return typeof playerOverall==="function"?playerOverall(d.player):Math.round(Object.values(d.player.attrs).reduce((a,b)=>a+b,0)/6)}
 function slotTeamLabel(d){if(!d)return "";if((d.stage==="NBA"||d.stage==="Offseason"||d.stage==="Retired")&&d.team){const t=NBA_TEAMS.find(x=>x.id===d.team);if(t)return t.city+" "+t.name}if(d.stage==="College"&&d.college)return d.college;return d.stage||"Career"}
 function slotSavedLabel(d){if(!d||!d.saveMeta||!d.saveMeta.lastSaved)return "Autosaved";const dt=new Date(d.saveMeta.lastSaved);return Number.isNaN(dt.getTime())?"Autosaved":dt.toLocaleString()}
@@ -7170,6 +7193,10 @@ function declareDraft(){const t=ensureCollegeTournamentState();if(S.stage!=="Col
 function collegeModal(){if(S.college){toast("Already committed to "+S.college);return}if(!S.offers.length){toast("You need a scholarship offer first");return}modal('<h2>Choose College</h2><p class="muted">This is a one-time commitment. Your player level, XP, attributes, badges, draft stock, and career game history will carry into college.</p><div class="list">'+S.offers.map(c=>'<button class="btn" data-college="'+c+'">'+c+'</button>').join("")+'</div><div class="modalFoot"><button class="btn" id="ccancel">Cancel</button></div>');document.querySelectorAll("[data-college]").forEach(b=>b.onclick=()=>{if(S.college){toast("College already selected");closeModal();return}const school=b.dataset.college;S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[]};S.careerHistory.highSchool={record:{w:S.record.w,l:S.record.l},games:S.game-1,stats:{...S.player.stats},level:S.player.level,ovr:ovr(),draft:S.player.draft};S.college=school;S.stage="College";S.year=1;S.record={w:0,l:0};S.game=1;resetSeasonStatLine();roadToNBATransition("college_arrival");S.live=null;S.news.unshift("Committed to "+S.college+". Your high-school career is saved and your college season begins.");save();closeModal();setScreen("home");toast("Committed to "+S.college)});$("ccancel").onclick=closeModal}
 window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEventListener("error",e=>{recordClientFailure(lastClientAction?.action||"window",e.error||e.message);console.error("MYCAREER error",e.error||e.message);const content=$("content");if(content&&!content.innerHTML.trim())content.innerHTML='<section class="card s12"><h3>MYCAREER recovered from an error</h3><p class="muted">Tap New Career again. Your save has not been deleted.</p><button class="btn primary" id="recoverBtn">Return Home</button></section>';const r=$("recoverBtn");if(r)r.onclick=()=>{S.screen="home";render()}});window.addEventListener("unhandledrejection",e=>recordClientFailure(lastClientAction?.action||"promise",e.reason||"Unhandled promise rejection"));document.addEventListener("click",e=>{const b=e.target&&e.target.closest?e.target.closest("button"):null;if(b)recordClientAction(b)},true);document.addEventListener("click",e=>{
  const b=e.target&&e.target.closest?e.target.closest("button"):null;if(!b)return;
+ if(b.id==="mainMenuBtn"||b.id==="topMainMenuBtn"||b.id==="switchPlayerBtn"){
+   e.preventDefault();e.stopImmediatePropagation();
+   returnToMainMenu();return
+ }
  if(b.dataset&&b.dataset.go==="rosters"){
    e.preventDefault();e.stopImmediatePropagation();
    S.screen="rosters";save();render();return
