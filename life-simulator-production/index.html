@@ -3436,15 +3436,28 @@ function forceRepairPlayoffSession(announce=false){
 }
 function runPlayoffAction(action){
  try{
-  if(action==="repair"){const ok=forceRepairPlayoffSession(true);render();return ok}
-  if(!forceRepairPlayoffSession(false)){toast("Playoff matchup could not be restored");return false}
+  if(action==="repair"){
+    const ok=forceRepairPlayoffSession(true);
+    if(ok)render();
+    else toast("Playoff session could not be repaired");
+    return ok
+  }
+  if(!(S.stage==="NBA"&&S.playoffs&&S.playoffs.active)){
+    toast("No active playoff matchup");return false
+  }
+  let opp=playoffOpponent();
+  if(!opp||opp.id===S.team){
+    if(!repairPlayoffGameState()){toast("Playoff matchup could not be restored");return false}
+    opp=playoffOpponent();
+    if(!opp||opp.id===S.team){toast("Playoff matchup could not be restored");return false}
+  }
   if(action==="full"){startFullGame();return true}
   if(action==="moment"){startMoment();return true}
   if(action==="quick"){quickSim();return true}
  }catch(e){
-  console.error("Playoff action failed",action,e);
-  S.fullGame=null;S.live=null;S.playoffBracket=null;
-  if(forceRepairPlayoffSession(false)){render();toast("Playoff session recovered — tap the action again")}else toast("Playoff recovery failed");
+  recordClientFailure("runPlayoffAction:"+action,e);
+  S.fullGame=null;S.live=null;
+  toast("Playoff action could not start");
   return false
  }
  return false
