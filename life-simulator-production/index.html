@@ -3510,7 +3510,7 @@ function playoffCommandCenter(){
  const myName=mine?mine.city+" "+mine.name:currentTeamName(),oppName=opp?opp.city+" "+opp.name:"Opponent being restored";
  const wins=Math.min(4,Number(S.playoffs.seriesWins)||0),losses=Math.min(4,Number(S.playoffs.seriesLosses)||0);
  const title=S.playoffs.playIn?(S.playoffs.playIn.stage===1?"Play-In Game":"Final Play-In Chance"):playoffRoundName()+" • Game "+playoffGameNumber();
- return '<section class="card s12" style="border-color:#ff9b42"><div class="row"><div><span class="kicker">PLAYOFF COMMAND CENTER</span><h2 style="margin:5px 0">'+title+'</h2><small class="muted">#'+(S.playoffs.seed||"—")+' '+myName+' vs #'+(S.playoffs.opponentSeed||"—")+' '+oppName+'</small></div><span class="pill good">'+(S.playoffs.playIn?"WIN OR GO HOME":wins+"-"+losses+" SERIES")+'</span></div><div class="grid" style="margin-top:10px"><div class="card" style="grid-column:span 4"><small class="muted">NEXT OPPONENT</small><div class="big" style="font-size:20px">'+oppName+'</div></div><div class="card" style="grid-column:span 4"><small class="muted">SERIES</small><div class="big" style="font-size:24px">'+wins+'-'+losses+'</div></div><div class="card" style="grid-column:span 4"><small class="muted">ENERGY</small><div class="big" style="font-size:24px">'+Math.round(Number(S.player?.energy)||0)+'</div></div></div><div class="actions" style="margin-top:12px"><button class="btn primary" data-playoff-action="full">Play Full Game</button><button class="btn" data-playoff-action="moment">Play Key Moment</button><button class="btn good" data-playoff-action="quick">Quick Sim</button><button class="btn" data-playoff-action="repair">Repair Playoff Session</button></div>'+(!ok?'<p class="muted" style="margin-top:10px">Your playoff save needs recovery. Tap Repair Playoff Session once, then choose a game option.</p>':'')+'</section>'
+ return '<section class="card s12" id="playoffCommandCenter" style="border-color:#ff9b42;scroll-margin-top:105px"><div class="row"><div><span class="kicker">PLAYOFF COMMAND CENTER</span><h2 style="margin:5px 0">'+title+'</h2><small class="muted">#'+(S.playoffs.seed||"—")+' '+myName+' vs #'+(S.playoffs.opponentSeed||"—")+' '+oppName+'</small></div><span class="pill good">'+(S.playoffs.playIn?"WIN OR GO HOME":wins+"-"+losses+" SERIES")+'</span></div><div class="grid" style="margin-top:10px"><div class="card" style="grid-column:span 4"><small class="muted">NEXT OPPONENT</small><div class="big" style="font-size:20px">'+oppName+'</div></div><div class="card" style="grid-column:span 4"><small class="muted">SERIES</small><div class="big" style="font-size:24px">'+wins+'-'+losses+'</div></div><div class="card" style="grid-column:span 4"><small class="muted">ENERGY</small><div class="big" style="font-size:24px">'+Math.round(Number(S.player?.energy)||0)+'</div></div></div><div class="actions" style="margin-top:12px"><button class="btn primary" data-playoff-action="full">Play Full Game</button><button class="btn" data-playoff-action="moment">Play Key Moment</button><button class="btn good" data-playoff-action="quick">Quick Sim</button><button class="btn" data-playoff-action="repair">Repair Playoff Session</button></div>'+(!ok?'<p class="muted" style="margin-top:10px">Your playoff save needs recovery. Tap Repair Playoff Session once, then choose a game option.</p>':'')+'</section>'
 }
 function playoffBanner(){
  if(!(S.playoffs&&S.playoffs.active))return "";if(S.playoffs.playIn){const opp=playoffOpponent();return '<section class="playoffBanner"><span class="kicker">NBA PLAY-IN TOURNAMENT</span><div class="playoffRound">'+(S.playoffs.playIn.stage===1?"Play-In Game":"Final Play-In Chance")+'</div><p class="muted">#'+S.playoffs.seed+' '+currentTeamName()+' vs #'+S.playoffs.opponentSeed+' '+(opp?opp.city+" "+opp.name:"Opponent")+' • Win to keep your season alive</p></section>'}
@@ -4708,6 +4708,13 @@ function playoffQuickBoxScoreHTML(r){
  const fg=(Number(r.fgm)||0)+"/"+(Number(r.fga)||0),three=(Number(r.tpm)||0)+"/"+(Number(r.tpa)||0),ft=(Number(r.ftm)||0)+"/"+(Number(r.fta)||0);
  return '<div class="row"><div><span class="kicker">FULL BOX SCORE • PLAYOFF GAME '+r.gameNumber+'</span><h2 style="margin:5px 0">'+r.teamName+' '+r.teamScore+' — '+r.oppScore+' '+r.opp+'</h2></div><span class="pill '+(r.win?"good":"bad")+'">'+(r.win?"WIN":"LOSS")+'</span></div><div class="list" style="margin-top:14px"><div class="row"><span>Points</span><strong>'+r.pts+'</strong></div><div class="row"><span>Assists</span><strong>'+r.ast+'</strong></div><div class="row"><span>Rebounds</span><strong>'+r.reb+'</strong></div><div class="row"><span>Steals</span><strong>'+r.stl+'</strong></div><div class="row"><span>Blocks</span><strong>'+r.blk+'</strong></div><div class="row"><span>Turnovers</span><strong>'+r.tov+'</strong></div><div class="row"><span>Personal Fouls</span><strong>'+r.pf+'</strong></div><div class="row"><span>Field Goals</span><strong>'+fg+'</strong></div><div class="row"><span>3-Pointers</span><strong>'+three+'</strong></div><div class="row"><span>Free Throws</span><strong>'+ft+'</strong></div></div>'
 }
+function scrollToPlayoffCommandCenter(){
+ requestAnimationFrame(()=>{
+   const el=$("playoffCommandCenter");
+   if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+   else window.scrollTo({top:0,behavior:"smooth"})
+ })
+}
 function closePlayoffQuickResultModal(){
  try{
    S.pendingQuickSimResult=null;
@@ -4718,7 +4725,8 @@ function closePlayoffQuickResultModal(){
  closeModal();
  const m=$("modal");if(m)m.innerHTML="";
  const host=$("livePlayoffQuickResultHost");if(host){host.innerHTML="";host.classList.add("hidden")}
- refreshPlayoffGamesViewLive()
+ refreshPlayoffGamesViewLive();
+ scrollToPlayoffCommandCenter()
 }
 let playoffQuickResultActionBusy=false;
 function playoffQuickNextGame(){
@@ -4732,7 +4740,7 @@ function playoffQuickNextGame(){
      const m=$("modal");if(m)m.innerHTML="";
      showChampionshipCelebration();return
    }
-   if(!(S.playoffs&&S.playoffs.active)){
+   if(!(S.stage==="NBA"&&S.playoffs&&S.playoffs.active)){
      playoffQuickResultActionBusy=false;quickSimBusy=false;
      toast("Playoffs are complete");return
    }
@@ -4740,22 +4748,19 @@ function playoffQuickNextGame(){
    S.lastPlayoffQuickResult=null;
    S.playoffPostgame=null;
    if(S.postgameMedia&&S.postgameMedia.pending){
-     S.postgameMedia.pending=false;S.postgameMedia.defer=false;S.postgameMedia.skipped=true
+     S.postgameMedia.pending=false;
+     S.postgameMedia.defer=false;
+     S.postgameMedia.skipped=true
    }
    save();
    closeModal();
    const m=$("modal");if(m)m.innerHTML="";
    const host=$("livePlayoffQuickResultHost");if(host){host.innerHTML="";host.classList.add("hidden")}
+   refreshPlayoffGamesViewLive();
+   scrollToPlayoffCommandCenter();
    quickSimBusy=false;
    playoffQuickResultActionBusy=false;
-   setTimeout(()=>{
-     try{quickSim()}
-     catch(e){
-       recordClientFailure("playoffQuickNextGame",e);
-       quickSimBusy=false;playoffQuickResultActionBusy=false;
-       toast("Could not quick sim the next playoff game")
-     }
-   },0)
+   requestAnimationFrame(()=>runPlayoffAction("quick"))
  }catch(e){
    playoffQuickResultActionBusy=false;quickSimBusy=false;
    recordClientFailure("playoffQuickNextGame",e);
