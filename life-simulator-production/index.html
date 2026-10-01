@@ -3417,6 +3417,14 @@ function fallbackPlayoffOpponent(round){
 function forceRepairPlayoffSession(announce=false){
  try{
   if(S.stage!=="NBA"||!S.playoffs||!S.playoffs.active)return true;
+  const currentOpp=playoffOpponent();
+  if(currentOpp&&currentOpp.id!==S.team){
+    sanitizePlayoffBracketState();
+    syncUserBracketSeries();
+    save();
+    if(announce)toast("Playoff session is healthy");
+    return true
+  }
   sanitizePlayoffBracketState();
   const ok=ensureGameActionState();
   if(ok){save();if(announce)toast("Playoff session repaired");return true}
@@ -4889,12 +4897,27 @@ function answerBackFull(type){
  }
  g.turn="defense";const status=fullAdvance(34+Math.floor(Math.random()*16));if(status==="active")finishFullGameAction()
 }
+function renderGameActionViewDirect(){
+ if(frontMode==="career"&&S.screen==="games"){
+   const content=$("content");
+   if(content){
+     try{
+       content.innerHTML=S.fullGame&&S.fullGame.active?fullGameView():(S.live?liveGame():games());
+       try{bindDynamic()}catch(e){recordClientFailure("renderGameActionViewDirect bindDynamic",e)}
+       bindCoreFallbackControls();
+       guardInteractiveHandlers();
+       return true
+     }catch(e){recordClientFailure("renderGameActionViewDirect",e)}
+   }
+ }
+ try{render();return true}catch(e){recordClientFailure("renderGameActionViewDirect fallback",e);return false}
+}
 function startFullGame(){
  ensureGameActionState();
  if(S.stage==="NBA"&&isInjured()&&!S.player.injury.playThroughNext){toast("You are injured");return}
  const opp=nextOpp(),target=fullTargetMinutes(),playoff=!!(S.playoffs&&S.playoffs.active),collegeTourney=collegeTournamentActive(),spot=S.stage==="NBA"?currentGameSpotlight():{mult:collegeTourney?2.4:1,title:collegeTourney?collegeTournamentRoundName():S.stage+" Game"},base=collegeTourney?collegeTournamentAudience(ensureCollegeTournamentState().round):broadcastBaseAudience(S.stage,playoff,S.playoffs&&S.playoffs.round||0)*spot.mult;
  const pb=pregameBoost();S.player.energy=Math.max(35,Math.min(100,S.player.energy+pb.energy));S.player.trust=Math.min(100,S.player.trust+pb.trust);const gameJersey=S.stage==="NBA"?activeJersey():null;S.fullGame={active:true,opp,stage:S.stage,playoff,collegeTournament:collegeTourney,collegeTournamentRound:collegeTourney?ensureCollegeTournamentState().round:null,collegeTournamentGame:collegeTourney?collegeTournamentGameNumber():null,jersey:gameJersey?{id:gameJersey.id,name:gameJersey.name,colors:jerseyColors(gameJersey)}:null,homeAway:playoff?"PLAYOFF":nextGameLocation(),quarter:1,clock:720,team:0,oppScore:0,turn:"offense",onCourt:true,minutesPlayed:0,targetMinutes:target,grade:70,energy:S.player.energy,halftimeDone:false,adjustment:null,stint:0,benchTrips:0,fouledOut:false,intro:true,pendingAnswer:null,hype:35,viewers:Math.round(base),viewerFloor:Math.round(base*.55),peakViewers:Math.round(base),broadcastLine:"Pregame coverage is live.",lastMessage:"Opening tip. Coach wants a composed first possession.",stats:{pts:0,ast:0,reb:0,stl:0,blk:0,tov:0,pf:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,plusMinus:0},log:["Opening tip vs "+opp+"."]};
- save();render()
+ save();renderGameActionViewDirect()
 }
 function cancelFullGameToOptions(){
  const g=S.fullGame;if(!g||!g.active)return;
@@ -6734,7 +6757,7 @@ function startMoment(){
  const opp=nextOpp(),playoff=!!(S.playoffs&&S.playoffs.active),nba=S.stage==="NBA",collegeTourney=collegeTournamentActive(),spot=nba?currentGameSpotlight():null;
  const base=nba?(playoff?100:104):(S.stage==="College"?68:58),team=base+Math.floor(Math.random()*(nba?15:10)),gap=1+Math.floor(Math.random()*4);
  const pb=pregameBoost();S.player.energy=Math.max(35,Math.min(100,S.player.energy+pb.energy));S.player.trust=Math.min(100,S.player.trust+pb.trust);S.live={opp,stage:S.stage,playoff,collegeTournament:collegeTourney,collegeTournamentRound:collegeTourney?ensureCollegeTournamentState().round:null,collegeTournamentGame:collegeTourney?collegeTournamentGameNumber():null,storyline:spot?spot.title:(collegeTourney?collegeTournamentRoundName():null),homeAway:playoff?"PLAYOFF":nextGameLocation(),team,oppScore:team+gap,pts:Math.max(8,Math.round(ovr()/3+Math.random()*7))+pb.pts+(hasStaff("shooting")?1:0),ast:Math.floor(Math.random()*6)+pb.ast,reb:Math.floor(Math.random()*6)+pb.reb,clutchPossessions:0,response:false,lastType:null,lastMessage:"Coach puts the ball in your hands."};
- save();render();requestAnimationFrame(()=>{const el=document.getElementById("keyMomentDecision");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});else scrollTo({top:0,behavior:"smooth"})})
+ save();renderGameActionViewDirect();requestAnimationFrame(()=>{const el=document.getElementById("keyMomentDecision");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});else scrollTo({top:0,behavior:"smooth"})})
 }
 function momentSkill(t){
  const a=S.player.attrs;
