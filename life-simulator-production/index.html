@@ -7409,6 +7409,48 @@ window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEvent
    runPlayoffAction(b.dataset.playoffAction);
    return
  }
+ if(b.dataset&&b.dataset.moment){
+   e.preventDefault();e.stopImmediatePropagation();
+   if(!S.live)return;
+   const choice=b.dataset.moment;
+   b.disabled=true;
+   try{resolveMoment(choice)}
+   catch(err){recordClientFailure("crucialMoment:"+choice,err);b.disabled=false;toast("Crucial moment action failed")}
+   return
+ }
+ if(b.dataset&&b.dataset.fullOff){
+   e.preventDefault();e.stopImmediatePropagation();
+   try{fullOffense(b.dataset.fullOff)}catch(err){recordClientFailure("fullOffense:"+b.dataset.fullOff,err);toast("Full Game offense action failed")}
+   return
+ }
+ if(b.dataset&&b.dataset.fullDef){
+   e.preventDefault();e.stopImmediatePropagation();
+   try{fullDefense(b.dataset.fullDef)}catch(err){recordClientFailure("fullDefense:"+b.dataset.fullDef,err);toast("Full Game defense action failed")}
+   return
+ }
+ if(b.dataset&&b.dataset.answerFull){
+   e.preventDefault();e.stopImmediatePropagation();
+   try{answerBackFull(b.dataset.answerFull)}catch(err){recordClientFailure("answerBackFull:"+b.dataset.answerFull,err);toast("Answer-back action failed")}
+   return
+ }
+ if(b.dataset&&b.dataset.half){
+   e.preventDefault();e.stopImmediatePropagation();
+   try{halftimeChoice(b.dataset.half)}catch(err){recordClientFailure("halftime:"+b.dataset.half,err);toast("Halftime action failed")}
+   return
+ }
+ if(b.id==="tipoffStartBtn"){
+   e.preventDefault();e.stopImmediatePropagation();
+   if(S.fullGame){S.fullGame.intro=false;S.fullGame.broadcastLine="Tipoff is underway.";save();renderGameActionViewDirect()}
+   return
+ }
+ if(b.id==="simBenchBtn"){e.preventDefault();e.stopImmediatePropagation();try{fullSimBench()}catch(err){recordClientFailure("simBench",err);toast("Bench sim failed")}return}
+ if(b.id==="declineAnswerBtn"){
+   e.preventDefault();e.stopImmediatePropagation();
+   if(!repairFullGameState())return;
+   S.fullGame.pendingAnswer=null;broadcastAdjust(-1,"The broadcast settles as you stay within the offense.");
+   const status=fullAdvance(32);if(status==="active")finishFullGameAction();
+   return
+ }
  if(b.id==="fullQuickSimBtn"){e.preventDefault();e.stopImmediatePropagation();fullSimRestOfGame();return}
  if(b.id==="fullToMomentBtn"){e.preventDefault();e.stopImmediatePropagation();fullJumpToCrucialMoment();return}
  if(b.id==="livePlayoffQuickNext"||b.id==="livePlayoffQuickNextBox"||b.id==="quickResultNext"){
