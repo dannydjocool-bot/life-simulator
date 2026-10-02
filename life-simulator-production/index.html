@@ -4108,13 +4108,29 @@ function offseasonDayInfo(day=ensureOffseasonFlow()?.day||1){
   7:{title:"Final Offseason Day",desc:"Review your roster and contract before starting the next NBA season."}
  }[day]
 }
-function openOffseasonScouting(){
+function openOffseasonScouting(focusProspectId=null){
  generateOffseason();ensureOffseasonFlow();
  if(S.stage!=="Offseason"){toast("Draft scouting is only available in the offseason");return}
- const rows=S.offseason.teamDrafts.map((d,i)=>{const t=nbaTeamById(d.teamId),p=d.player,r=scoutingReport(p),lv=prospectScoutLevel(p);return '<div class="item"><div><b>#'+(i+1)+' '+p.name+' • '+p.pos+' • Age '+p.age+'</b><small>'+p.archetype+' • OVR '+r.ovr+' • POT '+r.pot+' • '+r.confidence+'</small><small>Ceiling '+r.ceiling+' • Bust risk '+r.risk+' • Development '+r.dev+' • '+p.personality+'</small></div><div style="text-align:right"><span class="pill '+prospectTierClass(p.tier)+'">'+(lv>=2?p.tier:"PROSPECT")+'</span><small class="muted" style="display:block;margin-top:5px">'+t.abbr+'</small><button class="btn" style="margin-top:7px" data-scout="'+p.id+'" '+(lv>=2||S.nbaWorld.scouting.points<=0?'disabled':'')+'>'+(lv===0?'Scout':lv===1?'Scout Again':'Fully Scouted')+'</button></div></div>'}).join("");
+ const rows=S.offseason.teamDrafts.map((d,i)=>{const t=nbaTeamById(d.teamId),p=d.player,r=scoutingReport(p),lv=prospectScoutLevel(p);return '<div class="item" data-prospect-row="'+p.id+'"><div><b>#'+(i+1)+' '+p.name+' • '+p.pos+' • Age '+p.age+'</b><small>'+p.archetype+' • OVR '+r.ovr+' • POT '+r.pot+' • '+r.confidence+'</small><small>Ceiling '+r.ceiling+' • Bust risk '+r.risk+' • Development '+r.dev+' • '+p.personality+'</small></div><div style="text-align:right"><span class="pill '+prospectTierClass(p.tier)+'">'+(lv>=2?p.tier:"PROSPECT")+'</span><small class="muted" style="display:block;margin-top:5px">'+t.abbr+'</small><button class="btn" style="margin-top:7px" data-scout="'+p.id+'" '+(lv>=2||S.nbaWorld.scouting.points<=0?'disabled':'')+'>'+(lv===0?'Scout':lv===1?'Scout Again':'Fully Scouted')+'</button></div></div>'}).join("");
  modal('<div class="tradeModal"><span class="kicker">OFFSEASON • DAY '+S.offseason.day+'</span><h2>Draft Scouting</h2><p class="muted">Scouting Points: '+S.nbaWorld.scouting.points+' • Exact potential and bust risk stay hidden until fully scouted.</p><div class="list tradeCounterList">'+rows+'</div><div class="modalFoot"><button class="btn" id="closeOffseasonScouting">Back to Offseason</button></div></div>');
  $("closeOffseasonScouting").onclick=closeModal;
- document.querySelectorAll("[data-scout]").forEach(b=>b.onclick=()=>{scoutProspect(b.dataset.scout);closeModal();openOffseasonScouting()})
+ document.querySelectorAll("[data-scout]").forEach(b=>b.onclick=()=>{
+   const id=b.dataset.scout;
+   scoutProspect(id);
+   closeModal();
+   openOffseasonScouting(id)
+ });
+ if(focusProspectId){
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+     const row=document.querySelector('[data-prospect-row="'+focusProspectId+'"]');
+     if(row){
+       row.scrollIntoView({behavior:"smooth",block:"center"});
+       row.style.outline="2px solid var(--accent,#ff9b42)";
+       row.style.outlineOffset="2px";
+       setTimeout(()=>{row.style.outline="";row.style.outlineOffset=""},1200)
+     }
+   }))
+ }
 }
 let offseasonAdvanceBusy=false;
 function runOffseasonDayEvent(day){
