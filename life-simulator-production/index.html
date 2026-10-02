@@ -2422,7 +2422,15 @@ function savedPhonePosition(){
 function phoneSafePosition(x,y,el){
  const pad=8,w=el?.offsetWidth||70,h=el?.offsetHeight||70;
  const maxX=Math.max(pad,window.innerWidth-w-pad);
- const maxY=Math.max(pad,window.innerHeight-h-pad);
+ let safeBottom=window.innerHeight-pad;
+ const dock=$("bottomNav");
+ if(dock){
+   const dockStyle=getComputedStyle(dock),dockRect=dock.getBoundingClientRect();
+   if(dockStyle.display!=="none"&&dockStyle.visibility!=="hidden"&&dockRect.width>0&&dockRect.height>0){
+     safeBottom=Math.min(safeBottom,dockRect.top-12)
+   }
+ }
+ const maxY=Math.max(pad,safeBottom-h);
  return {x:Math.max(pad,Math.min(maxX,x)),y:Math.max(pad,Math.min(maxY,y))}
 }
 function defaultPhonePosition(el){
