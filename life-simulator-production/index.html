@@ -985,7 +985,12 @@ body.boxGlass .card,body.boxGlass .heroBox{background:linear-gradient(145deg,rgb
 .seasonCardButton .seasonBody{padding:13px}
 .badgeXpBar{height:5px;border-radius:99px;background:#26354b;overflow:hidden;margin-top:7px}.badgeXpBar i{display:block;height:100%;background:linear-gradient(90deg,#ff7724,#ffd45d)}
 @media(max-width:700px){.basketArt h3,.basketArt p,.basketArt .kicker{max-width:72%}}
-@media(max-width:900px){.fullGameUtilityActions{position:relative;z-index:76}.fullGameUtilityActions .btn{position:relative;z-index:77;touch-action:manipulation;pointer-events:auto}}</style>
+@media(max-width:900px){.fullGameUtilityActions{position:relative;z-index:76}.fullGameUtilityActions .btn{position:relative;z-index:77;touch-action:manipulation;pointer-events:auto}}
+@media(max-width:900px){
+ .playoffActionGrid,.playoffActionGrid .playoffTapBtn{position:relative!important;z-index:90!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:rgba(255,255,255,.08)}
+ .playoffActionGrid .playoffTapBtn{min-height:64px}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -3568,6 +3573,31 @@ function startPlayoffKeyMoment(){
   return false
  }
 }
+let playoffDirectLaunchBusy=false;
+function playoffActionError(label,error){
+ const msg=String(error&&error.message||error||"Unknown error");
+ recordClientFailure(label,error);
+ try{modal('<h2>'+label+' failed</h2><p class="muted">Error: '+msg.replace(/</g,"&lt;")+'</p><div class="modalFoot"><button class="btn primary" id="playoffDiagClose">Close</button></div>');if($("playoffDiagClose"))$("playoffDiagClose").onclick=closeModal}catch(_){toast(label+" failed: "+msg)}
+}
+function launchPlayoffControl(mode){
+ if(playoffDirectLaunchBusy)return false;
+ playoffDirectLaunchBusy=true;
+ try{
+  if(typeof setPhoneEditMode==="function"&&phoneEditMode)setPhoneEditMode(false);
+  try{repairInteractionBlockers()}catch(_){}
+  let ok=false;
+  if(mode==="full")ok=startPlayoffFullGame();
+  else if(mode==="moment")ok=startPlayoffKeyMoment();
+  else if(mode==="quick"){quickSim();ok=true}
+  else if(mode==="repair")ok=runPlayoffAction("repair");
+  setTimeout(()=>{playoffDirectLaunchBusy=false},120);
+  return ok
+ }catch(e){
+  playoffDirectLaunchBusy=false;
+  playoffActionError(mode==="full"?"Play Full Game":mode==="moment"?"Play Key Moment":"Playoff action",e);
+  return false
+ }
+}
 function runPlayoffAction(action){
  try{
   if(action==="repair"){
@@ -3636,7 +3666,7 @@ function playoffCommandCenter(){
  const myName=mine?mine.city+" "+mine.name:currentTeamName(),oppName=opp?opp.city+" "+opp.name:"Opponent being restored";
  const wins=Math.min(4,Number(S.playoffs.seriesWins)||0),losses=Math.min(4,Number(S.playoffs.seriesLosses)||0);
  const title=S.playoffs.playIn?(S.playoffs.playIn.stage===1?"Play-In Game":"Final Play-In Chance"):playoffRoundName()+" • Game "+playoffGameNumber();
- return '<section class="card s12" id="playoffCommandCenter" style="border-color:#ff9b42;scroll-margin-top:105px"><div class="row"><div><span class="kicker">PLAYOFF COMMAND CENTER</span><h2 style="margin:5px 0">'+title+'</h2><small class="muted">#'+(S.playoffs.seed||"—")+' '+myName+' vs #'+(S.playoffs.opponentSeed||"—")+' '+oppName+'</small></div><span class="pill good">'+(S.playoffs.playIn?"WIN OR GO HOME":wins+"-"+losses+" SERIES")+'</span></div><div class="grid" style="margin-top:10px"><div class="card" style="grid-column:span 4"><small class="muted">NEXT OPPONENT</small><div class="big" style="font-size:20px">'+oppName+'</div></div><div class="card" style="grid-column:span 4"><small class="muted">SERIES</small><div class="big" style="font-size:24px">'+wins+'-'+losses+'</div></div><div class="card" style="grid-column:span 4"><small class="muted">ENERGY</small><div class="big" style="font-size:24px">'+Math.round(Number(S.player?.energy)||0)+'</div></div></div><div class="actions" style="margin-top:12px"><button type="button" class="btn primary" id="playoffFullGameBtn">Play Full Game</button><button type="button" class="btn" id="playoffKeyMomentBtn">Play Key Moment</button><button type="button" class="btn good" id="playoffQuickSimBtn">Quick Sim</button><button type="button" class="btn" id="playoffRepairBtn">Repair Playoff Session</button></div>'+(!ok?'<p class="muted" style="margin-top:10px">Your playoff save needs recovery. Tap Repair Playoff Session once, then choose a game option.</p>':'')+'</section>'
+ return '<section class="card s12" id="playoffCommandCenter" style="border-color:#ff9b42;scroll-margin-top:105px"><div class="row"><div><span class="kicker">PLAYOFF COMMAND CENTER</span><h2 style="margin:5px 0">'+title+'</h2><small class="muted">#'+(S.playoffs.seed||"—")+' '+myName+' vs #'+(S.playoffs.opponentSeed||"—")+' '+oppName+'</small></div><span class="pill good">'+(S.playoffs.playIn?"WIN OR GO HOME":wins+"-"+losses+" SERIES")+'</span></div><div class="grid" style="margin-top:10px"><div class="card" style="grid-column:span 4"><small class="muted">NEXT OPPONENT</small><div class="big" style="font-size:20px">'+oppName+'</div></div><div class="card" style="grid-column:span 4"><small class="muted">SERIES</small><div class="big" style="font-size:24px">'+wins+'-'+losses+'</div></div><div class="card" style="grid-column:span 4"><small class="muted">ENERGY</small><div class="big" style="font-size:24px">'+Math.round(Number(S.player?.energy)||0)+'</div></div></div><div class="actions playoffActionGrid" style="margin-top:12px;position:relative;z-index:90"><button type="button" class="btn primary playoffTapBtn" id="playoffFullGameBtn">Play Full Game</button><button type="button" class="btn playoffTapBtn" id="playoffKeyMomentBtn">Play Key Moment</button><button type="button" class="btn good playoffTapBtn" id="playoffQuickSimBtn">Quick Sim</button><button type="button" class="btn playoffTapBtn" id="playoffRepairBtn">Repair Playoff Session</button></div>'+(!ok?'<p class="muted" style="margin-top:10px">Your playoff save needs recovery. Tap Repair Playoff Session once, then choose a game option.</p>':'')+'</section>'
 }
 function playoffBanner(){
  if(!(S.playoffs&&S.playoffs.active))return "";if(S.playoffs.playIn){const opp=playoffOpponent();return '<section class="playoffBanner"><span class="kicker">NBA PLAY-IN TOURNAMENT</span><div class="playoffRound">'+(S.playoffs.playIn.stage===1?"Play-In Game":"Final Play-In Chance")+'</div><p class="muted">#'+S.playoffs.seed+' '+currentTeamName()+' vs #'+S.playoffs.opponentSeed+' '+(opp?opp.city+" "+opp.name:"Opponent")+' • Win to keep your season alive</p></section>'}
@@ -7294,23 +7324,32 @@ function rest(){
 }
 function declareDraft(){const t=ensureCollegeTournamentState();if(S.stage!=="College"||!t.completed||S.player.draft<55){toast(!t.completed?"Finish the National College Tournament first":"You need at least 55 Draft Stock");return}S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[]};S.careerHistory.collegeSeasons=S.careerHistory.collegeSeasons||[];const projection=calculateDraftProjection();S.careerHistory.collegeSeasons.push({school:S.college,year:S.year,record:{w:S.record.w,l:S.record.l},games:S.game-1,stats:{...S.player.stats},level:S.player.level,ovr:ovr(),draft:S.player.draft,awards:[...ensureDraftProjectionState().collegeAwards],projection:{min:projection.min,max:projection.max,consensus:projection.consensus}});S.stage="Draft Combine";S.draftProcess={declared:true,combineDone:false,events:{shooting:false,agility:false,scrimmage:false},boost:0,pick:null,collegeProjection:{min:projection.min,max:projection.max,consensus:projection.consensus}};updateDraftProjectionHistory("Declared for Draft");roadToNBATransition("combine_arrival");S.live=null;S.news.unshift("You declared for the NBA Draft. Next stop: NBA Draft Combine.");resetTrainingCycle();save();setScreen("career");toast("NBA Draft Combine unlocked")}
 function collegeModal(){if(S.college){toast("Already committed to "+S.college);return}if(!S.offers.length){toast("You need a scholarship offer first");return}modal('<h2>Choose College</h2><p class="muted">This is a one-time commitment. Your player level, XP, attributes, badges, draft stock, and career game history will carry into college.</p><div class="list">'+S.offers.map(c=>'<button class="btn" data-college="'+c+'">'+c+'</button>').join("")+'</div><div class="modalFoot"><button class="btn" id="ccancel">Cancel</button></div>');document.querySelectorAll("[data-college]").forEach(b=>b.onclick=()=>{if(S.college){toast("College already selected");closeModal();return}const school=b.dataset.college;S.careerHistory=S.careerHistory||{highSchool:null,collegeSeasons:[]};S.careerHistory.highSchool={record:{w:S.record.w,l:S.record.l},games:S.game-1,stats:{...S.player.stats},level:S.player.level,ovr:ovr(),draft:S.player.draft};S.college=school;S.stage="College";S.year=1;S.record={w:0,l:0};S.game=1;resetSeasonStatLine();roadToNBATransition("college_arrival");S.live=null;S.news.unshift("Committed to "+S.college+". Your high-school career is saved and your college season begins.");save();closeModal();setScreen("home");toast("Committed to "+S.college)});$("ccancel").onclick=closeModal}
-window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEventListener("error",e=>{recordClientFailure(lastClientAction?.action||"window",e.error||e.message);console.error("MYCAREER error",e.error||e.message);const content=$("content");if(content&&!content.innerHTML.trim())content.innerHTML='<section class="card s12"><h3>MYCAREER recovered from an error</h3><p class="muted">Tap New Career again. Your save has not been deleted.</p><button class="btn primary" id="recoverBtn">Return Home</button></section>';const r=$("recoverBtn");if(r)r.onclick=()=>{S.screen="home";render()}});window.addEventListener("unhandledrejection",e=>recordClientFailure(lastClientAction?.action||"promise",e.reason||"Unhandled promise rejection"));document.addEventListener("click",e=>{const b=e.target&&e.target.closest?e.target.closest("button"):null;if(b)recordClientAction(b)},true);document.addEventListener("click",e=>{
+window.addEventListener("pagehide",()=>{if(S&&S.created)save()});window.addEventListener("error",e=>{recordClientFailure(lastClientAction?.action||"window",e.error||e.message);console.error("MYCAREER error",e.error||e.message);const content=$("content");if(content&&!content.innerHTML.trim())content.innerHTML='<section class="card s12"><h3>MYCAREER recovered from an error</h3><p class="muted">Tap New Career again. Your save has not been deleted.</p><button class="btn primary" id="recoverBtn">Return Home</button></section>';const r=$("recoverBtn");if(r)r.onclick=()=>{S.screen="home";render()}});window.addEventListener("unhandledrejection",e=>recordClientFailure(lastClientAction?.action||"promise",e.reason||"Unhandled promise rejection"));document.addEventListener("pointerup",e=>{
+ const b=e.target&&e.target.closest?e.target.closest("button"):null;if(!b)return;
+ let mode=null;
+ if(b.id==="playoffFullGameBtn")mode="full";
+ else if(b.id==="playoffKeyMomentBtn")mode="moment";
+ if(!mode)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ b.textContent=mode==="full"?"Opening Full Game…":"Opening Key Moment…";
+ launchPlayoffControl(mode)
+},true);document.addEventListener("click",e=>{const b=e.target&&e.target.closest?e.target.closest("button"):null;if(b)recordClientAction(b)},true);document.addEventListener("click",e=>{
  const b=e.target&&e.target.closest?e.target.closest("button"):null;if(!b)return;
  if(b.id==="playoffFullGameBtn"){
    e.preventDefault();e.stopImmediatePropagation();
-   startPlayoffFullGame();return
+   launchPlayoffControl("full");return
  }
  if(b.id==="playoffKeyMomentBtn"){
    e.preventDefault();e.stopImmediatePropagation();
-   startPlayoffKeyMoment();return
+   launchPlayoffControl("moment");return
  }
  if(b.id==="playoffQuickSimBtn"){
    e.preventDefault();e.stopImmediatePropagation();
-   quickSim();return
+   launchPlayoffControl("quick");return
  }
  if(b.id==="playoffRepairBtn"){
    e.preventDefault();e.stopImmediatePropagation();
-   runPlayoffAction("repair");return
+   launchPlayoffControl("repair");return
  }
  if(b.id==="mainMenuBtn"||b.id==="topMainMenuBtn"||b.id==="switchPlayerBtn"){
    e.preventDefault();e.stopImmediatePropagation();
