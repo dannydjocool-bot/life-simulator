@@ -3129,10 +3129,6 @@ function rebuildMissingSignedPlayer(playerName,targetId,msg){
 function canonicalRosterAssignments(){
  const assignments=new Map(),retired=new Set();
  const structured=[...(S.nbaWorld?.structuredTrades||[])].slice().reverse();
- structured.forEach(tr=>{
-  if(tr?.incoming?.name&&tr?.incoming?.teamId)assignments.set(tr.incoming.name,{teamId:tr.incoming.teamId,year:tr.year||S.year||1,msg:tr.msg||"",snapshot:tr.incoming.snapshot||null,source:"structured-trade"});
-  (tr?.outgoing||[]).forEach(x=>{if(x?.name&&x?.teamId)assignments.set(x.name,{teamId:x.teamId,year:tr.year||S.year||1,msg:tr.msg||"",snapshot:x.snapshot||null,source:"structured-trade"})})
- });
  const events=[];
  const social=(S.nbaWorld?.socialFeed||[]).slice().reverse();
  social.forEach(x=>events.push({text:String(x?.text||""),year:x?.year||S.year||1,source:"social"}));
@@ -3162,7 +3158,68 @@ function canonicalRosterAssignments(){
   m=msg.match(/^(.+?) retired from the NBA/);
   if(m){retired.add(m[1]);assignments.delete(m[1])}
  });
+ // Structured transactions are authoritative and always win over generated/social text.
+ structured.forEach(tr=>{
+  if(tr?.incoming?.name&&tr?.incoming?.teamId){assignments.set(tr.incoming.name,{teamId:tr.incoming.teamId,year:tr.year||S.year||1,msg:tr.msg||"",snapshot:tr.incoming.snapshot||null,source:"structured-trade"});retired.delete(tr.incoming.name)}
+  (tr?.outgoing||[]).forEach(x=>{if(x?.name&&x?.teamId){assignments.set(x.name,{teamId:x.teamId,year:tr.year||S.year||1,msg:tr.msg||"",snapshot:x.snapshot||null,source:"structured-trade"});retired.delete(x.name)}})
+ });
  return {assignments,retired}
+}
+function normalizeLeagueIdentityAndTransactions(){
+ ensureLeagueRosters();
+ const trades=structuredTradeStore(),chronological=[...trades].reverse(),valid=[],invalidMsgs=new Set(),location=new Map();
+ chronological.forEach(tr=>{
+  if(!tr||!tr.incoming?.name||!tr.fromId||!tr.toId)return;
+  const incoming=tr.incoming.name,outgoing=(tr.outgoing||[]).filter(x=>x&&x.name);
+  let ok=true;
+  const knownIncoming=location.get(incoming);
+  if(knownIncoming&&knownIncoming!==tr.fromId)ok=false;
+  outgoing.forEach(x=>{const known=location.get(x.name);if(known&&known!==tr.toId)ok=false});
+  if(!ok){if(tr.msg)invalidMsgs.add(String(tr.msg));return}
+  valid.push(tr);
+  location.set(incoming,tr.toId);
+  outgoing.forEach(x=>location.set(x.name,tr.fromId))
+ });
+ S.nbaWorld.structuredTrades=valid.reverse().slice(0,80);
+
+ // Remove impossible transaction headlines created by duplicate player identities.
+ if(invalidMsgs.size){
+  S.nbaWorld.leagueTransactions=(S.nbaWorld.leagueTransactions||[]).filter(x=>!invalidMsgs.has(String(x)));
+  S.nbaWorld.socialFeed=(S.nbaWorld.socialFeed||[]).filter(x=>!invalidMsgs.has(String(x?.text||"")));
+  if(Array.isArray(S.leagueNews))S.leagueNews=S.leagueNews.filter(x=>!invalidMsgs.has(String(x)))
+ }
+
+ // Keep only one live roster copy for each player name. Latest valid trade assignment wins.
+ const preferred=new Map();
+ [...S.nbaWorld.structuredTrades].reverse().forEach(tr=>{
+  if(tr?.incoming?.name)preferred.set(tr.incoming.name,tr.toId);
+  (tr?.outgoing||[]).forEach(x=>{if(x?.name)preferred.set(x.name,tr.fromId)})
+ });
+ const seen=new Map();
+ NBA_TEAMS.forEach(t=>{
+  const roster=S.leagueRosters[t.id]||[];
+  for(let i=roster.length-1;i>=0;i--){
+   const p=roster[i];if(!p?.name)continue;
+   const pref=preferred.get(p.name);
+   if(pref&&pref!==t.id){roster.splice(i,1);continue}
+   if(seen.has(p.name)){roster.splice(i,1);continue}
+   seen.set(p.name,t.id)
+  }
+ });
+ // Refill shortened rosters with unique depth players.
+ const used=new Set([S.player?.name].filter(Boolean));
+ NBA_TEAMS.forEach(t=>(S.leagueRosters[t.id]||[]).forEach(p=>{if(p?.name)used.add(p.name)}));
+ NBA_TEAMS.forEach(t=>{
+  const r=S.leagueRosters[t.id]||[];
+  while(r.length<15)r.push(makeRosterDepthPlayer(t.id,r.length,used));
+  r.sort((a,b)=>(b.ovr||0)-(a.ovr||0)||(b.ppg||0)-(a.ppg||0));
+  S.leagueRosters[t.id]=r.slice(0,15)
+ });
+
+ // Exact duplicate social headlines add no continuity, so keep only the newest copy.
+ const socialSeen=new Set();
+ S.nbaWorld.socialFeed=(S.nbaWorld.socialFeed||[]).filter(x=>{const k=String(x?.text||"").trim();if(!k||socialSeen.has(k))return false;socialSeen.add(k);return true}).slice(0,80);
+ return {invalid:invalidMsgs.size,players:seen.size}
 }
 function repairRosterTransactionConsistency(){
  ensureLeagueRosters();
@@ -3219,6 +3276,9 @@ function chooseTradeOutgoing(teamId,target){
  return pkg
 }
 function executeAITrade(fromId,toId,target,pkg){
+ normalizeLeagueIdentityAndTransactions();
+ if(!target?.name||findLeaguePlayerTeam(target.name)!==fromId)return false;
+ if(!(pkg||[]).length||(pkg||[]).some(p=>!p?.name||findLeaguePlayerTeam(p.name)!==toId))return false;
  const from=rosterFor(fromId),to=rosterFor(toId),targetIdx=from.findIndex(p=>p.name===target.name);if(targetIdx<0)return false;
  const targetSnapshot=JSON.parse(JSON.stringify(from[targetIdx]));
  from.splice(targetIdx,1);
@@ -4280,6 +4340,7 @@ function processStarBuildingTrades(maxMoves=5){
 }
 function ensureOffseasonLeagueActivity(){
  if(S.stage!=="Offseason"||!S.offseason?.active)return;
+ normalizeLeagueIdentityAndTransactions();
  const day=ensureOffseasonFlow()?.day||1;
  processAIExtensions();
  S.nbaWorld.offseasonActivity=S.nbaWorld.offseasonActivity&&typeof S.nbaWorld.offseasonActivity==="object"?S.nbaWorld.offseasonActivity:{};
@@ -6080,6 +6141,7 @@ function executeStarTrade(){
  rebalanceRosterPayroll(ours,S.team);rebalanceRosterPayroll(src,target.team.id);
  thread.completed=true;thread.tradeRequested=false;S.nbaWorld.recruitedYear=S.year;addCareerPathXP("dynasty",55);
  const pkgNames=pkg.map(p=>p.name).join(" + "),msg=currentTeamName()+" acquired "+target.player.name+" from "+teamNameById(target.team.id)+" for "+pkgNames+".";
+ recordStructuredTrade(target.team.id,S.team,target.player,pkg,msg);
  S.nbaWorld.leagueTransactions.unshift(msg);S.nbaWorld.leagueTransactions=S.nbaWorld.leagueTransactions.slice(0,30);pushLeagueNews(msg);pushSocialHeadline(msg,"TRADE");S.news.unshift("Your phone recruitment helped complete the trade for "+target.player.name+".");
  save();closeModal();render();toast(target.player.name+" traded to "+currentTeamName())
 }
@@ -6481,7 +6543,7 @@ function reshareLeaguePost(index){
  S.news.unshift("You reshared a "+x.type+" headline and gained "+gain.toLocaleString()+" followers.");
  save();render();toast("Reshared • +"+gain.toLocaleString()+" followers")
 }
-function social(){repairRosterTransactionConsistency();
+function social(){normalizeLeagueIdentityAndTransactions();repairRosterTransactionConsistency();
  S.social.playerFeed=Array.isArray(S.social.playerFeed)?S.social.playerFeed:[];
  S.social.reshared=Array.isArray(S.social.reshared)?S.social.reshared:[];
  const source=socialFeedSource();
