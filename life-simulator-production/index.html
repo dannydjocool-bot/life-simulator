@@ -4529,8 +4529,10 @@ function coachTrustGain(g){let gain=relationshipCoachTrustBonus();if(g.win)gain+
 function tradeRequestEligible(){return S.stage==="NBA"&&tradeDeadlineOpen()&&(S.record.w+S.record.l)>=12&&S.player.trust>=65}
 function playerTradeEligible(){return S.stage==="NBA"&&tradeDeadlineOpen()&&(S.record.w+S.record.l)>=18&&S.player.trust>=75}
 function positionControlEligible(){
- updateRole();
- return S.stage==="NBA"&&S.player.role==="Franchise Star"
+ if(!["NBA","Offseason"].includes(S.stage))return false;
+ if(S.player?.role==="Franchise Star")return true;
+ if(S.stage==="NBA")updateRole();
+ return S.player?.role==="Franchise Star"||(ovr()>=84&&Number(S.player?.trust||0)>=78)
 }
 function openTeamPositionEditor(){
  if(!positionControlEligible()){toast("Become the Franchise Star to edit player positions");return}
@@ -4542,8 +4544,8 @@ function openTeamPositionEditor(){
    '<div class="field"><label>'+S.player.name+' • YOU</label><select data-team-position-user="1">'+options(S.player.position)+'</select></div>',
    ...teammates.map((p,i)=>'<div class="field"><label>'+p.name+' • '+(p.ovr||75)+' OVR</label><select data-team-position-index="'+i+'">'+options(p.pos||"SG")+'</select></div>')
  ].join("");
- modal('<h2>Edit Player Positions</h2><p class="muted">Franchise Star control unlocked. Change any player on '+currentTeamName()+' between PG, SG, SF, PF and C. Changes save with your career and update roster/lineup displays.</p><div class="list">'+rows+'</div><div class="modalFoot"><button class="btn" id="positionEditorCancel">Cancel</button><button class="btn primary" id="saveTeamPositions">Save Positions</button></div>');
- $("positionEditorCancel").onclick=talkToCoach;
+ modal('<h2>Edit Player Positions</h2><p class="muted">Franchise Star roster control unlocked. Change any player on '+currentTeamName()+' between PG, SG, SF, PF and C. This works during the NBA season and offseason, and changes save with your career.</p><div class="list">'+rows+'</div><div class="modalFoot"><button class="btn" id="positionEditorCancel">Cancel</button><button class="btn primary" id="saveTeamPositions">Save Positions</button></div>');
+ $("positionEditorCancel").onclick=closeModal;
  $("saveTeamPositions").onclick=()=>{
    const userSelect=document.querySelector("[data-team-position-user]");
    if(userSelect)S.player.position=userSelect.value;
