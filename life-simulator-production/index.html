@@ -4939,11 +4939,9 @@ function playoffQuickNextGame(){
    closeModal();
    const m=$("modal");if(m)m.innerHTML="";
    const host=$("livePlayoffQuickResultHost");if(host){host.innerHTML="";host.classList.add("hidden")}
-   refreshPlayoffGamesViewLive();
-   scrollToPlayoffCommandCenter();
    quickSimBusy=false;
    playoffQuickResultActionBusy=false;
-   requestAnimationFrame(()=>runPlayoffAction("quick"))
+   return runPlayoffAction("quick")
  }catch(e){
    playoffQuickResultActionBusy=false;quickSimBusy=false;
    recordClientFailure("playoffQuickNextGame",e);
@@ -5164,8 +5162,9 @@ function fullJumpToCrucialMoment(){
    if(g.playoff){try{storyline=playoffRoundName()}catch(_){storyline="Playoffs"}}
    else if(g.stage==="NBA")storyline="Regular Season";
    S.live={opp:g.opp,stage:g.stage,playoff:!!g.playoff,collegeTournament:!!g.collegeTournament,collegeTournamentRound:g.collegeTournamentRound,collegeTournamentGame:g.collegeTournamentGame,storyline,homeAway:g.homeAway||"AWAY",team,oppScore:team+gap,pts:(Number(g.stats.pts)||0)+extraPts,ast:(Number(g.stats.ast)||0)+extraAst,reb:(Number(g.stats.reb)||0)+extraReb,clutchPossessions:0,response:false,lastType:null,lastMessage:"Jumped ahead to the final crucial possessions."};
-   S.fullGame=null;S.screen="games";save();closeModal();render();
-   requestAnimationFrame(()=>{const el=document.getElementById("keyMomentDecision");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});else scrollTo({top:0,behavior:"smooth"})});
+   S.fullGame=null;S.screen="games";save();closeModal();
+   if(!renderGameActionViewDirect())throw new Error("Crucial Moment view could not render");
+   requestAnimationFrame(()=>{const el=document.getElementById("keyMomentDecision");if(el)el.scrollIntoView({behavior:"smooth",block:"start"});else window.scrollTo({top:0,left:0,behavior:"auto"})});
    toast("Crucial moment ready")
  }catch(e){
    recordClientFailure("fullJumpToCrucialMoment",e);
