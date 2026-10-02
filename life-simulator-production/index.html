@@ -3218,8 +3218,9 @@ function normalizeLeagueIdentityAndTransactions(){
 
  // Exact duplicate social headlines add no continuity, so keep only the newest copy.
  const socialSeen=new Set();
+ const beforeSocial=(S.nbaWorld.socialFeed||[]).length;
  S.nbaWorld.socialFeed=(S.nbaWorld.socialFeed||[]).filter(x=>{const k=String(x?.text||"").trim();if(!k||socialSeen.has(k))return false;socialSeen.add(k);return true}).slice(0,80);
- return {invalid:invalidMsgs.size,players:seen.size}
+ return {invalid:invalidMsgs.size,players:seen.size,changed:invalidMsgs.size>0||beforeSocial!==S.nbaWorld.socialFeed.length}
 }
 function repairRosterTransactionConsistency(){
  ensureLeagueRosters();
@@ -3754,13 +3755,16 @@ function startPlayoffKeyMoment(){
  }
 }
 let playoffDirectLaunchBusy=false;
+let lastPlayoffDirectLaunchAt=0;
 function playoffActionError(label,error){
  const msg=String(error&&error.message||error||"Unknown error");
  recordClientFailure(label,error);
  try{modal('<h2>'+label+' failed</h2><p class="muted">Error: '+msg.replace(/</g,"&lt;")+'</p><div class="modalFoot"><button class="btn primary" id="playoffDiagClose">Close</button></div>');if($("playoffDiagClose"))$("playoffDiagClose").onclick=closeModal}catch(_){toast(label+" failed: "+msg)}
 }
 function launchPlayoffControl(mode){
- if(playoffDirectLaunchBusy)return false;
+ const now=Date.now();
+ if(playoffDirectLaunchBusy||now-lastPlayoffDirectLaunchAt<550)return false;
+ lastPlayoffDirectLaunchAt=now;
  playoffDirectLaunchBusy=true;
  try{
   if(typeof setPhoneEditMode==="function"&&phoneEditMode)setPhoneEditMode(false);
@@ -6543,7 +6547,7 @@ function reshareLeaguePost(index){
  S.news.unshift("You reshared a "+x.type+" headline and gained "+gain.toLocaleString()+" followers.");
  save();render();toast("Reshared • +"+gain.toLocaleString()+" followers")
 }
-function social(){normalizeLeagueIdentityAndTransactions();repairRosterTransactionConsistency();
+function social(){const continuityFix=normalizeLeagueIdentityAndTransactions();const rosterFix=repairRosterTransactionConsistency();if((continuityFix&&continuityFix.changed)||(rosterFix&&rosterFix.length)){try{save()}catch(_){}}
  S.social.playerFeed=Array.isArray(S.social.playerFeed)?S.social.playerFeed:[];
  S.social.reshared=Array.isArray(S.social.reshared)?S.social.reshared:[];
  const source=socialFeedSource();
