@@ -3465,100 +3465,105 @@ function forceRepairPlayoffSession(announce=false){
   return false
  }
 }
+function renderPlayoffFullGameDirect(){
+ const content=$("content"),g=S.fullGame;
+ if(!content||!g||!g.active)return false;
+ try{
+  content.innerHTML=fullGameView();
+  bindDynamic();bindCoreFallbackControls();guardInteractiveHandlers();
+  window.scrollTo({top:0,left:0,behavior:"auto"});
+  return true
+ }catch(e){
+  recordClientFailure("renderPlayoffFullGameDirect",e);
+  return false
+ }
+}
+function renderPlayoffKeyMomentDirect(){
+ const content=$("content"),g=S.live;
+ if(!content||!g)return false;
+ try{
+  content.innerHTML='<div class="grid" style="margin-top:0">'+playoffBanner()+
+   '<section class="card s8" id="keyMomentDecision"><span class="pill bad">4TH • CLUTCH</span><h3 style="margin-top:14px">'+currentTeamName()+' '+g.team+' — '+g.oppScore+' '+g.opp+'</h3><p class="muted">'+(g.lastMessage||"Coach puts the ball in your hands.")+' Choose your action.</p><div class="list"><button class="btn" data-moment="iso">Attack the switch</button><button class="btn" data-moment="three">Hunt the three</button><button class="btn" data-moment="pnr">Run pick-and-roll</button><button class="btn" data-moment="team">Make the team play</button></div></section>'+
+   '<section class="card"><h3>Your Line</h3><div class="big">'+(Number(g.pts)||0)+'</div>'+row("Assists",Number(g.ast)||0)+row("Rebounds",Number(g.reb)||0)+row("Energy",Math.round(Number(S.player.energy)||0))+row("Clutch chance",Math.min(MAX_CLUTCH_POSSESSIONS,(Number(g.clutchPossessions)||0)+1)+"/"+MAX_CLUTCH_POSSESSIONS)+'</section></div>';
+  bindDynamic();bindCoreFallbackControls();guardInteractiveHandlers();
+  const el=$("keyMomentDecision");if(el)el.scrollIntoView({behavior:"auto",block:"start"});
+  return true
+ }catch(e){
+  recordClientFailure("renderPlayoffKeyMomentDirect",e);
+  return false
+ }
+}
 function startPlayoffFullGame(){
  try{
-  if(!(S.stage==="NBA"&&S.playoffs&&S.playoffs.active))throw new Error("No active playoffs");
+  if(!(S.stage==="NBA"&&S.playoffs&&S.playoffs.active))throw new Error("No active playoff series");
   if(isInjured()&&!S.player.injury.playThroughNext){toast("You are injured");return false}
   let oppTeam=playoffOpponent();
   if(!oppTeam||oppTeam.id===S.team){
-    if(!repairPlayoffGameState())throw new Error("Missing playoff opponent");
-    oppTeam=playoffOpponent()
+   if(!repairPlayoffGameState())throw new Error("No valid playoff opponent");
+   oppTeam=playoffOpponent()
   }
-  if(!oppTeam||oppTeam.id===S.team)throw new Error("Invalid playoff opponent");
-  S.live=null;
+  if(!oppTeam||oppTeam.id===S.team)throw new Error("No valid playoff opponent");
   const opp=oppTeam.city+" "+oppTeam.name;
-  const target=Math.max(12,Math.min(40,Number(S.player.minutes)||fullTargetMinutes()||22));
-  const pb=pregameBoost();
-  S.player.energy=Math.max(35,Math.min(100,(Number(S.player.energy)||100)+(Number(pb.energy)||0)));
-  S.player.trust=Math.min(100,(Number(S.player.trust)||0)+(Number(pb.trust)||0));
-  let base=9000000;
-  try{base=Math.max(1000000,broadcastBaseAudience("NBA",true,Number(S.playoffs.round)||1))}catch(_){}
-  let gameJersey=null;
-  try{gameJersey=activeJersey()}catch(_){}
+  const target=Math.max(12,Math.min(40,Number(S.player.minutes)||22));
+  const audience=9000000+Math.round((Number(S.playoffs.round)||1)*2500000);
+  S.live=null;
   S.fullGame={
    active:true,opp,stage:"NBA",playoff:true,
    playoffRoundBefore:Number(S.playoffs.round)||1,
    playoffGameBefore:playoffGameNumber(),
-   jersey:gameJersey?{id:gameJersey.id,name:gameJersey.name,colors:jerseyColors(gameJersey)}:null,
-   homeAway:"PLAYOFF",quarter:1,clock:720,team:0,oppScore:0,turn:"offense",onCourt:true,
-   minutesPlayed:0,targetMinutes:target,grade:70,energy:S.player.energy,halftimeDone:false,
-   adjustment:null,stint:0,benchTrips:0,fouledOut:false,intro:true,pendingAnswer:null,hype:45,
-   viewers:Math.round(base),viewerFloor:Math.round(base*.55),peakViewers:Math.round(base),
-   broadcastLine:playoffRoundName()+" • Game "+playoffGameNumber()+" pregame coverage is live.",
-   lastMessage:"Opening tip. Coach wants a composed first possession.",
+   homeAway:"PLAYOFF",quarter:1,clock:720,team:0,oppScore:0,
+   turn:"offense",onCourt:true,minutesPlayed:0,targetMinutes:target,
+   grade:70,energy:Math.max(35,Number(S.player.energy)||100),
+   halftimeDone:false,adjustment:null,stint:0,benchTrips:0,fouledOut:false,
+   intro:false,pendingAnswer:null,hype:45,viewers:audience,viewerFloor:Math.round(audience*.55),peakViewers:audience,
+   broadcastLine:playoffRoundName()+" • Game "+playoffGameNumber()+" is live.",
+   lastMessage:"Opening possession. Make the first play.",
    stats:{pts:0,ast:0,reb:0,stl:0,blk:0,tov:0,pf:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,plusMinus:0},
-   log:["Opening tip vs "+opp+" • "+playoffRoundName()+" Game "+playoffGameNumber()+"."]
+   log:["Q1 12:00 • Opening tip vs "+opp+"."]
   };
-  S.screen="games";
-  save();
-  closeModal();
-  const ok=renderGameActionViewDirect();
-  if(!ok)throw new Error("Full Game view did not render");
-  requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:"auto"}));
+  S.screen="games";save();closeModal();
+  if(!renderPlayoffFullGameDirect())throw new Error("Playoff Full Game view failed");
   return true
  }catch(e){
-  S.fullGame=null;
   recordClientFailure("startPlayoffFullGame",e);
+  S.fullGame=null;save();
   toast("Full Game could not start");
-  try{refreshPlayoffGamesViewLive()}catch(_){}
+  refreshPlayoffGamesViewLive();
   return false
  }
 }
 function startPlayoffKeyMoment(){
  try{
-  if(!(S.stage==="NBA"&&S.playoffs&&S.playoffs.active))throw new Error("No active playoffs");
+  if(!(S.stage==="NBA"&&S.playoffs&&S.playoffs.active))throw new Error("No active playoff series");
   if(isInjured()&&!S.player.injury.playThroughNext){toast("You are injured");return false}
   let oppTeam=playoffOpponent();
   if(!oppTeam||oppTeam.id===S.team){
-    if(!repairPlayoffGameState())throw new Error("Missing playoff opponent");
-    oppTeam=playoffOpponent()
+   if(!repairPlayoffGameState())throw new Error("No valid playoff opponent");
+   oppTeam=playoffOpponent()
   }
-  if(!oppTeam||oppTeam.id===S.team)throw new Error("Invalid playoff opponent");
-  S.fullGame=null;
+  if(!oppTeam||oppTeam.id===S.team)throw new Error("No valid playoff opponent");
   const opp=oppTeam.city+" "+oppTeam.name;
-  const pb=pregameBoost();
-  S.player.energy=Math.max(35,Math.min(100,(Number(S.player.energy)||100)+(Number(pb.energy)||0)));
-  S.player.trust=Math.min(100,(Number(S.player.trust)||0)+(Number(pb.trust)||0));
-  const base=102+Math.floor(Math.random()*12),gap=1+Math.floor(Math.random()*4);
+  const teamScore=100+Math.floor(Math.random()*12),gap=1+Math.floor(Math.random()*4);
+  S.fullGame=null;
   S.live={
    opp,stage:"NBA",playoff:true,
    playoffRoundBefore:Number(S.playoffs.round)||1,
    playoffGameBefore:playoffGameNumber(),
-   storyline:playoffRoundName(),
-   homeAway:"PLAYOFF",
-   team:base,oppScore:base+gap,
-   pts:Math.max(8,Math.round(ovr()/3+Math.random()*7))+(Number(pb.pts)||0),
-   ast:Math.floor(Math.random()*6)+(Number(pb.ast)||0),
-   reb:Math.floor(Math.random()*6)+(Number(pb.reb)||0),
+   storyline:playoffRoundName(),homeAway:"PLAYOFF",
+   team:teamScore,oppScore:teamScore+gap,
+   pts:Math.max(8,Math.round((Number(ovr())||75)/3+Math.random()*7)),
+   ast:Math.floor(Math.random()*6),reb:Math.floor(Math.random()*6),
    clutchPossessions:0,response:false,lastType:null,
    lastMessage:"Coach puts the ball in your hands with the playoff game on the line."
   };
-  S.screen="games";
-  save();
-  closeModal();
-  const ok=renderGameActionViewDirect();
-  if(!ok)throw new Error("Key Moment view did not render");
-  requestAnimationFrame(()=>{
-   const el=document.getElementById("keyMomentDecision");
-   if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
-   else window.scrollTo({top:0,left:0,behavior:"auto"})
-  });
+  S.screen="games";save();closeModal();
+  if(!renderPlayoffKeyMomentDirect())throw new Error("Playoff Key Moment view failed");
   return true
  }catch(e){
-  S.live=null;
   recordClientFailure("startPlayoffKeyMoment",e);
+  S.live=null;save();
   toast("Key Moment could not start");
-  try{refreshPlayoffGamesViewLive()}catch(_){}
+  refreshPlayoffGamesViewLive();
   return false
  }
 }
