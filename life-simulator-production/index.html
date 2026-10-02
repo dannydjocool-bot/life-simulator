@@ -1981,7 +1981,42 @@ function validateCareerSave(data){
  sanitizeTransientGameState(d);
  return d
 }
-function writeSlot(slot,data){const key=slotKey(slot),payload=JSON.stringify(data),current=localStorage.getItem(key);if(current&&current!==payload)localStorage.setItem(slotBackupKey(slot),current);localStorage.setItem(key,payload);if(slot===1)localStorage.setItem("mycareer-v03",payload)}
+function isStorageQuotaError(e){return !!e&&(e.name==="QuotaExceededError"||e.name==="NS_ERROR_DOM_QUOTA_REACHED"||e.code===22||e.code===1014||/quota/i.test(String(e.message||e)))}
+function clearRedundantSaveCopies(slot){
+ try{localStorage.removeItem("mycareer-v03")}catch(_){}
+ try{localStorage.removeItem(slotBackupKey(slot))}catch(_){}
+ try{localStorage.removeItem(CLIENT_DIAG_KEY)}catch(_){}
+}
+function compactCareerForStorage(data){
+ if(!data||typeof data!=="object")return data;
+ const trim=(obj,key,max)=>{if(obj&&Array.isArray(obj[key])&&obj[key].length>max)obj[key]=obj[key].slice(0,max)};
+ trim(data,"news",120);trim(data,"leagueNews",120);trim(data,"games",220);trim(data,"accolades",120);
+ if(data.nbaWorld){trim(data.nbaWorld,"leagueEvents",120);trim(data.nbaWorld,"leagueTransactions",160);trim(data.nbaWorld,"socialFeed",160);trim(data.nbaWorld,"usedProspectNames",250)}
+ if(data.roadToNBA)trim(data.roadToNBA,"postgameFeed",80);
+ if(data.polish)trim(data.polish,"timeline",120);
+ return data
+}
+function writeSlot(slot,data){
+ const key=slotKey(slot),payload=JSON.stringify(data),current=localStorage.getItem(key);
+ if(slot===1){try{localStorage.removeItem("mycareer-v03")}catch(_){}}
+ if(current&&current!==payload){
+   try{localStorage.setItem(slotBackupKey(slot),current)}
+   catch(e){if(isStorageQuotaError(e)){try{localStorage.removeItem(slotBackupKey(slot))}catch(_){}}else throw e}
+ }
+ try{localStorage.setItem(key,payload);return true}
+ catch(e){
+   if(!isStorageQuotaError(e))throw e;
+   clearRedundantSaveCopies(slot);
+   try{localStorage.setItem(key,payload);return true}
+   catch(e2){
+     if(!isStorageQuotaError(e2))throw e2;
+     compactCareerForStorage(data);
+     const compactPayload=JSON.stringify(data);
+     clearRedundantSaveCopies(slot);
+     try{localStorage.setItem(key,compactPayload);return true}catch(e3){console.warn("Career save storage limit reached",e3);return false}
+   }
+ }
+}
 function recoverSlot(slot){const primary=parseSave(localStorage.getItem(slotKey(slot)));if(primary&&primary.created)return primary;const backup=parseSave(localStorage.getItem(slotBackupKey(slot)));if(backup&&backup.created){localStorage.setItem(slotKey(slot),JSON.stringify(backup));return backup}return primary}
 function migrateLegacySave(){if(recoverSlot(1)?.created)return;const old=localStorage.getItem("mycareer-v03");if(!old)return;const data=parseSave(old);if(data&&data.created){writeSlot(1,data);localStorage.setItem("mycareer-active-slot","1")}}
 migrateLegacySave();
@@ -2253,7 +2288,14 @@ function badgeBreakerHTML(){
  const goat=BADGES.filter(b=>bb.spent[b[0]]);
  return '<section class="card s12"><div class="row"><div><span class="kicker">CHAMPIONSHIP REWARDS</span><h3 style="margin:5px 0">Badge Breakers</h3></div><span class="pill good">'+bb.available+' AVAILABLE</span></div><p class="muted">Win an NBA championship to earn 1 Badge Breaker. Spend one on a Legend badge to permanently elevate it to the G.O.A.T. tier.</p><div class="row"><span>Championships / Lifetime earned</span><strong>'+championshipCount()+' / '+bb.earned+'</strong></div>'+(goat.length?'<div class="row"><span>G.O.A.T. badges</span><strong>'+goat.length+'</strong></div>':'')+'<div class="list" style="margin-top:10px">'+(legend.length?legend.map(b=>'<div class="item"><div><b>'+b[0]+' • Legend</b><small>'+b[1]+' • Eligible for G.O.A.T. upgrade</small></div><button class="btn primary" data-badge-breaker="'+b[0]+'" '+(bb.available<=0?'disabled':'')+'>Upgrade to G.O.A.T.</button></div>').join(""):'<div class="item"><div><b>No eligible Legend badges yet</b><small>Raise a badge to Legend, then use your championship Badge Breaker.</small></div></div>')+'</div></section>'
 }
-function save(msg){S.saveMeta=S.saveMeta||{lastSaved:null,manualSaves:0};S.saveMeta.lastSaved=new Date().toISOString();writeSlot(activeSlot,S);localStorage.setItem("mycareer-active-slot",String(activeSlot));if(msg)toast(msg)}
+function save(msg){
+ S.saveMeta=S.saveMeta||{lastSaved:null,manualSaves:0};S.saveMeta.lastSaved=new Date().toISOString();
+ let stored=false;
+ try{stored=writeSlot(activeSlot,S)}catch(e){if(!isStorageQuotaError(e))recordClientFailure("save",e)}
+ try{localStorage.setItem("mycareer-active-slot",String(activeSlot))}catch(_){}
+ if(msg)toast(stored?msg:"Game continues • storage cleanup needed");
+ return stored
+}
 function manualSave(){S.saveMeta=S.saveMeta||{lastSaved:null,manualSaves:0};S.saveMeta.manualSaves++;save("Progress saved")}
 function lastSavedText(){if(!S.saveMeta||!S.saveMeta.lastSaved)return "Not saved yet";const d=new Date(S.saveMeta.lastSaved);return Number.isNaN(d.getTime())?"Saved":d.toLocaleString()}
 function toast(t){$("toast").textContent=t;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),1300)}
