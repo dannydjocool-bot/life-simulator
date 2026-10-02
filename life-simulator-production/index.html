@@ -990,6 +990,84 @@ body.boxGlass .card,body.boxGlass .heroBox{background:linear-gradient(145deg,rgb
  .playoffActionGrid,.playoffActionGrid .playoffTapBtn{position:relative!important;z-index:90!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:rgba(255,255,255,.08)}
  .playoffActionGrid .playoffTapBtn{min-height:64px}
 }
+
+/* ===== v0.19.1 FINAL RESPONSIVE / OVERLAP SWEEP ===== */
+html,body,.app,.main,.content{min-width:0;max-width:100%}
+*,*::before,*::after{min-width:0}
+img,svg,canvas,video{max-width:100%;height:auto}
+.card,.heroBox,.item,.row,.list,.actions,.modal,.modalFoot,.badge,.playoffBanner,.playoffTeam{min-width:0;max-width:100%}
+.card,.heroBox,.item,.modal,.badge,.playoffBanner{overflow-wrap:anywhere}
+.row>*,
+.item>*,
+.actions>*,
+.modalFoot>*{min-width:0;max-width:100%}
+.row>span,.row>strong,.row>b,.row>div,
+.item>span,.item>strong,.item>b,.item>div,
+small,p,b,strong,h1,h2,h3,h4{overflow-wrap:anywhere;word-break:normal}
+.btn,.pill,button,select,input{max-width:100%}
+.btn,.pill,button{white-space:normal;overflow-wrap:anywhere;word-break:normal}
+.grid{grid-template-columns:repeat(12,minmax(0,1fr))}
+.form,.choiceGrid,.badgeGrid,.rosterSummary{min-width:0}
+table{max-width:100%}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr!important}
+  .heroBox,.ovr{width:100%;min-width:0}
+  .grid>.card{min-width:0}
+  .row{flex-wrap:wrap!important;align-items:flex-start!important}
+  .item{flex-wrap:wrap!important;align-items:flex-start!important}
+  .actions,.modalFoot{display:flex!important;flex-wrap:wrap!important;width:100%}
+  .actions>.btn,.modalFoot>.btn{flex:1 1 170px;min-width:0}
+  .playoffActionGrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%}
+  .playoffActionGrid .btn{width:100%!important}
+  .playoffMatch{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important}
+  .playoffTeam b,.playoffTeam small{display:block;overflow-wrap:anywhere}
+  .playoffScore{font-size:clamp(26px,6vw,34px)}
+  .rosterSummary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .rosterSummary>*{min-width:0!important}
+  .badgeGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .form,.choiceGrid{grid-template-columns:1fr!important}
+  .tradeActions{grid-template-columns:1fr!important}
+  .connectionItem,.tradePlayerRow{min-width:0}
+  .top{height:auto;min-height:72px}
+  .topActions{max-width:58%;min-width:0;flex-wrap:wrap}
+}
+
+@media(max-width:620px){
+  .content{padding-left:10px!important;padding-right:10px!important;overflow-x:hidden!important}
+  .grid{grid-template-columns:1fr!important}
+  .grid>.card,.card.s6,.card.s8,.card.s12{grid-column:1/-1!important;width:100%!important}
+  .card,.heroBox,.playoffBanner{padding:15px!important}
+  .playoffMatch{grid-template-columns:1fr!important;gap:9px!important}
+  .playoffTeam,.playoffTeam:last-child{text-align:left!important}
+  .playoffScore{text-align:center!important;width:100%}
+  .playoffActionGrid{grid-template-columns:1fr!important}
+  .playoffActionGrid .btn{width:100%!important}
+  .actions>.btn,.modalFoot>.btn{flex:1 1 100%!important;width:100%}
+  .item>div{flex:1 1 100%!important;width:100%!important}
+  .item>.pill,.item>.btn{flex:0 1 auto!important}
+  .row>strong{width:100%;text-align:left!important}
+  .rosterSummary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .badgeGrid{grid-template-columns:1fr!important}
+  .modalWrap{padding:6px!important;align-items:end!important}
+  .modal{width:100%!important;max-width:100%!important;max-height:94dvh!important;border-radius:18px 18px 0 0!important;padding:15px!important;overflow-x:hidden!important}
+  .modal h2{font-size:clamp(21px,7vw,27px);line-height:1.12}
+  .top h1{font-size:clamp(20px,6vw,25px)!important}
+  .topActions{max-width:62%}
+  .pill{font-size:9px}
+  .big{font-size:clamp(26px,9vw,34px)}
+  .rosterScroll,.tableScroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .rosterTable{min-width:680px}
+}
+
+@media(max-width:390px){
+  .rosterSummary{grid-template-columns:1fr!important}
+  .card,.heroBox,.playoffBanner{padding:13px!important}
+  .playoffRound{font-size:21px!important}
+  .playoffScore{font-size:28px!important}
+  .topActions{max-width:66%}
+  .topMainMenuBtn{max-width:78px!important}
+}
 </style>
 </head>
 <body>
