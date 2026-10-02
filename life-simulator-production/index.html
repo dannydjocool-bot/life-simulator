@@ -3083,6 +3083,41 @@ function makeRosterDepthPlayer(teamId,index,used){
  const contractYears=1+((seed+index)%4),contractValue=Math.round(realisticAnnualSalary(ovr)*(0.9+(seed%21)/100)*contractYears),gp=yearsPro*74;
  return {id:"depth-"+teamId+"-"+index,name,pos,age,ovr,potential,personality:["Loyal","Competitive","Professional","Defensive-Minded","Team-First"][(seed+index)%5],ppg,apg,rpg,source:"depth",yearsPro,contractYears,contractValue,career:{gp,pts:Math.round(ppg*gp),ast:Math.round(apg*gp),reb:Math.round(rpg*gp),allStars:0,mvps:0,titles:0}}
 }
+function leaguePlayerAgeSeed(player,teamId,index=0){
+ const raw=String(player?.id||player?.name||"player")+"|"+String(teamId||"")+"|"+index;
+ let h=2166136261;
+ for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)}
+ return h>>>0
+}
+function legacyLeaguePlayerAge(player,teamId,index=0){
+ const seed=leaguePlayerAgeSeed(player,teamId,index),careerYears=Math.max(0,(S.year||1)-1);
+ const entryAge=21+(seed%11);
+ return Math.max(20,Math.min(39,entryAge+careerYears))
+}
+function repairLegacyLeagueAgeDistribution(){
+ ensureLeagueRosters();
+ S.nbaWorld=S.nbaWorld||{};
+ if(S.nbaWorld.ageDistributionVersion>=2)return false;
+ let changed=false;
+ NBA_TEAMS.forEach(t=>{
+   const roster=S.leagueRosters[t.id]||[];
+   const counts={};roster.forEach(p=>{const a=Number(p.age);if(Number.isFinite(a))counts[a]=(counts[a]||0)+1});
+   roster.forEach((p,i)=>{
+     // Preserve actual drafted rookies and later generated draft classes.
+     if(p?.source==="rookie"||p?.draftYear||p?.draftPick)return;
+     const age=Number(p.age),crowded=Number.isFinite(age)&&(counts[age]||0)>=4;
+     const legacySource=!p?.source||p.source==="veteran"||p.source==="depth";
+     if(!legacySource&&!crowded)return;
+     if(!Number.isFinite(age)||crowded){
+       const next=legacyLeaguePlayerAge(p,t.id,i);
+       if(age!==next){p.age=next;changed=true}
+       p.yearsPro=Math.max(0,next-20)
+     }
+   })
+ });
+ S.nbaWorld.ageDistributionVersion=2;
+ return changed
+}
 function ensureLeagueRosters(){
  if(!S.leagueRosters||typeof S.leagueRosters!=="object"||Array.isArray(S.leagueRosters))S.leagueRosters={};
  NBA_TEAMS.forEach(t=>{
@@ -3090,9 +3125,9 @@ function ensureLeagueRosters(){
  });
  const used=new Set([S.player?.name].filter(Boolean));NBA_TEAMS.forEach(t=>t.stars.forEach(p=>used.add(p.name)));NBA_TEAMS.forEach(t=>(S.leagueRosters[t.id]||[]).forEach(p=>{if(p&&p.name)used.add(p.name)}));
  NBA_TEAMS.forEach(t=>{
-   if(!Array.isArray(S.leagueRosters[t.id])||!S.leagueRosters[t.id].length)S.leagueRosters[t.id]=t.stars.map(p=>({...p,source:"veteran",yearsPro:5}));
+   if(!Array.isArray(S.leagueRosters[t.id])||!S.leagueRosters[t.id].length)S.leagueRosters[t.id]=t.stars.map((p,i)=>{const age=legacyLeaguePlayerAge(p,t.id,i);return {...p,source:"veteran",age,yearsPro:Math.max(0,age-20)}});
    let roster=S.leagueRosters[t.id];roster.forEach(p=>used.add(p.name));while(roster.length<15)roster.push(makeRosterDepthPlayer(t.id,roster.length,used));
-   roster.forEach((p,i)=>{p.ppg=Number(p.ppg)||0;p.apg=Number(p.apg)||0;p.rpg=Number(p.rpg)||0;if(typeof p.yearsPro!=="number")p.yearsPro=5;if(typeof p.age!=="number")p.age=24+p.yearsPro;if(typeof p.ovr!=="number")p.ovr=Math.max(68,Math.min(95,Math.round(66+(p.ppg||10)*.75)));if(typeof p.potential!=="number")p.potential=Math.min(96,p.ovr+(p.yearsPro<=5?6:2));if(!p.personality)p.personality=["Loyal","Competitive","Money-Focused","Ring Chaser","Laid Back","Leader"][(i+t.id.length)%6];if(typeof p.contractYears!=="number")p.contractYears=1+((i+t.id.length)%4);if(typeof p.contractValue!=="number")p.contractValue=Math.round(realisticAnnualSalary(p.ovr)*Math.max(1,p.contractYears||1));normalizeContractValue(p);if(!p.career){const gp=p.yearsPro*76;p.career={gp,pts:Math.round((p.ppg||0)*gp),ast:Math.round((p.apg||0)*gp),reb:Math.round((p.rpg||0)*gp),allStars:0,mvps:0,titles:0}}});
+   roster.forEach((p,i)=>{p.ppg=Number(p.ppg)||0;p.apg=Number(p.apg)||0;p.rpg=Number(p.rpg)||0;if(typeof p.age!=="number")p.age=legacyLeaguePlayerAge(p,t.id,i);if(typeof p.yearsPro!=="number")p.yearsPro=Math.max(0,p.age-20);if(typeof p.ovr!=="number")p.ovr=Math.max(68,Math.min(95,Math.round(66+(p.ppg||10)*.75)));if(typeof p.potential!=="number")p.potential=Math.min(96,p.ovr+(p.yearsPro<=5?6:2));if(!p.personality)p.personality=["Loyal","Competitive","Money-Focused","Ring Chaser","Laid Back","Leader"][(i+t.id.length)%6];if(typeof p.contractYears!=="number")p.contractYears=1+((i+t.id.length)%4);if(typeof p.contractValue!=="number")p.contractValue=Math.round(realisticAnnualSalary(p.ovr)*Math.max(1,p.contractYears||1));normalizeContractValue(p);if(!p.career){const gp=p.yearsPro*76;p.career={gp,pts:Math.round((p.ppg||0)*gp),ast:Math.round((p.apg||0)*gp),reb:Math.round((p.rpg||0)*gp),allStars:0,mvps:0,titles:0}}});
    roster.sort((x,y)=>(y.ovr||0)-(x.ovr||0)||(y.ppg||0)-(x.ppg||0));if(roster.length>15)S.leagueRosters[t.id]=roster.slice(0,15);rebalanceRosterPayroll(S.leagueRosters[t.id],t.id)
  })
 }
@@ -4499,6 +4534,7 @@ function tradeRumorHTML(){
  if(!rumor)return "";return '<section class="card s12"><span class="kicker">LEAGUE RUMORS</span><h3>Trade Rumors Heating Up</h3><p class="muted">'+(S.player.trust<55?"Your relationship with the organization is drawing attention.":contractYearsRemaining()===1?"Your contract situation has teams watching closely.":"Your trade request is still being discussed around the league.")+'</p></section>'
 }
 function startOffseason(deferPresentation=false){
+ repairLegacyLeagueAgeDistribution();
  if(S.stage!=="Offseason"){
    applyBankSeasonInterest();processV018SeasonEnd();
    evaluateSeasonAwards();evaluateComebackSeason();processSeasonPromisesAndIncentives();updateLeaguePlayerCareers();updateArchetypeEvolution(true);archivePlayerSeason();archiveCompletedSeason();
@@ -6701,6 +6737,7 @@ function rosters(){
  try{
   ensureLeagueStandings();
   ensureLeagueRosters();
+  if(repairLegacyLeagueAgeDistribution())save();
   let rosterRepairs=[];
   try{rosterRepairs=repairRosterTransactionConsistency()||[]}catch(e){recordClientFailure("rosters repairRosterTransactionConsistency",e)}
   if(rosterRepairs.length>0)save();
