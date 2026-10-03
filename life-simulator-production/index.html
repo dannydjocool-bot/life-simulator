@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.19.0</title>
+<title>MYCAREER Basketball Sim v0.19.1</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -1485,12 +1485,18 @@ const HOME_DESIGNERS=[
 function homeDesigner(id=S.homeSpace?.designer){return HOME_DESIGNERS.find(x=>x.id===id)||HOME_DESIGNERS[0]}
 function homeStageRank(){return S.stage==="NBA"||S.stage==="Offseason"||S.stage==="Retired"?3:S.stage==="College"||S.stage==="Draft Combine"?2:1}
 const STORE_ITEMS=[
-{id:"apartment",name:"Starter Apartment",type:"Housing",price:1000,income:0,morale:3,desc:"Your first place and a small morale boost."},
+{id:"apartment",name:"Starter Apartment",type:"Housing",price:1000,income:0,morale:3,homeTier:"apartment",desc:"Your first place and a small morale boost."},
 {id:"car",name:"Used Sports Sedan",type:"Vehicle",price:5000,income:0,morale:2,desc:"Reliable transportation and a lifestyle upgrade."},
 {id:"rental1",name:"Starter Rental Unit",type:"Real Estate",price:25000,income:500,morale:0,desc:"Small rental paying income after every game."},
 {id:"condo",name:"City Condo Rental",type:"Real Estate",price:75000,income:1750,morale:0,desc:"Higher-value rental property."},
 {id:"duplex",name:"Duplex Investment",type:"Real Estate",price:180000,income:4500,morale:0,desc:"Two-unit rental with stronger passive income."},
-{id:"house",name:"Luxury Home",type:"Housing",price:350000,income:0,morale:8,desc:"A major lifestyle upgrade once your career takes off."}
+{id:"house",name:"Luxury Home",type:"Housing",price:350000,income:0,morale:8,homeTier:"luxury",desc:"A major lifestyle upgrade once your career takes off."},
+{id:"modern_estate",name:"Modern Estate",type:"Housing",price:1200000,income:0,morale:10,homeTier:"estate",desc:"A modern private estate with a pool, home gym and expanded four-car garage."},
+{id:"celebrity_mansion",name:"Celebrity Mansion",type:"Housing",price:3800000,income:0,morale:12,homeTier:"mansion",desc:"A superstar mansion with a theater, private court and room for a serious car collection."},
+{id:"skyline_residence",name:"Skyline Penthouse Residence",type:"Housing",price:7500000,income:0,morale:13,homeTier:"skyline",desc:"An ultra-premium penthouse with private lift access, skyline views and a dedicated trophy lounge."},
+{id:"athlete_compound_home",name:"Private Athlete Compound",type:"Housing",price:12000000,income:0,morale:15,homeTier:"compound",desc:"A gated training-first compound with a full court, recovery wing and twelve-car garage."},
+{id:"waterfront_megahome",name:"Waterfront Mega Home",type:"Housing",price:22000000,income:0,morale:17,homeTier:"waterfront",desc:"A waterfront superstar residence with a dock, guest house, spa and private training space."},
+{id:"legacy_estate_home",name:"Legacy Estate",type:"Housing",price:35000000,income:0,morale:20,homeTier:"legacy",desc:"The ultimate career home with a private court, trophy museum, security wing and massive garage."}
 ];
 const REAL_ESTATE=[
 {id:"skyline_penthouse",name:"Skyline Penthouse",price:1500000,income:0,upkeep:2200,tier:"penthouse",desc:"Private high-rise residence with concierge service, skyline views and a trophy lounge."},
@@ -6526,12 +6532,24 @@ function relationshipsHTML(){
 }
 function homeTier(){
  ensureHomeSpace();
- ensureWealthState();const owned=S.finance?.owned||[],properties=S.finance.realEstate||[],rank={family:1,campus:2,apartment:3,penthouse:4,mansion:5},nba=S.stage==="NBA"||S.stage==="Offseason"||S.stage==="Retired";
+ ensureWealthState();
+ const owned=S.finance?.owned||[],properties=S.finance.realEstate||[],nba=S.stage==="NBA"||S.stage==="Offseason"||S.stage==="Retired";
+ const rank={family:1,campus:2,apartment:3,luxury:4,estate:5,mansion:6,skyline:7,compound:8,waterfront:9,legacy:10};
  let earned="family";
  if(S.stage==="College"||S.stage==="Draft Combine")earned="campus";
  if(nba)earned="apartment";
- if(nba&&(S.social?.fame>=65||totalLiquid()>=750000||properties.some(id=>REAL_ESTATE.find(x=>x.id===id)?.tier==="penthouse")))earned="penthouse";
- if(owned.includes("house")||properties.some(id=>REAL_ESTATE.find(x=>x.id===id)?.tier==="mansion"))earned="mansion";
+ if(nba&&(S.social?.fame>=65||totalLiquid()>=750000||properties.some(id=>REAL_ESTATE.find(x=>x.id===id)?.tier==="penthouse")))earned="luxury";
+
+ const housingOwned=STORE_ITEMS.filter(x=>x.type==="Housing"&&x.homeTier&&owned.includes(x.id));
+ housingOwned.forEach(x=>{if((rank[x.homeTier]||0)>(rank[earned]||0))earned=x.homeTier});
+
+ if(properties.includes("skyline_penthouse")&&(rank.skyline>rank[earned]))earned="skyline";
+ if(properties.includes("gated_mansion")&&(rank.mansion>rank[earned]))earned="mansion";
+ if(properties.includes("lake_estate")&&(rank.waterfront>rank[earned]))earned="waterfront";
+ if(properties.includes("private_compound")&&(rank.compound>rank[earned]))earned="compound";
+ if(properties.includes("legacy_development")&&(rank.legacy>rank[earned]))earned="legacy";
+ if(properties.some(id=>REAL_ESTATE.find(x=>x.id===id)?.tier==="mansion")&&(rank.mansion>rank[earned]))earned="mansion";
+
  const current=S.homeSpace.tier&&rank[S.homeSpace.tier]?S.homeSpace.tier:"family";
  if(rank[earned]>rank[current])S.homeSpace.tier=earned;else if(!S.homeSpace.tier)S.homeSpace.tier=current;
  const id=rank[S.homeSpace.tier]>=rank[earned]?S.homeSpace.tier:earned;
@@ -6539,8 +6557,13 @@ function homeTier(){
   family:{id:"family",name:"Family Home",subtitle:"Where the journey starts",rooms:["bedroom","living","kitchen"]},
   campus:{id:"campus",name:"Campus Apartment",subtitle:"College life",rooms:["bedroom","living","kitchen","study"]},
   apartment:{id:"apartment",name:"Pro Apartment",subtitle:"Your own city space",rooms:["bedroom","living","kitchen","closet","film"]},
-  penthouse:{id:"penthouse",name:"Skyline Penthouse",subtitle:"High-rise NBA living",rooms:["bedroom","living","kitchen","closet","trophy","gym","balcony"]},
-  mansion:{id:"mansion",name:"Luxury Residence",subtitle:"Private estate",rooms:["bedroom","living","kitchen","closet","trophy","gym","pool","theater"]}
+  luxury:{id:"luxury",name:"Luxury Home",subtitle:"Your first major lifestyle upgrade",rooms:["bedroom","living","kitchen","closet","trophy","gym"]},
+  estate:{id:"estate",name:"Modern Estate",subtitle:"Private modern living",rooms:["bedroom","living","kitchen","closet","trophy","gym","pool"]},
+  mansion:{id:"mansion",name:"Celebrity Mansion",subtitle:"Superstar estate living",rooms:["bedroom","living","kitchen","closet","trophy","gym","pool","theater"]},
+  skyline:{id:"skyline",name:"Skyline Penthouse Residence",subtitle:"Ultra-premium high-rise living",rooms:["bedroom","living","kitchen","closet","trophy","gym","balcony","theater"]},
+  compound:{id:"compound",name:"Private Athlete Compound",subtitle:"Built around training, recovery and privacy",rooms:["bedroom","living","kitchen","closet","trophy","gym","pool","theater","film"]},
+  waterfront:{id:"waterfront",name:"Waterfront Mega Home",subtitle:"Elite waterfront superstar living",rooms:["bedroom","living","kitchen","closet","trophy","gym","pool","theater","balcony"]},
+  legacy:{id:"legacy",name:"Legacy Estate",subtitle:"The ultimate home for a generational career",rooms:["bedroom","living","kitchen","closet","trophy","gym","pool","theater","film","balcony"]}
  };
  return tiers[id]||tiers.family
 }
