@@ -4760,21 +4760,28 @@ function openStartingFiveEditor(){
  }
 }
 function coachOfficeName(){return S.stage==="NBA"?currentCoach():(S.stage==="College"?"Head Coach":"Coach")}
+function coachOfficeStageLabel(){return S.stage==="NBA"?"NBA":S.stage==="College"?"COLLEGE":S.stage==="High School"?"HIGH SCHOOL":String(S.stage||"CAREER").toUpperCase()}
+function coachOfficeTeamLabel(){
+ if(S.stage==="NBA")return currentTeamName();
+ if(S.stage==="College")return String(S.college||"College Basketball");
+ if(S.stage==="High School")return "Northside HS";
+ return "Basketball";
+}
 function coachOfficeRoleText(){
- if(S.stage==="NBA"){updateRole();applyUserLineupRole();return S.player.role+" • "+S.player.minutes+" MPG"}
- if(S.stage==="High School")return "Senior Varsity • "+Math.round(S.player.trust||50)+" Coach Trust";
- if(S.stage==="College")return "College Rotation • "+Math.round(S.player.trust||50)+" Coach Trust";
+ if(S.stage==="NBA"){updateRole();applyUserLineupRole();return S.player.role+" • "+S.player.minutes+" MPG • "+coachOfficeTeamLabel()}
+ if(S.stage==="High School")return "Senior Varsity • "+coachOfficeTeamLabel()+" • "+Math.round(S.player.trust||50)+" Coach Trust";
+ if(S.stage==="College")return "College Rotation • "+coachOfficeTeamLabel()+" • "+Math.round(S.player.trust||50)+" Coach Trust";
  return S.stage
 }
 function coachOfficeSceneHTML(){
  const coach=coachOfficeName(),player=String(S.player?.name||"Player"),stage=String(S.stage||"Career"),nba=S.stage==="NBA",hs=S.stage==="High School",college=S.stage==="College";
  const lineup=nba?currentStartingFive():[],lineupText=nba?lineup.map(p=>p.name+(p.user?" (You)":"")).join(" • "):"";
- const teamLabel=nba?currentTeamName():(hs?"NORTHSIDE HS":(college?(S.college||"COLLEGE BASKETBALL"):"BASKETBALL"));
+ const teamLabel=coachOfficeTeamLabel(),stageLabel=coachOfficeStageLabel(),stageClass=nba?"nba":college?"college":"highschool";
  const jerseyNo=String(S.player?.number??3);
  return '<style>'+
  '.coachCinema{position:relative;min-height:650px;border-radius:22px;overflow:hidden;background:#0a1118;box-shadow:0 32px 90px rgba(0,0,0,.62);color:#eef6ff;isolation:isolate}'+
  '.coachCinema:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 51% 24%,rgba(255,218,170,.17),transparent 25%),radial-gradient(circle at 50% 58%,rgba(67,115,150,.12),transparent 38%),linear-gradient(90deg,rgba(2,7,12,.72),transparent 22%,transparent 78%,rgba(2,7,12,.72));z-index:8;pointer-events:none}'+
- '.coachOfficeBg{position:absolute;inset:0;background:linear-gradient(180deg,#223343 0 12%,#192b39 12% 57%,#111920 57% 100%)}'+
+ '.coachOfficeBg{position:absolute;inset:0;background:linear-gradient(180deg,#223343 0 12%,#192b39 12% 57%,#111920 57% 100%)}.coachCinema.college .coachOfficeBg{background:linear-gradient(180deg,#283346 0 12%,#1e2939 12% 57%,#121923 57% 100%)}.coachCinema.nba .coachOfficeBg{background:linear-gradient(180deg,#1c2936 0 12%,#142431 12% 57%,#0b141d 57% 100%)}'+
  '.coachOfficeBg:after{content:"";position:absolute;left:0;right:0;top:56%;height:2px;background:rgba(255,255,255,.06);box-shadow:0 5px 18px rgba(0,0,0,.5)}'+
  '.coachWindow{position:absolute;left:4.5%;top:8%;width:27%;height:38%;border:7px solid #121a22;border-radius:5px;background:linear-gradient(180deg,#526c81 0%,#9baebb 48%,#e1c38a 49%,#46535d 56%,#1f2a34 100%);box-shadow:inset 0 0 35px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.24)}'+
  '.coachWindow:before{content:"";position:absolute;left:49%;top:0;bottom:0;width:5px;background:#17212a}.coachWindow:after{content:"";position:absolute;left:0;right:0;bottom:8%;height:27%;background:repeating-linear-gradient(90deg,#25313b 0 15px,#11181f 15px 23px);opacity:.82}'+
@@ -4782,7 +4789,7 @@ function coachOfficeSceneHTML(){
  '.coachJersey:before{content:"";position:absolute;inset:0;background:linear-gradient(145deg,#f7f9fb 0%,#d6dee5 55%,#a5b2bd 100%);clip-path:polygon(14% 0,34% 7%,66% 7%,86% 0,100% 18%,84% 35%,76% 25%,76% 100%,24% 100%,24% 25%,16% 35%,0 18%);border-radius:6px;box-shadow:inset 0 0 0 2px rgba(19,32,42,.12),inset 0 -18px 26px rgba(19,32,42,.08)}'+
  '.coachJerseyName{position:absolute;left:15%;right:15%;top:34%;z-index:3;text-align:center;color:#13202a;font-size:clamp(8px,1vw,12px);line-height:1.05;font-weight:1000;letter-spacing:.03em;white-space:normal;overflow:visible;overflow-wrap:anywhere;text-shadow:0 1px 0 rgba(255,255,255,.5)}.coachJerseyNo{position:absolute;left:0;right:0;top:53%;z-index:3;text-align:center;color:#13202a;font-size:clamp(27px,3.4vw,36px);line-height:1;font-weight:1000;text-shadow:0 1px 0 rgba(255,255,255,.45)}'+
  '.coachBanner{position:absolute;right:5%;top:7%;width:23%;height:29%;background:linear-gradient(160deg,#1a2b39,#10202b);clip-path:polygon(0 0,100% 0,100% 84%,50% 100%,0 84%);border:1px solid rgba(255,255,255,.14);box-shadow:0 13px 28px rgba(0,0,0,.36);z-index:2}'+
- '.coachBanner:before{content:"CHAMPIONSHIP";position:absolute;left:0;right:0;top:18%;text-align:center;font-weight:1000;letter-spacing:.13em;font-size:clamp(8px,1.1vw,14px);color:#f2d584}.coachBanner:after{content:"CULTURE";position:absolute;left:0;right:0;top:42%;text-align:center;font-weight:1000;letter-spacing:.22em;font-size:clamp(10px,1.3vw,16px);color:#f6f8fb}'+
+ '.coachBanner:before{content:"CHAMPIONSHIP";position:absolute;left:0;right:0;top:18%;text-align:center;font-weight:1000;letter-spacing:.13em;font-size:clamp(8px,1.1vw,14px);color:#f2d584}.coachBanner:after{content:"PROGRAM";position:absolute;left:0;right:0;top:42%;text-align:center;font-weight:1000;letter-spacing:.22em;font-size:clamp(10px,1.3vw,16px);color:#f6f8fb}.coachCinema.nba .coachBanner:after{content:"NBA STANDARD"}.coachCinema.college .coachBanner:after{content:"COLLEGE HOOPS"}'+
  '.coachPoster{position:absolute;right:32%;top:10%;width:11%;height:17%;border:5px solid #2a211a;background:linear-gradient(135deg,#d9dfe4,#83919c);box-shadow:0 8px 18px rgba(0,0,0,.35)}'+
  '.coachPoster:before{content:"TEAM\\A STANDARD";white-space:pre;position:absolute;inset:10%;display:grid;place-items:center;text-align:center;color:#17222b;font-size:8px;font-weight:1000;letter-spacing:.06em}'+
  '.coachShelf{position:absolute;right:5%;top:38%;width:25%;height:8px;background:linear-gradient(180deg,#76543a,#432f22);box-shadow:0 6px 15px rgba(0,0,0,.4);z-index:2}'+
@@ -4814,13 +4821,13 @@ function coachOfficeSceneHTML(){
  '.coachDialogue h3{margin:0 0 5px;font-size:clamp(17px,2vw,24px)}.coachChoices{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:10px}.coachChoices .btn{min-height:44px}'+
  '@media(max-width:700px){.coachCinema{min-height:700px}.coachFigure{bottom:31%;transform:translateX(-50%) scale(.78);transform-origin:bottom center}.coachDesk{left:5%;right:4%;bottom:17%;height:20%}.coachJersey{left:26%;top:8%;width:34%;height:26%}.coachJerseyName{left:14%;right:14%;top:35%;font-size:8px;letter-spacing:.015em}.coachJerseyNo{top:54%;font-size:31px}.coachBanner{width:27%}.coachPoster{display:none}.coachCabinet{bottom:28%;height:19%}.coachDialogue{left:2%;right:2%;bottom:2%}}'+
  '</style>'+
- '<div class="coachCinema">'+
+ '<div class="coachCinema '+stageClass+'">'+
   '<div class="coachOfficeBg"></div><div class="coachLamp"></div><div class="coachWindow"></div>'+
   '<div class="coachJersey"><div class="coachJerseyName">'+teamLabel+'</div><div class="coachJerseyNo">'+jerseyNo+'</div></div>'+
   '<div class="coachBanner"></div><div class="coachPoster"></div><div class="coachShelf"></div><div class="coachTrophy"></div><div class="coachBall"><div class="coachBallSeam"></div></div><div class="coachCabinet"></div>'+
   '<div class="coachFigure"><div class="coachBody"></div><div class="coachShirt"></div><div class="coachTie"></div><div class="coachNeck"></div><div class="coachEarL"></div><div class="coachEarR"></div><div class="coachHead"></div><div class="coachHair"></div><div class="coachBrowL"></div><div class="coachBrowR"></div><div class="coachEyeL"></div><div class="coachEyeR"></div><div class="coachNose"></div><div class="coachMouth"></div><div class="coachChin"></div><div class="coachStubble"></div><div class="coachArmL"></div><div class="coachArmR"></div></div>'+
   '<div class="coachDesk"></div><div class="coachPOV"></div>'+
-  '<div class="coachHud"><span>FIRST-PERSON • COACH OFFICE</span><span>'+stage.toUpperCase()+' • '+player+'</span></div>'+
+  '<div class="coachHud"><span>'+stageLabel+' • '+teamLabel+' COACH OFFICE</span><span>'+stageLabel+' • '+player+'</span></div>'+
   '<div class="coachDialogue"><div class="row"><div><small class="muted">'+coachOfficeRoleText()+'</small><h3>'+coach+': “What do you need?”</h3></div><span class="pill good">TRUST '+Math.round(S.player.trust||0)+'</span></div>'+
    (nba?'<small class="muted">Starting 5: '+lineupText+'</small>':'<small class="muted">Development meeting • '+player+'</small>')+
    '<div class="coachChoices">'+
