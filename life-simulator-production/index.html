@@ -4911,6 +4911,7 @@ function talkToCoach(){
  ensureHighSchoolOnboarding();
  if(S.stage==="High School"&&S.onboarding.missionActive&&!S.onboarding.coachIntroComplete){
    modal(coachOfficeSceneHTML().replace(coachOfficeName()+': “What do you need?”',coachOfficeName()+': “Welcome to '+highSchoolTeamName()+', '+S.player.name+'.”').replace('<div class="coachChoices">','<p class="muted" style="margin-top:12px">You are the key star player for us this year. I am looking forward to seeing the basketball legacy you create here. I want you leading this team from day one.</p><p class="muted">To help you get started, I am giving you 5 Attribute Points to build your game.</p><div class="coachChoices">').replace('<button class="btn primary" id="askRole">Ask About My Role</button>','<button class="btn primary" id="acceptCoachGift">Accept 5 Attribute Points</button>'));
+   if($("askDevelopment"))$("askDevelopment").style.display="none";if($("askMinutes"))$("askMinutes").style.display="none";
    if($("acceptCoachGift"))$("acceptCoachGift").onclick=()=>{
      if(!S.onboarding.rewardClaimed){const a=ensureAttributeUpgradeState();a.earned+=5;a.available+=5;S.onboarding.rewardClaimed=true}
      S.onboarding.coachIntroComplete=true;S.onboarding.missionComplete=true;S.onboarding.missionActive=false;S.coach.talks=(S.coach.talks||0)+1;
