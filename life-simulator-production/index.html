@@ -2183,6 +2183,35 @@ function returnToMainMenu(){
 function slotOvr(d){if(!d||!d.player||!d.player.attrs)return 0;return typeof playerOverall==="function"?playerOverall(d.player):Math.round(Object.values(d.player.attrs).reduce((a,b)=>a+b,0)/6)}
 function slotTeamLabel(d){if(!d)return "";if((d.stage==="NBA"||d.stage==="Offseason"||d.stage==="Retired")&&d.team){const t=NBA_TEAMS.find(x=>x.id===d.team);if(t)return t.city+" "+t.name}if(d.stage==="College"&&d.college)return d.college;return d.stage||"Career"}
 function slotSavedLabel(d){if(!d||!d.saveMeta||!d.saveMeta.lastSaved)return "Autosaved";const dt=new Date(d.saveMeta.lastSaved);return Number.isNaN(dt.getTime())?"Autosaved":dt.toLocaleString()}
+function ensureDevTestCareer(){
+ const existing=[1,2,3].map(i=>slotData(i)).find(Boolean);
+ if(existing)return;
+ const d=fresh();
+ d.created=true;
+ d.devTestCareer=true;
+ d.player.name="Test Player";
+ d.player.number=3;
+ d.player.level=4;
+ d.player.trust=75;
+ d.player.chemistry=75;
+ d.player.morale=85;
+ d.record={w:4,l:1};
+ d.game=6;
+ d.offers=["UConn","Villanova"];
+ d.player.attrs.Shooting=68;
+ d.player.attrs.Playmaking=72;
+ d.player.attrs.Defense=67;
+ d.player.expandedAttrs=null;
+ ensureExpandedAttributes(d.player);
+ d.news=["DEV TEST CAREER • Reusable test save created for the coach-office preview."];
+ d.saveMeta=d.saveMeta||{};
+ d.saveMeta.lastSaved=new Date().toISOString();
+ writeSlot(1,d);
+ activeSlot=1;
+ pendingNewSlot=1;
+ localStorage.setItem("mycareer-active-slot","1");
+}
+ensureDevTestCareer();
 let S=load(),chosen="Two-Way Creator";
 let frontMode="main";
 let menuSettings={
