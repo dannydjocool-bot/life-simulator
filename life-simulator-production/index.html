@@ -1896,6 +1896,9 @@ function sanitizeSubsystemShapes(d){
  if(!validPlainObject(d.player.attrs)){d.player.attrs={...fresh().player.attrs};changed=true}
  if(!validPlainObject(d.player.stats)){d.player.stats={...fresh().player.stats};changed=true}
  if(!validPlainObject(d.player.appearance)){d.player.appearance={...fresh().player.appearance};changed=true}
+ if(!validPlainObject(d.player.attributeUpgrades)){d.player.attributeUpgrades={earned:0,available:0,spent:{}};changed=true}
+ num(d.player.attributeUpgrades,"earned",0);num(d.player.attributeUpgrades,"available",0);
+ if(!validPlainObject(d.player.attributeUpgrades.spent)){d.player.attributeUpgrades.spent={};changed=true}
  ["Finishing","Shooting","Playmaking","Defense","Athleticism","IQ"].forEach(k=>num(d.player.attrs,k,fresh().player.attrs[k]));
  ["gp","ppg","apg","rpg"].forEach(k=>num(d.player.stats,k,0));
  if(!Array.isArray(d.offers)){d.offers=[];changed=true}else{const clean=[...new Set(d.offers.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim()))];if(clean.length!==d.offers.length){d.offers=clean;changed=true}}
@@ -1912,6 +1915,19 @@ function sanitizeSubsystemShapes(d){
  if(!validPlainObject(d.careerStats)){d.careerStats=fresh().careerStats;changed=true}
  ["highSchool","college","nba"].forEach(section=>{if(!validPlainObject(d.careerStats[section])){d.careerStats[section]={gp:0,pts:0,ast:0,reb:0};changed=true}["gp","pts","ast","reb"].forEach(k=>num(d.careerStats[section],k,0))});
  if(d.highSchool!==null&&d.highSchool!==undefined&&!validPlainObject(d.highSchool)){d.highSchool=null;changed=true}
+ if(!validPlainObject(d.onboarding)){d.onboarding={schoolChosen:!!d.highSchool,welcomeShown:!!d.highSchool,missionActive:false,missionComplete:false,coachIntroComplete:false,rewardClaimed:false};changed=true}
+ if(!validPlainObject(d.personalMessages)){d.personalMessages={unread:0,threads:{}};changed=true}
+ if(!validPlainObject(d.personalMessages.threads)){d.personalMessages.threads={};changed=true}
+ num(d.personalMessages,"unread",0);
+ if(!validPlainObject(d.highSchoolRecruiting)){d.highSchoolRecruiting={points:0,lastOfferGame:0,totalEvaluations:0};changed=true}
+ ["points","lastOfferGame","totalEvaluations"].forEach(k=>num(d.highSchoolRecruiting,k,0));
+ if(!validPlainObject(d.highSchoolFinals)){d.highSchoolFinals={triggered:false,coachMessaged:false,meetingComplete:false,rewardClaimed:false,gameReady:false,played:false,won:false,opponent:"Westbridge Academy",result:null,draftStockBefore:0,draftBoost:0,sponsorOffer:null,sponsorAccepted:false,awaitingCollegeChoice:false,preFinalUpgrade:false};changed=true}
+ const hsF=d.highSchoolFinals;
+ ["triggered","coachMessaged","meetingComplete","rewardClaimed","gameReady","played","won","sponsorAccepted","awaitingCollegeChoice","preFinalUpgrade"].forEach(k=>{if(typeof hsF[k]!=="boolean"){hsF[k]=false;changed=true}});
+ if(typeof hsF.opponent!=="string"||!hsF.opponent.trim()){hsF.opponent="Westbridge Academy";changed=true}
+ ["draftStockBefore","draftBoost"].forEach(k=>num(hsF,k,0));
+ if(hsF.result!==null&&!validPlainObject(hsF.result)){hsF.result=null;changed=true}
+ if(hsF.sponsorOffer!==null&&!validPlainObject(hsF.sponsorOffer)){hsF.sponsorOffer=null;changed=true}
  if(!validPlainObject(d.finance)){d.finance=fresh().finance;changed=true}
  if(!validPlainObject(d.social)){d.social=fresh().social;changed=true}
  if(!validPlainObject(d.relationships)){d.relationships=fresh().relationships;changed=true}
@@ -2027,8 +2043,7 @@ function sanitizeTransientGameState(d){
  const finite=v=>Number.isFinite(Number(v)),obj=v=>v&&typeof v==="object"&&!Array.isArray(v);
  const full=d.fullGame;
  if(full){
-   let valid=false;
-   try{valid=repairFullGameState()}catch(_){valid=false}
+   const valid=obj(full)&&full.active===true&&typeof full.opp==="string"&&full.opp.trim()&&["team","oppScore"].every(k=>finite(full[k]))&&obj(full.stats);
    if(!valid){d.fullGame=null;changed=true}
  }
  const live=d.live;
@@ -2041,6 +2056,8 @@ function sanitizeTransientGameState(d){
    const valid=!media.pending||(obj(media)&&typeof media.opp==="string"&&typeof media.finalScore==="string"&&typeof media.question==="string");
    if(!valid){d.postgameMedia=null;changed=true}
  }
+ if(d.highSchoolFinals&&d.highSchoolFinals.played){if(d.highSchoolFinals.preFinalUpgrade){d.highSchoolFinals.preFinalUpgrade=false;changed=true}if(d.highSchoolFinals.gameReady){d.highSchoolFinals.gameReady=false;changed=true}}
+ if(d.highSchoolFinals&&d.highSchoolFinals.preFinalUpgrade&&!d.highSchoolFinals.meetingComplete){d.highSchoolFinals.preFinalUpgrade=false;changed=true}
  if(d.playoffs&&typeof d.playoffs==="object"&&d.playoffs.active){
    const p=d.playoffs;
    if(p.playIn&&typeof p.playIn!=="object"){p.playIn=null;changed=true}
@@ -2211,14 +2228,18 @@ function writeSlot(slot,data){
 function recoverSlot(slot){const primary=parseSave(localStorage.getItem(slotKey(slot)));if(primary&&primary.created)return primary;const backup=parseSave(localStorage.getItem(slotBackupKey(slot)));if(backup&&backup.created){localStorage.setItem(slotKey(slot),JSON.stringify(backup));return backup}return primary}
 function migrateLegacySave(){if(recoverSlot(1)?.created)return;const old=localStorage.getItem("mycareer-v03");if(!old)return;const data=parseSave(old);if(data&&data.created){writeSlot(1,data);localStorage.setItem("mycareer-active-slot","1")}}
 migrateLegacySave();
-function loadSlot(slot){const d=recoverSlot(slot);if(!d)return fresh();try{return validateCareerSave(d)}catch(e){console.warn("Save validation recovery",e);const repaired=merge(d,fresh());try{sanitizeSubsystemShapes(repaired);sanitizeTransientGameState(repaired)}catch(repairErr){console.warn("Save repair fallback",repairErr)}return repaired}}
+function loadSlot(slot){
+ const d=recoverSlot(slot);if(!d)return fresh();
+ try{const clean=validateCareerSave(d);sanitizeSubsystemShapes(clean);sanitizeTransientGameState(clean);return clean}
+ catch(e){console.warn("Save validation recovery",e);const repaired=merge(validPlainObject(d)?d:{},fresh());try{sanitizeSubsystemShapes(repaired);sanitizeTransientGameState(repaired)}catch(repairErr){console.warn("Save repair fallback",repairErr)}return repaired}
+}
 function load(){return loadSlot(activeSlot)}
 function slotData(slot){const d=recoverSlot(slot);return d&&d.created?d:null}
 function exportSaves(){const pack={type:"mycareer-save-pack",version:1,exportedAt:new Date().toISOString(),activeSlot,slots:{}};for(let i=1;i<=SAVE_SLOT_COUNT;i++){const d=slotData(i);if(d)pack.slots[i]=d}const blob=new Blob([JSON.stringify(pack)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="MyHallOfFame-saves-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("Save backup exported")}
 function importSavesFile(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const pack=JSON.parse(String(reader.result||""));if(!pack||pack.type!=="mycareer-save-pack"||!pack.slots)throw new Error("Invalid save file");let count=0;for(let i=1;i<=SAVE_SLOT_COUNT;i++){const d=pack.slots[i]||pack.slots[String(i)];if(d&&d.created){const clean=validateCareerSave(d);writeSlot(i,clean);count++}}if(!count)throw new Error("No careers found");activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+pack.activeSlot||1));localStorage.setItem("mycareer-active-slot",String(activeSlot));S=loadSlot(activeSlot);frontMode="main";closeModal();render();toast(count+" career save"+(count===1?"":"s")+" imported")}catch(e){toast("Import failed — choose a valid MyHallOfFame save file")}};reader.readAsText(file)}
 function selectSlot(slot){
  stopMenuMusic();activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+slot||1));localStorage.setItem("mycareer-active-slot",String(activeSlot));
- try{S=loadSlot(activeSlot);sanitizeSubsystemShapes(S);ensureHighSchoolOnboarding();frontMode="career";render();if(S.created)toast("Loaded Slot "+activeSlot)}
+ try{S=loadSlot(activeSlot);sanitizeSubsystemShapes(S);sanitizeTransientGameState(S);ensureHighSchoolOnboarding();try{localStorage.removeItem(CLIENT_DIAG_KEY)}catch(_){}frontMode="career";render();if(S.created)toast("Loaded Slot "+activeSlot)}
  catch(e){recordClientFailure("selectSlot load",e);try{const raw=recoverSlot(activeSlot);S=raw?merge(raw,fresh()):fresh();sanitizeSubsystemShapes(S);ensureHighSchoolOnboarding();frontMode="career";save();render();toast("Career repaired and loaded")}catch(e2){recordClientFailure("selectSlot recovery",e2);frontMode="main";S=fresh();S.created=false;render()}}
 }
 function newCareerInSlot(slot){activeSlot=Math.max(1,Math.min(SAVE_SLOT_COUNT,+slot||1));pendingNewSlot=activeSlot;localStorage.setItem("mycareer-active-slot",String(activeSlot));createModal()}
@@ -2527,6 +2548,7 @@ function ensureHighSchoolOnboarding(){
  if(!validPlainObject(S.personalMessages))S.personalMessages={unread:0,threads:{}};
  if(!validPlainObject(S.personalMessages.threads))S.personalMessages.threads={};
  if(typeof S.personalMessages.unread!=="number"||!Number.isFinite(S.personalMessages.unread))S.personalMessages.unread=0;
+ if(!Array.isArray(S.offers))S.offers=[];S.offers=[...new Set(S.offers.filter(x=>typeof x==="string"&&x.trim()))].slice(0,8);
  if(!validPlainObject(S.highSchoolRecruiting))S.highSchoolRecruiting={points:0,lastOfferGame:0,totalEvaluations:0};
  ["points","lastOfferGame","totalEvaluations"].forEach(k=>{const v=Number(S.highSchoolRecruiting[k]);S.highSchoolRecruiting[k]=Number.isFinite(v)?v:0});
  if(!validPlainObject(S.highSchoolFinals))S.highSchoolFinals={triggered:false,coachMessaged:false,meetingComplete:false,rewardClaimed:false,gameReady:false,played:false,won:false,opponent:"Westbridge Academy",result:null,draftStockBefore:0,draftBoost:0,sponsorOffer:null,sponsorAccepted:false,awaitingCollegeChoice:false};
