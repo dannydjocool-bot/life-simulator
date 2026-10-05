@@ -1945,6 +1945,10 @@ function sanitizeSubsystemShapes(d){
  if(!Array.isArray(d.nbaWorld.phone.collegeInvites)){d.nbaWorld.phone.collegeInvites=[];changed=true}
 
  if(!validPlainObject(d.onboarding)){d.onboarding={schoolChosen:false,welcomeShown:false,missionActive:false,missionComplete:false,coachIntroComplete:false,rewardClaimed:false};changed=true}
+ if(d.created&&d.stage==="High School"&&!d.onboarding.schoolChosen&&!validPlainObject(d.highSchool)&&((Number(d.player?.stats?.gp)||0)>0||(Number(d.game)||1)>1)){
+   d.highSchool={id:"northside",name:"Northside High",mascot:"Lions"};
+   d.onboarding.schoolChosen=true;d.onboarding.welcomeShown=true;d.onboarding.missionActive=false;d.onboarding.missionComplete=true;d.onboarding.coachIntroComplete=true;d.onboarding.rewardClaimed=true;changed=true
+ }
  if(!validPlainObject(d.personalMessages)){d.personalMessages={unread:0,threads:{}};changed=true}
  if(!validPlainObject(d.personalMessages.threads)){d.personalMessages.threads={};changed=true}
  num(d.personalMessages,"unread",0);
@@ -2188,7 +2192,7 @@ function writeSlot(slot,data){
 function recoverSlot(slot){const primary=parseSave(localStorage.getItem(slotKey(slot)));if(primary&&primary.created)return primary;const backup=parseSave(localStorage.getItem(slotBackupKey(slot)));if(backup&&backup.created){localStorage.setItem(slotKey(slot),JSON.stringify(backup));return backup}return primary}
 function migrateLegacySave(){if(recoverSlot(1)?.created)return;const old=localStorage.getItem("mycareer-v03");if(!old)return;const data=parseSave(old);if(data&&data.created){writeSlot(1,data);localStorage.setItem("mycareer-active-slot","1")}}
 migrateLegacySave();
-function loadSlot(slot){const d=recoverSlot(slot);if(!d)return fresh();try{return validateCareerSave(d)}catch(e){console.warn("Save validation recovery",e);return merge(d,fresh())}}
+function loadSlot(slot){const d=recoverSlot(slot);if(!d)return fresh();try{return validateCareerSave(d)}catch(e){console.warn("Save validation recovery",e);const repaired=merge(d,fresh());try{sanitizeSubsystemShapes(repaired);sanitizeTransientGameState(repaired)}catch(repairErr){console.warn("Save repair fallback",repairErr)}return repaired}}
 function load(){return loadSlot(activeSlot)}
 function slotData(slot){const d=recoverSlot(slot);return d&&d.created?d:null}
 function exportSaves(){const pack={type:"mycareer-save-pack",version:1,exportedAt:new Date().toISOString(),activeSlot,slots:{}};for(let i=1;i<=SAVE_SLOT_COUNT;i++){const d=slotData(i);if(d)pack.slots[i]=d}const blob=new Blob([JSON.stringify(pack)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="MyHallOfFame-saves-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);toast("Save backup exported")}
@@ -2821,7 +2825,16 @@ function appearanceEditor(prefix,player=S.player){const a=player.appearance||ens
 function readAppearance(prefix){return {skin:$(prefix+"Skin").value,hairStyle:$(prefix+"HairStyle").value,hairColor:$(prefix+"HairColor").value,eyeColor:$(prefix+"EyeColor").value,facialHair:$(prefix+"FacialHair").value,accessory:$(prefix+"Accessory").value,headband:$(prefix+"Headband").value}}
 function wireAppearancePreview(prefix,tempPlayer){["Skin","HairStyle","HairColor","EyeColor","FacialHair","Accessory","Headband"].forEach(k=>{$(prefix+k).onchange=()=>{tempPlayer.appearance=readAppearance(prefix);$(prefix+"Preview").innerHTML=avatarMarkup("lg",tempPlayer)}})}
 function openAppearance(){ensureAppearance();const temp={...S.player,appearance:{...S.player.appearance}};modal('<h2>Customize Player</h2><p class="muted">Change your face, hair, facial hair, accessories and headband anytime.</p>'+appearanceEditor("edit",temp)+'<div class="modalFoot"><button class="btn" id="appearanceCancel">Cancel</button><button class="btn primary" id="appearanceSave">Save Look</button></div>');wireAppearancePreview("edit",temp);$("appearanceCancel").onclick=closeModal;$("appearanceSave").onclick=()=>{S.player.appearance=readAppearance("edit");save();closeModal();render();toast("Appearance updated")}}
-function head(){const T={home:["CAREER HUB","Hub"],career:["MY JOURNEY","Career"],games:["GAME DAY","Games"],player:["PLAYER DEVELOPMENT","Player"],life:["OFF COURT","Life"],social:["SOCIAL","Social"],phone:["MY PHONE","Phone"],dating:["LOVE & LEGACY","Dating"],residence:["MY SPACE","Home"],rosters:["LEAGUE ORGANIZATIONS","Rosters"],league:["AROUND THE LEAGUE","League"]};const x=T[S.screen]||T.home;$("eyebrow").textContent=x[0];$("title").textContent=S.created?x[1]:"MYHALLOFFAME";$("pname").textContent=S.player.name;$("profileAvatar").innerHTML=avatarMarkup("sm");$("povr").textContent=ovr()+" OVR";$("mini").innerHTML='<small>'+S.stage+' • Year '+S.year+'</small><div class="big">'+S.record.w+"-"+S.record.l+'</div><div class="muted">Game '+S.game+'</div><button class="btn" id="mainMenuBtn" style="width:100%;margin-top:10px">Main Menu</button>';$("topMainMenuBtn").style.display="inline-flex"}
+function head(){
+ const T={home:["CAREER HUB","Hub"],career:["MY JOURNEY","Career"],games:["GAME DAY","Games"],player:["PLAYER DEVELOPMENT","Player"],life:["OFF COURT","Life"],social:["SOCIAL","Social"],phone:["MY PHONE","Phone"],dating:["LOVE & LEGACY","Dating"],residence:["MY SPACE","Home"],rosters:["LEAGUE ORGANIZATIONS","Rosters"],league:["AROUND THE LEAGUE","League"]};
+ const x=T[S?.screen]||T.home,p=S?.player||fresh().player,r=S?.record&&typeof S.record==="object"?S.record:{w:0,l:0};
+ const setText=(id,v)=>{const el=$(id);if(el)el.textContent=String(v??"")};
+ setText("eyebrow",x[0]);setText("title",S?.created?x[1]:"MYHALLOFFAME");setText("pname",p.name||"Player");
+ const av=$("profileAvatar");if(av){try{ensureAppearance();av.innerHTML=avatarMarkup("sm")}catch(e){recordClientFailure("header avatar",e);av.innerHTML='<div class="avatarFallback">🏀</div>'}}
+ try{setText("povr",(Number.isFinite(ovr())?ovr():60)+" OVR")}catch(e){recordClientFailure("header overall",e);setText("povr","60 OVR")}
+ const mini=$("mini");if(mini)mini.innerHTML='<small>'+String(S?.stage||"High School")+' • Year '+Math.max(1,Number(S?.year)||1)+'</small><div class="big">'+Math.max(0,Number(r.w)||0)+"-"+Math.max(0,Number(r.l)||0)+'</div><div class="muted">Game '+Math.max(1,Number(S?.game)||1)+'</div><button class="btn" id="mainMenuBtn" style="width:100%;margin-top:10px">Main Menu</button>';
+ const top=$("topMainMenuBtn");if(top)top.style.display="inline-flex"
+}
 function meter(n,v){return '<div class="meter"><div class="meterTop"><span>'+n+'</span><b>'+Math.round(v)+'</b></div><div class="bar"><i style="width:'+Math.max(0,Math.min(100,v))+'%"></i></div></div>'}
 function contractYearsRemaining(){const c=S.finance&&S.finance.contract;return c&&typeof c.yearsRemaining==="number"?Math.max(0,c.yearsRemaining):0}
 function isUnderContract(){return !!(S.finance&&S.finance.contract&&contractYearsRemaining()>0)}
@@ -2915,7 +2928,7 @@ function render(){
  ensureHighSchoolOnboarding();
  if(frontMode==="career"&&S.created&&S.stage==="High School"&&!S.onboarding.schoolChosen){
    repairInteractionBlockers();if((shapeRecovered||transientRecovered)&&S&&S.created)save();
-   try{nav()}catch(e){recordClientFailure("school choice nav",e)}if($("profileBtn"))$("profileBtn").style.visibility="visible";head();if($("content"))$("content").innerHTML='<section class="card s12"><span class="kicker">HIGH SCHOOL DECISION REQUIRED</span><h2>Choose your high school to continue.</h2><p class="muted">Your career cannot progress until you select a school.</p><button class="btn primary" id="requiredSchoolChoiceBtn">Choose High School</button></section>';if($("requiredSchoolChoiceBtn"))$("requiredSchoolChoiceBtn").onclick=showHighSchoolPicker;syncMissionLauncher();return
+   try{nav()}catch(e){recordClientFailure("school choice nav",e)}if($("profileBtn"))$("profileBtn").style.visibility="visible";try{ensureAppearance();head()}catch(e){recordClientFailure("school choice header",e)}if($("content"))$("content").innerHTML='<section class="card s12"><span class="kicker">HIGH SCHOOL DECISION REQUIRED</span><h2>Choose your high school to continue.</h2><p class="muted">Your career cannot progress until you select a school.</p><button class="btn primary" id="requiredSchoolChoiceBtn">Choose High School</button></section>';if($("requiredSchoolChoiceBtn"))$("requiredSchoolChoiceBtn").onclick=showHighSchoolPicker;try{syncMissionLauncher()}catch(e){recordClientFailure("school choice mission launcher",e)}return
  }
  repairInteractionBlockers();if((shapeRecovered||transientRecovered)&&S&&S.created)save();
  const bootSteps=[
