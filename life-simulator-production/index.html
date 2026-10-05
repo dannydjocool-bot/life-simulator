@@ -1926,6 +1926,18 @@ function sanitizeSubsystemShapes(d){
  if(!Array.isArray(d.offers)){d.offers=[];changed=true}else{const clean=[...new Set(d.offers.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim()))];if(clean.length!==d.offers.length){d.offers=clean;changed=true}}
  if(!Array.isArray(d.games)){d.games=[];changed=true}
  if(!Array.isArray(d.news)){d.news=[];changed=true}
+ else{
+  const before=d.news.length;
+  d.news=d.news.filter(n=>{
+   const t=String(n||"").trim();
+   return !/^MISSION COMPLETE/i.test(t)
+    && !/^👀 GAME 3 UNLOCKED/i.test(t)
+    && !/^🌙 PRIVATE INVITE EARNED/i.test(t)
+    && !/^🏆 FINALS BOOST/i.test(t)
+    && !/^⭐ .* CAPTAIN • Starting 5 control unlocked/i.test(t);
+  });
+  if(d.news.length!==before)changed=true
+ }
  if(!Array.isArray(d.accolades)){d.accolades=[];changed=true}
  if(!Array.isArray(d.leagueNews)){d.leagueNews=[];changed=true}
  if(!validPlainObject(d.record)){d.record={w:0,l:0};changed=true}
@@ -3192,7 +3204,16 @@ function safeNum(v,fallback=0){v=Number(v);return Number.isFinite(v)?v:fallback}
 function safeFixed(v,d=1){return safeNum(v,0).toFixed(d)}
 function home(){
  const p=S.player||fresh().player,po=!!(S.playoffs&&S.playoffs.active),off=S.stage==="Offseason",retired=S.stage==="Retired";
- const firstName=String(p.name||"Player").split(" ")[0],news=Array.isArray(S.news)&&S.news.length?String(S.news[0]):"Your career is ready.";
+ const firstName=String(p.name||"Player").split(" ")[0];
+ const hubNewsList=Array.isArray(S.news)?S.news.filter(n=>{
+  const t=String(n||"").trim();
+  return !/^MISSION COMPLETE/i.test(t)
+   && !/^👀 GAME 3 UNLOCKED/i.test(t)
+   && !/^🌙 PRIVATE INVITE EARNED/i.test(t)
+   && !/^🏆 FINALS BOOST/i.test(t)
+   && !/^⭐ .* CAPTAIN • Starting 5 control unlocked/i.test(t);
+ }):[];
+ const news=hubNewsList.length?String(hubNewsList[0]):"Your career is ready.";
  const stageLabel=String(S.stage||"High School").toUpperCase();
  const record=S.record&&typeof S.record==="object"?S.record:{w:0,l:0};
  const stats=p.stats&&typeof p.stats==="object"?p.stats:{ppg:0,apg:0,rpg:0};
@@ -3203,7 +3224,7 @@ function home(){
  const profile=safeSection(()=>'<section class="card"><h3>Profile</h3><div class="appearanceCard"><div>'+avatarMarkup("md",p)+'</div><div><div class="big">#'+safeNum(p.number,0)+'</div><p class="muted">'+String(p.position||"PG")+' • '+String(p.height||"6\'3\"")+' • '+String(p.archetype||"Two-Way Creator")+'</p><span class="pill">'+safeNum(p.level,1)+' LVL</span></div></div></section>',"Profile");
  const offcourt='<section class="card"><h3>Off-Court</h3><div class="big">$'+Math.round(safeNum(S.finance?.cash,1000)).toLocaleString()+'</div><p class="muted">'+Math.round(safeNum(S.social?.followers,100)).toLocaleString()+' followers • Fame '+Math.round(safeNum(S.social?.fame,0))+'</p><button class="btn" data-go="life">Open Life Hub</button></section>';
  const saveCard='<section class="card"><h3>Save Status</h3><div class="big" style="font-size:20px">Slot '+activeSlot+' • Autosave ON</div><p class="muted">Last saved: '+safeSection(()=>lastSavedText(),"Save Status")+'</p><button class="btn good" id="saveProgressCardBtn">Save Now</button></section>';
- const latest='<section class="card s12"><h3>Latest Story</h3><div class="list">'+(Array.isArray(S.news)?S.news.slice(0,4):[]).map(n=>'<div class="item"><div><small>'+String(n)+'</small></div></div>').join("")+'</div></section>';
+ const latest='<section class="card s12"><h3>Latest Story</h3><div class="list">'+hubNewsList.slice(0,4).map(n=>'<div class="item"><div><small>'+String(n)+'</small></div></div>').join("")+'</div></section>';
  return hero+'<div class="grid">'+safeSection(()=>hubContextHTML(),"Next Up")+safeSection(()=>quickAccessHTML(),"Quick Access")+(po?safeSection(()=>playoffBanner(),"Playoff Banner"):"")+season+draft+pulse+profile+offcourt+saveCard+safeSection(()=>roadToNBAHTML(true),"Road to NBA")+safeSection(()=>careerStoryHTML(true),"Career Story")+safeSection(()=>saveSafetyHTML(),"Save Safety")+latest+'</div>'
 }
 function row(a,b){return '<div class="row"><span>'+a+'</span><strong>'+b+'</strong></div>'}
