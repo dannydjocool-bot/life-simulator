@@ -349,7 +349,7 @@ body.menuReducedMotion *{scroll-behavior:auto!important;transition:none!importan
  .floatingPhone small{font-size:9px;color:#eef5ff;letter-spacing:.2px}
  .floatingPhone i{position:absolute;right:8px;top:8px;width:12px;height:12px;border-radius:50%;background:#ff6b14;border:2px solid #132238;display:none;box-shadow:0 0 0 2px rgba(255,107,20,.12)}
  .missionLauncher{position:fixed;z-index:74;right:18px;top:92px;width:70px;min-height:70px;border-radius:20px;border:1px solid #7f6948;background:linear-gradient(145deg,#3b3021,#17130e);color:#fff;display:grid;place-items:center;align-content:center;gap:3px;box-shadow:0 16px 38px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.12);font-weight:900}
- .missionLauncher.hidden{display:none!important}.modalSuppressed{display:none!important}.missionLauncher .missionScroll{font-size:31px;line-height:1}.missionLauncher small{font-size:9px;color:#f5dfb5;letter-spacing:.35px}.missionLauncher i{position:absolute;right:7px;top:7px;width:12px;height:12px;border-radius:50%;background:#ffb13b;border:2px solid #21180d;box-shadow:0 0 0 3px rgba(255,177,59,.12)}
+ .missionLauncher.hidden{display:none!important}.modalSuppressed{display:none!important}.missionLauncher .missionScroll{font-size:31px;line-height:1}.missionLauncher small{font-size:9px;color:#f5dfb5;letter-spacing:.35px}.missionLauncher i{position:absolute;right:7px;top:7px;width:12px;height:12px;border-radius:50%;background:#ffb13b;border:2px solid #21180d;box-shadow:0 0 0 3px rgba(255,177,59,.12)}.missionLauncher.completed{border-color:#4b9d70;background:linear-gradient(145deg,#183b29,#0d2118)}.missionLauncher.completed small{color:#bff2d1}.missionLauncher.completed i{background:#40d47a;border-color:#102c1c}
  .personalUnread{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#e94f5f;color:#fff;font-size:10px;font-weight:950;margin-left:6px}
 .scholarshipHub{background:radial-gradient(circle at 90% 0,rgba(75,135,255,.16),transparent 35%),linear-gradient(145deg,#0d1725,#111a28)!important;border-color:#304967!important}
 .scholarStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:15px 0}.scholarStats>div{background:linear-gradient(145deg,#101c2b,#0a121d);border:1px solid #263c58;border-radius:16px;padding:13px}.scholarStats small{display:block;color:#8fa4be;font-size:10px;font-weight:850;letter-spacing:.08em}.scholarStats b{display:block;font-size:21px;margin-top:5px}
@@ -2596,6 +2596,8 @@ function ensureHighSchoolOnboarding(){
  ["coachMessaged","welcomeMeetingComplete","captainGranted","rewardClaimed"].forEach(k=>{if(typeof S.collegeOnboarding[k]!=="boolean")S.collegeOnboarding[k]=false});
  if(!validPlainObject(S.collegeLineup))S.collegeLineup={roster:[],startingFive:[]};
  if(!Array.isArray(S.collegeLineup.roster))S.collegeLineup.roster=[];if(!Array.isArray(S.collegeLineup.startingFive))S.collegeLineup.startingFive=[];
+ if(!validPlainObject(S.missionUI))S.missionUI={completed:null};
+ if(S.missionUI.completed!==null&&!validPlainObject(S.missionUI.completed))S.missionUI.completed=null;
  return S.onboarding
 }
 function highSchoolTeamName(){return S.highSchool?.name||"Northside High"}
@@ -2738,22 +2740,39 @@ function showHighSchoolWelcome(){
  modal('<span class="kicker">WELCOME TO HIGH SCHOOL</span><h2>Welcome to '+highSchoolTeamFull()+'</h2><p class="muted">'+S.player.name+', this is where your basketball legacy starts. Your coach has already sent you a personal message and wants to see you in his office.</p><div class="item"><div><b>New Mission</b><small>Talk to Coach • Open the scroll icon in the top-right to track it.</small></div><span class="pill good">ACTIVE</span></div><div class="modalFoot"><button class="btn primary" id="hsWelcomeClose">Start My Journey</button></div>');
  $("hsWelcomeClose").onclick=()=>{closeModal();render()}
 }
+function markMissionCompleted(title,detail){
+ ensureHighSchoolOnboarding();
+ S.missionUI.completed={title:String(title||"Mission Complete"),detail:String(detail||""),viewed:false,dismissAt:0,at:Date.now()};
+}
+function missionCompletionNotice(){
+ ensureHighSchoolOnboarding();const n=S.missionUI.completed;if(!n)return null;
+ if(n.dismissAt&&Date.now()>=n.dismissAt){S.missionUI.completed=null;return null}
+ return n
+}
 function missionHTML(){
  ensureHighSchoolOnboarding();
- const finals=highSchoolFinalsPending()&&!S.highSchoolFinals.meetingComplete,invite=highSchoolLateNightInvitePending(),scout=highSchoolGame3CoachLock(),graduate=highSchoolGraduationMissionPending(),collegeWelcome=collegeWelcomeMissionPending();
- const title=collegeWelcome?(S.college+" Coach Welcome"):graduate?"College Decision Meeting":finals?"Championship Meeting":invite?"Private Invitation":scout?"Game 3 Scout Meeting":"Talk to Coach";
- const detail=collegeWelcome?"Your new college coach received your recommendation letter and wants to meet before your first game.":graduate?"Your high-school season is over. Coach wants to discuss your college decision and recommendation letter.":finals?"The High School Championship Final is today. Coach wants you in the office before warmups.":invite?"Your Game 3 performance earned a private opportunity. Coach wants you back in the office.":scout?"Game 3 is locked until you meet with Coach. Six top NBA scouts are coming to evaluate you.":"Your coach texted you to come to his office after you get settled in.";
- return '<h2>Mission</h2><div class="item"><div><b>'+title+'</b><small>'+highSchoolTeamName()+' • '+detail+'</small></div><span class="pill good">ACTIVE</span></div><div class="modalFoot"><button class="btn primary" id="missionTalkCoach">Go to Coach Office</button><button class="btn" id="missionClose">Close</button></div>'
+ const active=requiredCoachGameMission(),done=missionCompletionNotice();
+ if(active)return '<h2>Mission</h2><div class="item"><div><b>'+active.title+'</b><small>'+active.detail+'</small></div><span class="pill good">ACTIVE</span></div><div class="modalFoot"><button class="btn primary" id="missionTalkCoach">Go to Coach Office</button><button class="btn" id="missionClose">Close</button></div>';
+ if(done)return '<h2>Mission Complete ✅</h2><div class="item" style="border-color:#2ca86f"><div><b>'+done.title+'</b>'+(done.detail?'<small>'+done.detail+'</small>':'')+'</div><span class="pill good">✓ COMPLETE</span></div><p class="muted">This scroll will disappear 10 seconds after you close it.</p><div class="modalFoot"><button class="btn primary" id="missionClose">Close</button></div>';
+ return '<h2>Missions</h2><p class="muted">No active missions right now.</p><div class="modalFoot"><button class="btn" id="missionClose">Close</button></div>'
+}
+function closeViewedMission(){
+ const active=requiredCoachGameMission(),done=missionCompletionNotice();
+ if(!active&&done){done.viewed=true;done.dismissAt=Date.now()+10000;save();closeModal();syncMissionLauncher();setTimeout(()=>{syncMissionLauncher()},10100);return}
+ closeModal()
 }
 function openMission(){
  modal(missionHTML());
  if($("missionTalkCoach"))$("missionTalkCoach").onclick=()=>{closeModal();talkToCoach()};
- $("missionClose").onclick=closeModal
+ if($("missionClose"))$("missionClose").onclick=closeViewedMission
 }
 function syncMissionLauncher(){
  const b=$("missionLauncherBtn");if(!b)return;ensureHighSchoolOnboarding();
- const show=frontMode==="career"&&S.created&&((S.stage==="High School"&&((S.onboarding.missionActive&&!S.onboarding.missionComplete)||(highSchoolFinalsPending()&&!S.highSchoolFinals.meetingComplete)||highSchoolGame3CoachLock()||highSchoolLateNightInvitePending()||highSchoolGraduationMissionPending()))||(S.stage==="College"&&collegeWelcomeMissionPending()));
- b.classList.toggle("hidden",!show);b.onclick=openMission
+ const active=requiredCoachGameMission(),done=missionCompletionNotice(),show=frontMode==="career"&&S.created&&!!(active||done);
+ b.classList.toggle("hidden",!show);b.classList.toggle("completed",!!done&&!active);
+ const icon=b.querySelector(".missionScroll"),label=b.querySelector("small");
+ if(icon)icon.textContent=done&&!active?"✅":"📜";if(label)label.textContent=done&&!active?"COMPLETE":"MISSION";
+ b.setAttribute("aria-label",done&&!active?"View completed mission":"Open Mission");b.onclick=openMission
 }
 function openPersonalMessages(){
  ensureHighSchoolOnboarding();S.personalMessages.unread=0;save();
@@ -5274,7 +5293,7 @@ function talkToCoach(){
      if(!h.rewardClaimed){const a=ensureAttributeUpgradeState();a.earned+=10;a.available+=10;h.rewardClaimed=true}
      h.meetingComplete=true;h.draftStockBefore=S.player.draft;S.onboarding.missionActive=false;S.onboarding.missionComplete=true;
      addPersonalMessage("Coach","Championship time. Scouts are everywhere. Play your game and leave everything on the floor.",true);
-     S.news.unshift("🏆 FINALS BOOST • +10 Attribute Points • 3× Draft Stock multiplier active.");
+     markMissionCompleted("Championship Coach Meeting","+10 Attribute Points awarded • 3× Draft Stock boost activated.");
      save();closeModal(true);openFinalsUpgradeModal()
    };
    return
@@ -5288,7 +5307,7 @@ function talkToCoach(){
      m.inviteMissionActive=false;m.inviteMeetingComplete=true;m.lateNightInvite={title:"Private NBA Late-Night Run",host:"NBA Player",guests:"NBA legends in attendance",earnedAfter:"Game 3 scout showcase",status:"INVITED"};
      S.onboarding.missionActive=false;S.onboarding.missionComplete=true;S.coach.talks=(S.coach.talks||0)+1;
      addPersonalMessage("Coach","Invitation secured. Keep playing at this level and more opportunities will open for you.",true);
-     S.news.unshift("🌙 PRIVATE INVITE EARNED • NBA late-night hoops with legends in attendance • +10 Attribute Points.");
+     markMissionCompleted("Private NBA Invitation","Late-night hoops invitation secured • +10 Attribute Points.");
      if(typeof addCareerTimeline==="function")addCareerTimeline("Private NBA Invitation","Earned a private NBA late-night hoops invitation after the Game 3 scout showcase.","INVITED");
      save();closeModal();render();setTimeout(()=>toast("+10 Attribute Points • Private Invite Earned"),80)
    };
@@ -5301,7 +5320,7 @@ function talkToCoach(){
    if($("acceptScoutMission"))$("acceptScoutMission").onclick=()=>{
      m.pregameMeetingComplete=true;S.onboarding.missionActive=false;S.onboarding.missionComplete=true;S.coach.talks=(S.coach.talks||0)+1;
      addPersonalMessage("Coach","Game 3 is unlocked. Six NBA scouts are watching — stay composed and make them remember your name.",true);
-     S.news.unshift("👀 GAME 3 UNLOCKED • 6 top NBA scouts are evaluating your performance.");
+     markMissionCompleted("Game 3 Scout Meeting","Game 3 unlocked • 6 NBA scouts are watching.");
      save();closeModal();render();setTimeout(()=>toast("Game 3 unlocked • 6 NBA scouts watching"),80)
    };
    return
@@ -5310,13 +5329,13 @@ function talkToCoach(){
    const h=S.highSchoolFinals;
    modal(coachOfficeSceneHTML().replace(coachOfficeName()+': “What do you need?”',coachOfficeName()+': “It is time to choose what comes next.”').replace('<div class="coachChoices">','<p class="muted" style="margin-top:12px">Your high-school chapter is finished. Now you need to choose the college where you want to build the next part of your career.</p><p class="muted">Once you decide, I am sending a <b>Letter of Recommendation</b> to your new coach. I am recommending you as a leader — someone who can set the tone, hold teammates accountable, and help run a program.</p><div class="coachChoices">').replace('<button class="btn primary" id="askRole">Ask About My Role</button>','<button class="btn primary" id="viewScholarshipsFromCoach">🎓 View Scholarship Options</button>'));
    if($("askDevelopment"))$("askDevelopment").style.display="none";if($("askMinutes"))$("askMinutes").style.display="none";if($("coachClose"))$("coachClose").style.display="none";
-   if($("viewScholarshipsFromCoach"))$("viewScholarshipsFromCoach").onclick=()=>{h.graduationMeetingComplete=true;h.recommendationSent=true;h.awaitingCollegeChoice=true;S.onboarding.missionActive=false;S.onboarding.missionComplete=true;S.news.unshift("✉️ LETTER OF RECOMMENDATION • Coach endorsed "+S.player.name+" as a future college leader.");if(typeof addCareerTimeline==="function")addCareerTimeline("Letter of Recommendation","High-school coach recommended you as a leader to your future college program.","LEADERSHIP");save();closeModal(true);collegeModal()};
+   if($("viewScholarshipsFromCoach"))$("viewScholarshipsFromCoach").onclick=()=>{h.graduationMeetingComplete=true;h.recommendationSent=true;h.awaitingCollegeChoice=true;S.onboarding.missionActive=false;S.onboarding.missionComplete=true;markMissionCompleted("College Decision Meeting","Letter of Recommendation prepared • Scholarship selection unlocked.");if(typeof addCareerTimeline==="function")addCareerTimeline("Letter of Recommendation","High-school coach recommended you as a leader to your future college program.","LEADERSHIP");save();closeModal(true);collegeModal()};
    return
  }
  if(S.stage==="College"&&collegeWelcomeMissionPending()){
    modal(coachOfficeSceneHTML().replace(coachOfficeName()+': “What do you need?”',coachOfficeName()+': “Welcome to '+S.college+'. We have been expecting you.”').replace('<div class="coachChoices">','<p class="muted" style="margin-top:12px">Your high-school coach sent me a letter of recommendation. He did not just talk about your talent — he talked about your leadership, your work ethic, and your ability to make the players around you better.</p><p class="muted">I believe you have what it takes to lead this team. You are being named a <b>Team Captain</b> immediately. That gives you a voice in our active starting five. I am also giving you <b>25 Attribute Points</b> to prepare for this level.</p><div class="coachChoices">').replace('<button class="btn primary" id="askRole">Ask About My Role</button>','<button class="btn primary" id="acceptCollegeCaptain">⭐ Accept Captain Role & 25 Points</button>'));
    if($("askDevelopment"))$("askDevelopment").style.display="none";if($("askMinutes"))$("askMinutes").style.display="none";if($("coachClose"))$("coachClose").style.display="none";
-   if($("acceptCollegeCaptain"))$("acceptCollegeCaptain").onclick=()=>{const co=S.collegeOnboarding;if(!co.rewardClaimed){const a=ensureAttributeUpgradeState();a.earned+=25;a.available+=25;co.rewardClaimed=true}co.captainGranted=true;co.welcomeMeetingComplete=true;S.player.collegeCaptain=true;S.player.role="Captain";S.player.minutes=Math.max(32,S.player.minutes||0);S.player.trust=Math.max(85,S.player.trust||0);S.onboarding.missionActive=false;S.onboarding.missionComplete=true;S.coach.talks=(S.coach.talks||0)+1;S.news.unshift("⭐ "+S.college+" CAPTAIN • Starting 5 control unlocked • +25 Attribute Points.");addPersonalMessage("College Coach","You are our captain now. Lead the room, help shape the starting five, and show us why that recommendation mattered.",true);if(typeof addCareerTimeline==="function")addCareerTimeline("College Team Captain","Named captain at "+S.college+" after arriving with a leadership recommendation.","CAPTAIN");save();closeModal();render();setTimeout(()=>toast("Captain Role • +25 Attribute Points • Starting 5 unlocked"),80)};
+   if($("acceptCollegeCaptain"))$("acceptCollegeCaptain").onclick=()=>{const co=S.collegeOnboarding;if(!co.rewardClaimed){const a=ensureAttributeUpgradeState();a.earned+=25;a.available+=25;co.rewardClaimed=true}co.captainGranted=true;co.welcomeMeetingComplete=true;S.player.collegeCaptain=true;S.player.role="Captain";S.player.minutes=Math.max(32,S.player.minutes||0);S.player.trust=Math.max(85,S.player.trust||0);S.onboarding.missionActive=false;S.onboarding.missionComplete=true;S.coach.talks=(S.coach.talks||0)+1;markMissionCompleted(S.college+" Coach Welcome","Team Captain role • Starting 5 control • +25 Attribute Points.");addPersonalMessage("College Coach","You are our captain now. Lead the room, help shape the starting five, and show us why that recommendation mattered.",true);if(typeof addCareerTimeline==="function")addCareerTimeline("College Team Captain","Named captain at "+S.college+" after arriving with a leadership recommendation.","CAPTAIN");save();closeModal();render();setTimeout(()=>toast("Captain Role • +25 Attribute Points • Starting 5 unlocked"),80)};
    return
  }
  if(S.stage==="High School"&&S.onboarding.missionActive&&!S.onboarding.coachIntroComplete){
@@ -5326,8 +5345,8 @@ function talkToCoach(){
      if(!S.onboarding.rewardClaimed){const a=ensureAttributeUpgradeState();a.earned+=5;a.available+=5;S.onboarding.rewardClaimed=true}
      S.onboarding.coachIntroComplete=true;S.onboarding.missionComplete=true;S.onboarding.missionActive=false;S.coach.talks=(S.coach.talks||0)+1;
      addPersonalMessage("Coach","Good meeting today. Use those 5 Attribute Points wisely. My office is always open if you want to talk development, minutes, or your role.",true);
-     S.news.unshift("MISSION COMPLETE • Talk to Coach — +5 Attribute Points awarded.");
-     save();closeModal();render();setTimeout(()=>{toast("+5 Attribute Points");talkToCoach()},80)
+     markMissionCompleted("Talk to Coach","+5 Attribute Points awarded • Game 1 unlocked.");
+     save();closeModal();render();setTimeout(()=>toast("+5 Attribute Points"),80)
    };
    if($("coachClose"))$("coachClose").onclick=closeModal;
    return
