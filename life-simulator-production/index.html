@@ -2560,7 +2560,7 @@ function ensureHighSchoolOnboarding(){
  if(sm.lateNightInvite!==null&&!validPlainObject(sm.lateNightInvite))sm.lateNightInvite=null;
  if(S.stage!=="High School"){sm.inviteMissionActive=false}
  if(!validPlainObject(S.highSchoolFinals))S.highSchoolFinals={triggered:false,coachMessaged:false,meetingComplete:false,rewardClaimed:false,gameReady:false,played:false,won:false,opponent:"Westbridge Academy",result:null,draftStockBefore:0,draftBoost:0,sponsorOffer:null,sponsorAccepted:false,awaitingCollegeChoice:false};
- const hf=S.highSchoolFinals,hfBool=["triggered","coachMessaged","meetingComplete","rewardClaimed","gameReady","played","won","sponsorAccepted","awaitingCollegeChoice","preFinalUpgrade"];
+ const hf=S.highSchoolFinals,hfBool=["triggered","coachMessaged","meetingComplete","rewardClaimed","gameReady","played","won","sponsorAccepted","awaitingCollegeChoice","preFinalUpgrade","graduationCoachMessaged","graduationMeetingComplete","recommendationSent"];
  hfBool.forEach(k=>{if(typeof hf[k]!=="boolean")hf[k]=false});
  if(typeof hf.opponent!=="string"||!hf.opponent.trim())hf.opponent="Westbridge Academy";
  ["draftStockBefore","draftBoost"].forEach(k=>{const v=Number(hf[k]);hf[k]=Number.isFinite(v)?v:0});
@@ -2570,6 +2570,10 @@ function ensureHighSchoolOnboarding(){
  if(hf.won&&!hf.played)hf.won=false;
  if(hf.sponsorAccepted&&!hf.sponsorOffer)hf.sponsorAccepted=false;
  if(S.stage!=="High School"){hf.gameReady=false;hf.preFinalUpgrade=false}
+ if(!validPlainObject(S.collegeOnboarding))S.collegeOnboarding={coachMessaged:false,welcomeMeetingComplete:false,captainGranted:false,rewardClaimed:false};
+ ["coachMessaged","welcomeMeetingComplete","captainGranted","rewardClaimed"].forEach(k=>{if(typeof S.collegeOnboarding[k]!=="boolean")S.collegeOnboarding[k]=false});
+ if(!validPlainObject(S.collegeLineup))S.collegeLineup={roster:[],startingFive:[]};
+ if(!Array.isArray(S.collegeLineup.roster))S.collegeLineup.roster=[];if(!Array.isArray(S.collegeLineup.startingFive))S.collegeLineup.startingFive=[];
  return S.onboarding
 }
 function highSchoolTeamName(){return S.highSchool?.name||"Northside High"}
@@ -2634,10 +2638,14 @@ function triggerHighSchoolFinals(){
 }
 function highSchoolFinalsPending(){return S.stage==="High School"&&S.highSchoolFinals?.triggered&&!S.highSchoolFinals?.played}
 function highSchoolFinalDraftGain(g){const base=Math.max(2,Math.min(10,Math.round(((g.pts||0)/8)+((g.ast||0)/4)+((g.reb||0)/5)+((g.stl||0)+(g.blk||0))*.8+(g.win?2:0))));return Math.min(30,base*3)}
+function highSchoolGraduationMissionPending(){ensureHighSchoolOnboarding();const h=S.highSchoolFinals;return S.stage==="High School"&&!!h.played&&!h.graduationMeetingComplete}
+function collegeWelcomeMissionPending(){ensureHighSchoolOnboarding();return S.stage==="College"&&!!S.college&&!S.collegeOnboarding.welcomeMeetingComplete}
+function triggerHighSchoolGraduationMission(){ensureHighSchoolOnboarding();const h=S.highSchoolFinals;if(S.stage!=="High School"||!h.played||h.graduationMeetingComplete)return false;h.awaitingCollegeChoice=false;if(!h.graduationCoachMessaged){addPersonalMessage("Coach","Season is over. Come to my office — it is time to decide where you are going next, and I want to send a recommendation with you.",true);h.graduationCoachMessaged=true}S.onboarding.missionActive=true;S.onboarding.missionComplete=false;S.news.unshift("🎓 NEW MISSION • Meet Coach before choosing your college.");save();return true}
+function triggerCollegeWelcomeMission(){ensureHighSchoolOnboarding();if(S.stage!=="College"||!S.college||S.collegeOnboarding.welcomeMeetingComplete)return false;if(!S.collegeOnboarding.coachMessaged){addPersonalMessage("College Coach","Welcome to "+S.college+", "+S.player.name+". I received a strong recommendation from your high-school coach. Come to my office before your first game.",true);S.collegeOnboarding.coachMessaged=true}S.onboarding.missionActive=true;S.onboarding.missionComplete=false;S.news.unshift("🏀 NEW MISSION • Meet your "+S.college+" coach before your first college game.");save();return true}
 
 function processHighSchoolFinalResult(g){
  ensureHighSchoolOnboarding();const h=S.highSchoolFinals;if(!g||!g.highSchoolFinals||h.played)return;
- h.played=true;h.gameReady=false;h.won=!!g.win;h.result={...g};h.awaitingCollegeChoice=true;
+ h.played=true;h.gameReady=false;h.won=!!g.win;h.result={...g};h.awaitingCollegeChoice=false;
  if(g.win){
    if(!S.accolades.includes("High School Champion"))S.accolades.push("High School Champion");
    h.sponsorOffer={id:"legacy-elite-hs",name:"Legacy Elite Athletics",tier:"Championship Partnership",category:"Apparel",bonus:25000,perGame:2500};
@@ -2647,6 +2655,7 @@ function processHighSchoolFinalResult(g){
    S.news.unshift("High School Final complete. Your season ends as runner-up, but your 8 scholarships remain available.");
    addCareerTimeline("High School Championship","Finished runner-up vs "+g.opp,"FINALS");
  }
+ triggerHighSchoolGraduationMission()
 }
 function acceptHighSchoolSponsor(){
  const h=S.highSchoolFinals,deal=h?.sponsorOffer;if(!deal||h.sponsorAccepted)return;
