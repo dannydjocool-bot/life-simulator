@@ -2545,6 +2545,8 @@ function ensureHighSchoolOnboarding(){
  if(!validPlainObject(S.onboarding))S.onboarding={schoolChosen:false,welcomeShown:false,missionActive:false,missionComplete:false,coachIntroComplete:false,rewardClaimed:false};
  const obDefaults={schoolChosen:false,welcomeShown:false,missionActive:false,missionComplete:false,coachIntroComplete:false,rewardClaimed:false};
  Object.keys(obDefaults).forEach(k=>{if(typeof S.onboarding[k]!=="boolean")S.onboarding[k]=obDefaults[k]});
+ if(validPlainObject(S.highSchool)&&typeof S.highSchool.name==="string"&&S.highSchool.name.trim()){S.onboarding.schoolChosen=true;if(S.stage!=="High School")S.onboarding.welcomeShown=true}
+ if(S.stage!=="High School"){S.onboarding.missionActive=false}
  if(!validPlainObject(S.personalMessages))S.personalMessages={unread:0,threads:{}};
  if(!validPlainObject(S.personalMessages.threads))S.personalMessages.threads={};
  if(typeof S.personalMessages.unread!=="number"||!Number.isFinite(S.personalMessages.unread))S.personalMessages.unread=0;
@@ -2558,6 +2560,10 @@ function ensureHighSchoolOnboarding(){
  ["draftStockBefore","draftBoost"].forEach(k=>{const v=Number(hf[k]);hf[k]=Number.isFinite(v)?v:0});
  if(hf.result!==null&&!validPlainObject(hf.result))hf.result=null;
  if(hf.sponsorOffer!==null&&!validPlainObject(hf.sponsorOffer))hf.sponsorOffer=null;
+ if(hf.played){hf.gameReady=false;hf.preFinalUpgrade=false;hf.meetingComplete=true}
+ if(hf.won&&!hf.played)hf.won=false;
+ if(hf.sponsorAccepted&&!hf.sponsorOffer)hf.sponsorAccepted=false;
+ if(S.stage!=="High School"){hf.gameReady=false;hf.preFinalUpgrade=false}
  return S.onboarding
 }
 function highSchoolTeamName(){return S.highSchool?.name||"Northside High"}
@@ -2585,7 +2591,7 @@ function addScholarshipOffer(){
  S.offers.push(school);S.highSchoolRecruiting.lastOfferGame=highSchoolGamesPlayed();S.news.unshift("🎓 SCHOLARSHIP OFFER • "+school+" has offered "+S.player.name+".");addPersonalMessage("Recruiting","Scholarship offer received from "+school+". They have been tracking your high-school season.",true);return school
 }
 function processHighSchoolRecruiting(g){
- ensureHighSchoolOnboarding();if(S.stage!=="High School"||g.highSchoolFinals||S.highSchoolFinals.played)return [];
+ ensureHighSchoolOnboarding();if(!g||S.stage!=="High School"||g.highSchoolFinals||S.highSchoolFinals.played)return [];
  const gp=S.player.stats?.gp||highSchoolGamesPlayed(),cap=highSchoolOfferCap(gp),r=S.highSchoolRecruiting,perf=highSchoolPerformanceScore(g);r.totalEvaluations++;r.points+=20+Math.max(4,perf*.45);const added=[];let threshold=32+S.offers.length*5;
  while(S.offers.length<Math.min(8,cap)&&r.points>=threshold){r.points-=threshold;const offer=addScholarshipOffer();if(!offer)break;added.push(offer);threshold=32+S.offers.length*5}
  if(gp>=12&&S.offers.length<Math.min(8,cap)&&gp-(r.lastOfferGame||0)>=2){const offer=addScholarshipOffer();if(offer)added.push(offer)}
@@ -2599,7 +2605,7 @@ function highSchoolFinalsPending(){return S.stage==="High School"&&S.highSchoolF
 function highSchoolFinalDraftGain(g){const base=Math.max(2,Math.min(10,Math.round(((g.pts||0)/8)+((g.ast||0)/4)+((g.reb||0)/5)+((g.stl||0)+(g.blk||0))*.8+(g.win?2:0))));return Math.min(30,base*3)}
 
 function processHighSchoolFinalResult(g){
- const h=S.highSchoolFinals;if(!g.highSchoolFinals||h.played)return;
+ ensureHighSchoolOnboarding();const h=S.highSchoolFinals;if(!g||!g.highSchoolFinals||h.played)return;
  h.played=true;h.gameReady=false;h.won=!!g.win;h.result={...g};h.awaitingCollegeChoice=true;
  if(g.win){
    if(!S.accolades.includes("High School Champion"))S.accolades.push("High School Champion");
