@@ -1913,7 +1913,37 @@ function sanitizeSubsystemShapes(d){
  if(!validPlainObject(d.immersion)){d.immersion={};changed=true}
  if(!validPlainObject(d.civic)){d.civic=fresh().civic;changed=true}
  if(!validPlainObject(d.homeSpace)){d.homeSpace=fresh().homeSpace;changed=true}
+
  array(d,"games");array(d,"offers");array(d,"news");array(d,"accolades");
+ if(!validPlainObject(d.training)){d.training=fresh().training;changed=true}
+ ["used","max","recoveryUsed","recoveryMax"].forEach(k=>num(d.training,k,k==="max"?3:k==="recoveryMax"?1:0));if(typeof d.training.recovered!=="boolean"){d.training.recovered=false;changed=true}
+ if(!validPlainObject(d.saveMeta)){d.saveMeta=fresh().saveMeta;changed=true}
+ num(d.saveMeta,"manualSaves",0);
+ if(!validPlainObject(d.draftProcess)){d.draftProcess=fresh().draftProcess;changed=true}
+ if(!validPlainObject(d.draftProcess.events)){d.draftProcess.events=fresh().draftProcess.events;changed=true}
+ ["shooting","agility","scrimmage"].forEach(k=>{if(typeof d.draftProcess.events[k]!=="boolean"){d.draftProcess.events[k]=false;changed=true}});
+ num(d.draftProcess,"boost",0);
+ if(!validPlainObject(d.careerHistory)){d.careerHistory=fresh().careerHistory;changed=true}
+ array(d.careerHistory,"collegeSeasons");array(d.careerHistory,"nbaSeasons");
+ if(d.careerHistory.highSchool!==null&&!validPlainObject(d.careerHistory.highSchool)){d.careerHistory.highSchool=null;changed=true}
+ if(!validPlainObject(d.careerStats)){d.careerStats=fresh().careerStats;changed=true}
+ ["highSchool","college","nba"].forEach(stage=>{if(!validPlainObject(d.careerStats[stage])){d.careerStats[stage]={gp:0,pts:0,ast:0,reb:0};changed=true}["gp","pts","ast","reb"].forEach(k=>num(d.careerStats[stage],k,0))});
+ if(!validPlainObject(d.regularSeasonStats)){d.regularSeasonStats=fresh().regularSeasonStats;changed=true}
+ ["year","gp","pts","ast","reb","stl","blk","tov","fgm","fga","tpm","tpa","ftm","fta"].forEach(k=>num(d.regularSeasonStats,k,k==="year"?1:0));
+ if(!validPlainObject(d.regularSeasonCareer)){d.regularSeasonCareer=fresh().regularSeasonCareer;changed=true}
+ ["gp","pts","ast","reb","stl","blk"].forEach(k=>num(d.regularSeasonCareer,k,0));
+ if(!validPlainObject(d.player.attributeUpgrades)){d.player.attributeUpgrades=fresh().player.attributeUpgrades;changed=true}
+ if(!validPlainObject(d.player.attributeUpgrades.spent)){d.player.attributeUpgrades.spent={};changed=true}
+ ["earned","available"].forEach(k=>num(d.player.attributeUpgrades,k,0));
+ if(!Array.isArray(d.finance.sponsors)){d.finance.sponsors=[];changed=true}
+ if(!Array.isArray(d.finance.realEstate)){d.finance.realEstate=[];changed=true}
+ ["cash","bank","earnings"].forEach(k=>num(d.finance,k,k==="cash"?1000:0));
+ if(!validPlainObject(d.nbaWorld.phone)){d.nbaWorld.phone=fresh().nbaWorld.phone;changed=true}
+ if(!validPlainObject(d.nbaWorld.phone.threads)){d.nbaWorld.phone.threads={};changed=true}
+ if(!validPlainObject(d.nbaWorld.phone.leagueThreads)){d.nbaWorld.phone.leagueThreads={};changed=true}
+ if(!validPlainObject(d.nbaWorld.phone.teammateThreads)){d.nbaWorld.phone.teammateThreads={};changed=true}
+ if(!Array.isArray(d.nbaWorld.phone.collegeInvites)){d.nbaWorld.phone.collegeInvites=[];changed=true}
+
  if(!validPlainObject(d.onboarding)){d.onboarding={schoolChosen:false,welcomeShown:false,missionActive:false,missionComplete:false,coachIntroComplete:false,rewardClaimed:false};changed=true}
  if(!validPlainObject(d.personalMessages)){d.personalMessages={unread:0,threads:{}};changed=true}
  if(!validPlainObject(d.personalMessages.threads)){d.personalMessages.threads={};changed=true}
