@@ -36,55 +36,59 @@ button{cursor:pointer}.hidden{display:none!important}.app{min-height:100vh;displ
 .avatar.avatar-stage-college .brows{top:40.8%;width:23%;}.avatar.avatar-stage-college .brows:before{transform:rotate(-6deg)}.avatar.avatar-stage-college .brows:after{transform:rotate(6deg)}
 .avatar.avatar-stage-college .eyes{top:46.3%;width:22.8%;height:6.1%}
 .avatar.avatar-stage-college .nose{top:53.8%;height:5.8%}.avatar.avatar-stage-college .mouth{top:61.5%;width:9%}
-.avatar.avatar-stage-college .hair.fade,.avatar.avatar-stage-college .hair.waves{top:20.2%;width:46.5%}.avatar.avatar-stage-college .hair.curls{top:11.8%;width:53%;height:22%}.avatar.avatar-stage-college .hair.afro{top:6.2%;width:60%;height:32%}
 .avatar.avatar-stage-nba .head{width:45%;height:56.5%;top:47.1%;border-radius:45% 45% 40% 40%/38% 38% 62% 62%}.avatar.avatar-stage-nba .shirt{width:82%;height:30%;background:linear-gradient(145deg,#202d42,#151f31 58%,#0c1420)}
 .avatar .hair i{display:none;position:absolute;background:var(--hair);pointer-events:none}
 
 /* scalp-hugging short styles */
 .avatar .hair.fade{
- top:21.2%;width:48%;height:10.3%;
- border-radius:55% 55% 22% 22%/88% 88% 18% 18%;
- background:linear-gradient(180deg,color-mix(in srgb,var(--hair) 88%,#fff),var(--hair) 44%,color-mix(in srgb,var(--hair) 90%,#000));
- clip-path:ellipse(50% 58% at 50% 58%)
-}
-.avatar .hair.buzz{
- top:22.4%;width:46.5%;height:7.1%;
- border-radius:58% 58% 30% 30%/85% 85% 25% 25%;
+ top:19.6%;width:46.2%;height:12.2%;
+ border-radius:56% 56% 18% 18%/82% 82% 20% 20%;
  background:
- repeating-linear-gradient(95deg,color-mix(in srgb,var(--hair) 94%,#000) 0 1.5px,var(--hair) 1.5px 3px),
- linear-gradient(180deg,color-mix(in srgb,var(--hair) 86%,#fff),var(--hair));
- clip-path:ellipse(50% 62% at 50% 58%);
- box-shadow:inset 0 -1px 0 rgba(255,255,255,.03)
+ linear-gradient(180deg,color-mix(in srgb,var(--hair) 78%,#fff) 0 10%,var(--hair) 35% 74%,color-mix(in srgb,var(--hair) 88%,#000) 75% 100%);
+ clip-path:polygon(9% 34%,18% 16%,36% 5%,50% 2%,64% 5%,82% 16%,91% 34%,87% 76%,73% 87%,50% 92%,27% 87%,13% 76%);
+ box-shadow:inset 0 -2px 0 rgba(255,255,255,.025)
 }
 .avatar .hair.waves{
- top:20.9%;width:48.5%;height:10.5%;
- border-radius:56% 56% 22% 22%/88% 88% 20% 20%;
- background:repeating-radial-gradient(ellipse at 50% 118%,var(--hair) 0 2.5px,color-mix(in srgb,var(--hair) 76%,#fff) 2.5px 3.5px,var(--hair) 3.5px 6px);
- clip-path:ellipse(50% 62% at 50% 58%)
-}
-
-/* textured volume styles */
-.avatar .hair.curls{
- top:12.5%;width:55%;height:22.5%;border-radius:50% 50% 35% 35%;
+ top:20%;width:46.4%;height:11.6%;
+ border-radius:56% 56% 20% 20%/84% 84% 18% 18%;
  background:
- radial-gradient(circle at 12% 70%,var(--hair) 0 9%,transparent 10%),
- radial-gradient(circle at 27% 34%,var(--hair) 0 12%,transparent 13%),
- radial-gradient(circle at 42% 22%,var(--hair) 0 13%,transparent 14%),
- radial-gradient(circle at 58% 22%,var(--hair) 0 13%,transparent 14%),
- radial-gradient(circle at 73% 34%,var(--hair) 0 12%,transparent 13%),
- radial-gradient(circle at 88% 70%,var(--hair) 0 9%,transparent 10%),
- radial-gradient(ellipse at 50% 64%,var(--hair) 0 43%,transparent 44%)
+ repeating-radial-gradient(ellipse at 50% 110%,color-mix(in srgb,var(--hair) 72%,#fff) 0 1.4px,var(--hair) 1.5px 4px,color-mix(in srgb,var(--hair) 90%,#000) 4px 5.4px),
+ linear-gradient(var(--hair),var(--hair));
+ clip-path:polygon(8% 34%,17% 17%,35% 6%,50% 3%,65% 6%,83% 17%,92% 34%,88% 76%,72% 89%,50% 93%,28% 89%,12% 76%)
+}
+.avatar .hair.curls{
+ top:12.8%;width:50.5%;height:21%;
+ background:
+ radial-gradient(circle at 10% 70%,var(--hair) 0 10%,transparent 11%),
+ radial-gradient(circle at 22% 44%,var(--hair) 0 13%,transparent 14%),
+ radial-gradient(circle at 34% 25%,var(--hair) 0 14%,transparent 15%),
+ radial-gradient(circle at 49% 19%,var(--hair) 0 15%,transparent 16%),
+ radial-gradient(circle at 64% 25%,var(--hair) 0 14%,transparent 15%),
+ radial-gradient(circle at 77% 44%,var(--hair) 0 13%,transparent 14%),
+ radial-gradient(circle at 90% 70%,var(--hair) 0 10%,transparent 11%),
+ radial-gradient(ellipse at 50% 69%,var(--hair) 0 45%,transparent 46%);
+ border-radius:50% 50% 32% 32%;
+ filter:drop-shadow(0 1px 0 rgba(0,0,0,.1))
 }
 .avatar .hair.afro{
- top:7%;width:63%;height:33%;border-radius:50%;
+ top:6.4%;width:58%;height:31%;
+ border-radius:50%;
  background:
- radial-gradient(circle at 18% 44%,var(--hair) 0 22%,transparent 23%),
- radial-gradient(circle at 35% 22%,var(--hair) 0 27%,transparent 28%),
- radial-gradient(circle at 50% 16%,var(--hair) 0 28%,transparent 29%),
- radial-gradient(circle at 65% 22%,var(--hair) 0 27%,transparent 28%),
- radial-gradient(circle at 82% 44%,var(--hair) 0 22%,transparent 23%),
- radial-gradient(ellipse at 50% 64%,var(--hair) 0 46%,transparent 47%)
+ radial-gradient(circle at 12% 57%,var(--hair) 0 18%,transparent 19%),
+ radial-gradient(circle at 24% 31%,var(--hair) 0 23%,transparent 24%),
+ radial-gradient(circle at 41% 16%,var(--hair) 0 25%,transparent 26%),
+ radial-gradient(circle at 59% 16%,var(--hair) 0 25%,transparent 26%),
+ radial-gradient(circle at 76% 31%,var(--hair) 0 23%,transparent 24%),
+ radial-gradient(circle at 88% 57%,var(--hair) 0 18%,transparent 19%),
+ radial-gradient(ellipse at 50% 67%,var(--hair) 0 46%,transparent 47%)
 }
+.avatar.avatar-stage-highschool .hair.fade,.avatar.avatar-stage-highschool .hair.waves{top:20%;width:47%}
+.avatar.avatar-stage-college .hair.fade,.avatar.avatar-stage-college .hair.waves{top:19.2%;width:44.8%}
+.avatar.avatar-stage-college .hair.curls{top:12.1%;width:48.5%;height:20.3%}
+.avatar.avatar-stage-college .hair.afro{top:5.9%;width:55%;height:29.5%}
+.avatar.avatar-stage-nba .hair.fade,.avatar.avatar-stage-nba .hair.waves{top:18.9%;width:44.5%}
+.avatar.avatar-stage-nba .hair.curls{top:11.8%;width:48%}
+.avatar.avatar-stage-nba .hair.afro{top:5.7%;width:54.5%}
 
 /* strand-based styles */
 .avatar .hair.shorttwist,.avatar .hair.twists,.avatar .hair.braids,.avatar .hair.dreads,.avatar .hair.long{background:transparent;box-shadow:none;border-radius:0}
@@ -5211,6 +5215,21 @@ function coachOfficeSceneHTML(){
  '.coachHud{position:absolute;left:16px;right:16px;top:14px;z-index:11;display:flex;justify-content:space-between;gap:10px;pointer-events:none}.coachHud span{padding:7px 10px;border-radius:999px;background:rgba(4,9,14,.7);border:1px solid rgba(166,205,236,.24);backdrop-filter:blur(8px);font-size:11px;letter-spacing:.08em}'+
  '.coachDialogue{position:absolute;left:3%;right:3%;bottom:3%;z-index:12;padding:14px;border-radius:16px;background:linear-gradient(180deg,rgba(7,13,20,.9),rgba(4,8,13,.97));border:1px solid rgba(153,197,231,.23);box-shadow:0 14px 34px rgba(0,0,0,.48);backdrop-filter:blur(13px)}'+
  '.coachDialogue h3{margin:0 0 5px;font-size:clamp(17px,2vw,24px)}.coachChoices{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:10px}.coachChoices .btn{min-height:44px}'+
+ /* high-school coach: older, square face, salt-and-pepper crew cut */
+ '.coachCinema.highschool .coachHead{left:60px;top:16px;width:110px;height:124px;border-radius:43% 43% 39% 39%/39% 39% 61% 61%;background:radial-gradient(circle at 35% 30%,rgba(255,225,200,.16),transparent 22%),linear-gradient(90deg,#87543d,#c48765 48%,#87553e)}'+
+ '.coachCinema.highschool .coachHair{left:65px;top:11px;width:100px;height:34px;border-radius:54% 54% 18% 18%/80% 80% 20% 20%;background:repeating-linear-gradient(95deg,#272b2f 0 4px,#4a4d50 4px 7px,#22262a 7px 11px);clip-path:ellipse(50% 62% at 50% 55%)}'+
+ '.coachCinema.highschool .coachBrowL,.coachCinema.highschool .coachBrowR{top:60px;border-top-width:3px}.coachCinema.highschool .coachEyeL,.coachCinema.highschool .coachEyeR{top:70px;height:8px}.coachCinema.highschool .coachNose{top:76px;height:27px}.coachCinema.highschool .coachMouth{top:108px;width:39px;left:96px}.coachCinema.highschool .coachStubble{top:96px;left:79px;right:79px;height:30px;background:linear-gradient(180deg,transparent,rgba(45,45,42,.18))}'+
+ /* college coach: different person — narrower face, bald fade, darker skin, goatee, sharper brows */
+ '.coachCinema.college .coachHead{left:66px;top:19px;width:99px;height:119px;border-radius:46% 46% 42% 42%/37% 37% 63% 63%;background:radial-gradient(circle at 38% 30%,rgba(255,218,177,.12),transparent 22%),linear-gradient(90deg,#5c392b,#926049 48%,#5a382b);box-shadow:inset 8px -13px 18px rgba(36,19,14,.28),inset -5px 4px 10px rgba(255,214,178,.05)}'+
+ '.coachCinema.college .coachNeck{left:92px;top:108px;width:47px;background:linear-gradient(90deg,#573429,#875543 48%,#573429)}'+
+ '.coachCinema.college .coachEarL,.coachCinema.college .coachEarR{top:62px;width:14px;height:29px;background:#6f4737}.coachCinema.college .coachEarL{left:61px}.coachCinema.college .coachEarR{right:61px}'+
+ '.coachCinema.college .coachHair{left:71px;top:18px;width:89px;height:20px;border-radius:56% 56% 18% 18%;background:repeating-radial-gradient(ellipse at 50% 120%,#111417 0 2px,#262b30 2px 3px,#111417 3px 5px);clip-path:ellipse(50% 62% at 50% 58%)}'+
+ '.coachCinema.college .coachBrowL,.coachCinema.college .coachBrowR{top:57px;width:27px;border-top:4px solid #1e1815}.coachCinema.college .coachBrowL{left:82px;transform:rotate(-10deg)}.coachCinema.college .coachBrowR{right:82px;transform:rotate(10deg)}'+
+ '.coachCinema.college .coachEyeL,.coachCinema.college .coachEyeR{top:67px;width:18px;height:8px;background:#d8cbc1}.coachCinema.college .coachEyeL{left:87px}.coachCinema.college .coachEyeR{right:87px}.coachCinema.college .coachEyeL:after,.coachCinema.college .coachEyeR:after{background:#171513}'+
+ '.coachCinema.college .coachNose{left:110px;top:73px;width:11px;height:27px;border-bottom-color:rgba(45,25,19,.4)}'+
+ '.coachCinema.college .coachMouth{left:96px;top:104px;width:38px;height:10px;border-bottom:2px solid #3b241e}'+
+ '.coachCinema.college .coachStubble{left:92px;right:92px;top:99px;height:31px;background:linear-gradient(180deg,transparent 0 23%,rgba(20,18,17,.7) 24% 31%,transparent 32% 58%,rgba(20,18,17,.82) 59% 100%);clip-path:polygon(17% 0,83% 0,72% 35%,66% 100%,34% 100%,28% 35%)}'+
+ '.coachCinema.college .coachBody{background:linear-gradient(90deg,#101319,#262c33 38%,#303740 50%,#252b32 64%,#0f1217 100%)}.coachCinema.college .coachShirt{background:linear-gradient(180deg,#1a2640,#24395f 52%,#17233a)}.coachCinema.college .coachTie{background:linear-gradient(180deg,#d8b85a,#8a6b22)}'+
  '@media(max-width:700px){.coachCinema{min-height:700px}.coachFigure{bottom:34%;transform:translateX(-50%) scale(.72);transform-origin:bottom center}.coachDesk{left:5%;right:4%;bottom:20%;height:18%}.coachJersey{left:25%;top:8%;width:36%;height:25%}.coachJerseyName{left:12%;right:12%;top:35%;font-size:7.5px;letter-spacing:.01em}.coachJerseyNo{top:54%;font-size:29px}.coachBanner{width:27%}.coachPoster{display:none}.coachCabinet{bottom:31%;height:17%}.coachHud{left:10px;right:10px;top:10px;gap:6px}.coachHud span{font-size:9px;padding:6px 8px;max-width:58%;white-space:normal;line-height:1.2}.coachHud span:last-child{max-width:40%;text-align:right}.coachDialogue{left:2%;right:2%;bottom:2%;max-height:47dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:13px}.coachDialogue .row{align-items:flex-start;flex-wrap:wrap}.coachDialogue h3{font-size:19px;line-height:1.22}.coachChoices{grid-template-columns:1fr;gap:8px}.coachChoices .btn{width:100%;min-height:48px}.coachDialogue p{font-size:15px;line-height:1.45}.coachDialogue::-webkit-scrollbar{width:5px}.coachDialogue::-webkit-scrollbar-thumb{background:#536579;border-radius:8px}}'+
  '</style>'+
  '<div class="coachCinema '+stageClass+'">'+
