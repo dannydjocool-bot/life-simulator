@@ -1893,6 +1893,25 @@ function sanitizeSubsystemShapes(d){
  const array=(parent,key)=>{if(!Array.isArray(parent[key])){parent[key]=[];changed=true}};
  const num=(parent,key,fallback=0)=>{const v=Number(parent[key]);if(!Number.isFinite(v)){parent[key]=fallback;changed=true}else if(parent[key]!==v){parent[key]=v;changed=true}};
  if(!validPlainObject(d.player)){d.player=fresh().player;changed=true}
+ if(!validPlainObject(d.player.attrs)){d.player.attrs={...fresh().player.attrs};changed=true}
+ if(!validPlainObject(d.player.stats)){d.player.stats={...fresh().player.stats};changed=true}
+ if(!validPlainObject(d.player.appearance)){d.player.appearance={...fresh().player.appearance};changed=true}
+ ["Finishing","Shooting","Playmaking","Defense","Athleticism","IQ"].forEach(k=>num(d.player.attrs,k,fresh().player.attrs[k]));
+ ["gp","ppg","apg","rpg"].forEach(k=>num(d.player.stats,k,0));
+ if(!Array.isArray(d.offers)){d.offers=[];changed=true}else{const clean=[...new Set(d.offers.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim()))];if(clean.length!==d.offers.length){d.offers=clean;changed=true}}
+ if(!Array.isArray(d.games)){d.games=[];changed=true}
+ if(!Array.isArray(d.news)){d.news=[];changed=true}
+ if(!Array.isArray(d.accolades)){d.accolades=[];changed=true}
+ if(!Array.isArray(d.leagueNews)){d.leagueNews=[];changed=true}
+ if(!validPlainObject(d.record)){d.record={w:0,l:0};changed=true}
+ ["w","l"].forEach(k=>num(d.record,k,0));
+ if(typeof d.screen!=="string"||!["home","story","career","games","stats","player","badges","phone","social","life","residence","rosters","league","finance","connections"].includes(d.screen)){d.screen="home";changed=true}
+ if(!validPlainObject(d.careerHistory)){d.careerHistory={highSchool:null,collegeSeasons:[],nbaSeasons:[]};changed=true}
+ if(!Array.isArray(d.careerHistory.collegeSeasons)){d.careerHistory.collegeSeasons=[];changed=true}
+ if(!Array.isArray(d.careerHistory.nbaSeasons)){d.careerHistory.nbaSeasons=[];changed=true}
+ if(!validPlainObject(d.careerStats)){d.careerStats=fresh().careerStats;changed=true}
+ ["highSchool","college","nba"].forEach(section=>{if(!validPlainObject(d.careerStats[section])){d.careerStats[section]={gp:0,pts:0,ast:0,reb:0};changed=true}["gp","pts","ast","reb"].forEach(k=>num(d.careerStats[section],k,0))});
+ if(d.highSchool!==null&&d.highSchool!==undefined&&!validPlainObject(d.highSchool)){d.highSchool=null;changed=true}
  if(!validPlainObject(d.finance)){d.finance=fresh().finance;changed=true}
  if(!validPlainObject(d.social)){d.social=fresh().social;changed=true}
  if(!validPlainObject(d.relationships)){d.relationships=fresh().relationships;changed=true}
@@ -3187,7 +3206,8 @@ function legacyRoomHTML(){
  return '<section class="card s12"><span class="kicker">LEGACY ROOM</span><h2 style="margin:6px 0">Your Career Museum</h2><div class="grid"><div class="card"><small class="muted">CHAMPIONSHIPS</small><div class="big">'+titles+'</div></div><div class="card"><small class="muted">MAJOR ACCOLADES</small><div class="big">'+awards.length+'</div></div><div class="card"><small class="muted">CAREER CLASSICS</small><div class="big">'+classics.length+'</div></div></div><div class="row"><span>Retired Jersey Track</span><strong>'+(ss.legacy.retiredJersey?"JERSEY RETIRED":jerseyEligible?"ELIGIBLE":"Build more legacy")+'</strong></div><h3>Career Classics</h3><div class="list">'+(classics.length?classics.slice(0,10).map(x=>'<div class="item"><div><b>'+x.reason+' • '+x.opp+'</b><small>'+x.pts+' PTS • '+x.ast+' AST • '+x.reb+' REB • '+x.score+'</small></div><div class="actions"><span class="pill '+(x.win?'good':'bad')+'">'+(x.win?'WIN':'LOSS')+'</span><button class="btn" data-career-classic="'+x.key+'">View</button></div></div>').join(""):'<div class="item"><small>Historic performances will automatically be saved here.</small></div>')+'</div></section>'
 }
 function saveSafetyHTML(){
- const isMain=location.hostname.includes("git-main")||location.hostname==="life-simulator-xi.vercel.app"||location.hostname==="life-simulator-nada-f420.vercel.app";
+ const host=String((typeof location!=="undefined"&&location&&location.hostname)||"");
+ const isMain=host.includes("git-main")||host==="life-simulator-xi.vercel.app"||host==="life-simulator-nada-f420.vercel.app";
  return '<section class="card s12"><div class="row"><div><span class="kicker">SAVE SAFETY</span><h3 style="margin:5px 0">'+(isMain?"Main Career Save":"Preview / Test Save")+'</h3><small class="muted">'+(isMain?"Your real career belongs on this main address.":"This browser address has separate storage from main. Do not use it for your primary career.")+'</small></div><span class="pill '+(isMain?'good':'bad')+'">'+(isMain?'MAIN':'TEST DOMAIN')+'</span></div><div class="actions"><button class="btn" id="exportCareerSafetyBtn">Export Backup</button></div></section>'
 }
 function ensurePolishState(){
