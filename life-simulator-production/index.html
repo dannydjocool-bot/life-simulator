@@ -5070,6 +5070,11 @@ function openTeamPositionEditor(){
    save();closeModal();render();toast("Player positions updated")
  }
 }
+function collegeLineupControlEligible(){return S.stage==="College"&&!!S.collegeOnboarding?.captainGranted}
+function ensureCollegeLineupState(){ensureHighSchoolOnboarding();const cl=S.collegeLineup;if(cl.roster.length<9){const first=["Malik","Jaylen","Marcus","Darius","Andre","Tyrese","Jordan","Isaiah","Devin","Cameron","Xavier"],last=["Carter","Brooks","Reed","Harris","Coleman","Turner","Bennett","Price","Foster","Hayes","Morris"],pos=["PG","SG","SF","PF","C"],seed=String(S.college||"College").split("").reduce((a,ch)=>a+ch.charCodeAt(0),0);cl.roster=Array.from({length:11},(_,i)=>({id:"college-"+i,name:first[(seed+i*3)%first.length]+" "+last[(seed*2+i*5)%last.length],pos:pos[i%5],ovr:68+((seed+i*7)%14)}))}if(cl.startingFive.length!==5)cl.startingFive=["user",...cl.roster.slice().sort((a,b)=>b.ovr-a.ovr).slice(0,4).map(p=>p.id)];return cl}
+function collegeLineupCandidates(){const cl=ensureCollegeLineupState();return [{key:"user",name:S.player.name,pos:S.player.position,ovr:ovr(),user:true},...cl.roster.map(p=>({key:p.id,name:p.name,pos:p.pos,ovr:p.ovr,user:false}))]}
+function currentCollegeStartingFive(){const cl=ensureCollegeLineupState(),map=new Map(collegeLineupCandidates().map(p=>[p.key,p]));return cl.startingFive.map(k=>map.get(k)).filter(Boolean)}
+function openCollegeStartingFiveEditor(){if(!collegeLineupControlEligible()){toast("College captain role required");return}const cl=ensureCollegeLineupState(),candidates=collegeLineupCandidates(),current=currentCollegeStartingFive(),opts=s=>candidates.map(p=>'<option value="'+p.key+'" '+(p.key===s?'selected':'')+'>'+p.name+(p.user?' • YOU':'')+' • '+p.pos+' • '+p.ovr+' OVR</option>').join("");modal('<h2>Edit '+S.college+' Starting 5</h2><p class="muted">Captain privilege • Choose your five starters.</p><div class="list">'+current.map((p,i)=>'<div class="field"><label>Starter '+(i+1)+'</label><select data-college-lineup-slot="'+i+'">'+opts(p.key)+'</select></div>').join("")+'</div><div class="modalFoot"><button class="btn" id="collegeLineupCancel">Cancel</button><button class="btn primary" id="saveCollegeStartingFive">Save Starting 5</button></div>');$("collegeLineupCancel").onclick=talkToCoach;$("saveCollegeStartingFive").onclick=()=>{const keys=[...document.querySelectorAll("[data-college-lineup-slot]")].map(x=>x.value);if(new Set(keys).size!==5){toast("Each starter must be different");return}cl.startingFive=keys;S.news.unshift("Captain "+S.player.name+" updated the "+S.college+" starting five.");save();closeModal();render();toast("College Starting 5 updated")}}
 function lineupControlEligible(){return S.stage==="NBA"&&S.player.trust>=85}
 function lineupCandidateList(){
  ensureLeagueRosters();
@@ -5139,7 +5144,7 @@ function coachOfficeTeamLabel(){
 function coachOfficeRoleText(){
  if(S.stage==="NBA"){updateRole();applyUserLineupRole();return S.player.role+" • "+S.player.minutes+" MPG • "+coachOfficeTeamLabel()}
  if(S.stage==="High School")return "Senior Varsity • "+coachOfficeTeamLabel()+" • "+Math.round(S.player.trust||50)+" Coach Trust";
- if(S.stage==="College")return "College Rotation • "+coachOfficeTeamLabel()+" • "+Math.round(S.player.trust||50)+" Coach Trust";
+ if(S.stage==="College")return (S.collegeOnboarding?.captainGranted?"Team Captain":"College Rotation")+" • "+coachOfficeTeamLabel()+" • "+Math.round(S.player.trust||50)+" Coach Trust";
  return S.stage
 }
 function coachOfficeSceneHTML(){
@@ -5202,6 +5207,7 @@ function coachOfficeSceneHTML(){
    '<div class="coachChoices">'+
     '<button class="btn primary" id="askRole">Ask About My Role</button>'+
     ((hs||college)?'<button class="btn good" id="askDevelopment">Ask Development Plan</button><button class="btn" id="askMinutes">Ask About Playing Time</button>':'')+
+    (college&&collegeLineupControlEligible()?'<button class="btn good" id="editCollegeStartingFive">⭐ Captain • Edit Starting 5</button>':'')+
     (nba?'<button class="btn good" id="editStartingFive" '+(lineupControlEligible()?'':'disabled')+'>Edit Starting 5 '+(lineupControlEligible()?'':'(85 Trust)')+'</button><button class="btn" id="selfTrade" '+(tradeRequestEligible()?'':'disabled')+'>Request Trade</button><button class="btn" id="rosterTrade" '+(playerTradeEligible()?'':'disabled')+'>Suggest Player Trade</button>':'')+
     '<button class="btn" id="coachClose">Leave Office</button>'+
    '</div>'+
@@ -5298,6 +5304,7 @@ function talkToCoach(){
    const msg=(S.player.trust||0)>=75?"You have earned heavy minutes. Stay disciplined and they are yours.":"Minutes come with trust. Defend, move the ball, and finish possessions.";
    S.news.unshift("Coach on playing time: "+msg);S.coach.talks=(S.coach.talks||0)+1;save();toast(msg)
  };
+ if($("editCollegeStartingFive"))$("editCollegeStartingFive").onclick=openCollegeStartingFiveEditor;
  if($("editStartingFive"))$("editStartingFive").onclick=openStartingFiveEditor;
  if($("selfTrade"))$("selfTrade").onclick=requestSelfTrade;
  if($("rosterTrade"))$("rosterTrade").onclick=openRosterTrade
