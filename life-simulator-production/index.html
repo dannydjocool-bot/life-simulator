@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.20.3</title>
+<title>MYCAREER Basketball Sim v0.20.4</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -3317,7 +3317,7 @@ function render(){
    repairInteractionBlockers();if((shapeRecovered||transientRecovered||finalsReplayRecovered)&&S&&S.created)save();
    try{nav()}catch(e){recordClientFailure("school choice nav",e)}if($("profileBtn"))$("profileBtn").style.visibility="visible";try{ensureAppearance();head()}catch(e){recordClientFailure("school choice header",e)}if($("content"))$("content").innerHTML='<section class="card s12"><span class="kicker">HIGH SCHOOL DECISION REQUIRED</span><h2>Choose your high school to continue.</h2><p class="muted">Your career cannot progress until you select a school.</p><button class="btn primary" id="requiredSchoolChoiceBtn">Choose High School</button></section>';if($("requiredSchoolChoiceBtn"))$("requiredSchoolChoiceBtn").onclick=showHighSchoolPicker;try{syncMissionLauncher()}catch(e){recordClientFailure("school choice mission launcher",e)}return
  }
- repairInteractionBlockers();if((shapeRecovered||transientRecovered)&&S&&S.created)save();
+ repairInteractionBlockers();if((shapeRecovered||transientRecovered||finalsReplayRecovered)&&S&&S.created)save();
  const bootSteps=[
   ["immersion",()=>ensureImmersionState(),()=>{S.immersion={pace:"balanced",pending:null,history:[],lastStoryGame:0,storySeq:0}}],
   ["polish",()=>ensurePolishState(),()=>{S.polish=fresh().polish}],
@@ -6532,6 +6532,7 @@ function finalsReplayButtonHTML(g=S.fullGame){
 }
 async function openFinalsReplayView(){
  const g=S.fullGame;if(!g?.highSchoolFinals||!g?.active||!g?.finalsReplay?.available)return;
+ g.finalsReplayReturnState={quarter:g.quarter,clock:g.clock,team:g.team,oppScore:g.oppScore,turn:g.turn,stats:JSON.stringify(g.stats)};
  const type=g.finalsReplay.type,title=type==="poster"?"Poster on Jomal Gibbs":"Crossed Jomal • Step-Back Three";
  const caption=type==="poster"?S.player.name+" attacks the 7-footer and POSTERIZES Jomal Gibbs in the High School Championship.":S.player.name+" crosses Jomal Gibbs to the floor and drills the step-back three in the High School Championship.";
  const asset=finalsReplayImagePath(type);g.finalsReplay.viewed=true;save();
@@ -6542,7 +6543,7 @@ async function openFinalsReplayView(){
    const res=await fetch(asset,{cache:"force-cache"});if(!res.ok)throw new Error("Replay asset "+res.status);
    const b64=(await res.text()).trim();if(!b64)throw new Error("Replay asset empty");
    const img=$("finalsReplayImage"),loading=$("finalsReplayLoading");
-   if(img){img.src="data:image/webp;base64,"+b64;img.style.display="block"}
+   if(img){img.src="data:image/jpeg;base64,"+b64;img.style.display="block"}
    if(loading)loading.remove()
  }catch(e){
    const loading=$("finalsReplayLoading");if(loading)loading.textContent="Replay image could not load. Tap Back to Game and try again.";
@@ -6550,7 +6551,17 @@ async function openFinalsReplayView(){
  }
 }
 function closeFinalsReplayView(){
- closeModal(true)
+ const g=S.fullGame,back=g?.finalsReplayReturnState;
+ closeModal(true);
+ if(g?.highSchoolFinals&&back){
+   const unchanged=g.quarter===back.quarter&&g.clock===back.clock&&g.team===back.team&&g.oppScore===back.oppScore&&g.turn===back.turn&&JSON.stringify(g.stats)===back.stats;
+   if(!unchanged){
+     g.quarter=back.quarter;g.clock=back.clock;g.team=back.team;g.oppScore=back.oppScore;g.turn=back.turn;
+     try{g.stats=JSON.parse(back.stats)}catch(e){}
+   }
+   delete g.finalsReplayReturnState;save()
+ }
+ renderGameActionViewDirect()
 }
 function fullAdvance(seconds){
  const g=S.fullGame;if(!g||!g.active)return "inactive";
@@ -6672,6 +6683,7 @@ function fullDefense(type){
  const status=fullAdvance(34+Math.floor(Math.random()*22));if(status==="active")finishFullGameAction()
 }
 function fullGameView(){
+ if(repairHighSchoolFinalsReplayState())save();
  const g=S.fullGame;if(!g)return "";
  const s=g.stats,on=g.onCourt,close=Math.abs(g.team-g.oppScore)<=8&&g.quarter===4&&g.clock<=120;const uniformLine=g.jersey?'<p class="muted">Uniform: '+g.jersey.name+'</p>':'';
  if(g.intro){return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+starIntroHTML()+highSchoolFinalsPregameHTML(g)+'<section class="card s12"><p class="muted">'+g.broadcastLine+'</p><div class="actions"><button class="btn primary" id="tipoffStartBtn">Start Tipoff</button>'+(g.highSchoolFinals?'':'<button class="btn" id="pregameLockerBtn">Visit Locker Room</button>')+''+(g.highSchoolFinals?'':'<button type="button" class="btn" id="fullToMomentBtn">Play Crucial Moment</button><button type="button" class="btn" id="fullQuickSimBtn">Quick Sim Game</button>')+'<button class="btn" id="cancelFullGameBtn">Back to Game Options</button></div></section></div>'}
