@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.19.8</title>
+<title>MYCAREER Basketball Sim v0.19.9</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -1293,6 +1293,12 @@ table{max-width:100%}
  .finalsCompareRow{grid-template-columns:54px 1fr 54px;padding:9px 6px}
  .finalsCompareStats{grid-template-columns:1fr}
  .finalsHypeCard .actions .btn{width:100%}
+}
+
+/* v0.19.9 High School Finals scripted championship flow */
+.finalsClimaxChoice{border:1px solid rgba(255,116,72,.45);background:linear-gradient(145deg,rgba(110,28,20,.22),rgba(16,20,28,.96))}
+@media(max-width:520px){
+ [data-finals-quarter],[data-finals-climax]{width:100%}
 }
 </style>
 </head>
@@ -6293,6 +6299,7 @@ function starIntroHTML(){
 }
 function maybeOpponentStarMoment(){
  const g=S.fullGame;if(!g||!g.active||g.turn!=="offense"||g.pendingAnswer||g.quarter<2)return false;
+ if(g.highSchoolFinals)return false;
  const lead=fullOpponentLeader(g);if(!lead)return false;
  const chance=(g.quarter===4?18:8)+(Math.abs(g.team-g.oppScore)<=8?10:0);
  if(Math.random()*100>=chance)return false;
@@ -6340,7 +6347,7 @@ function startFullGame(){
  if(highSchoolGame3CoachLock()){toast("Game 3 is locked • Talk to Coach first");openMission();return}
  if(S.stage==="NBA"&&isInjured()&&!S.player.injury.playThroughNext){toast("You are injured");return}
  const hsFinal=highSchoolFinalsPending()&&S.highSchoolFinals.meetingComplete&&S.highSchoolFinals.gameReady,opp=hsFinal?(S.highSchoolFinals.opponent||"Westbridge Academy"):nextOpp(),target=fullTargetMinutes(),playoff=!!(S.playoffs&&S.playoffs.active),collegeTourney=collegeTournamentActive(),spot=S.stage==="NBA"?currentGameSpotlight():{mult:hsFinal?3.2:collegeTourney?2.4:1,title:hsFinal?"High School Championship Final":collegeTourney?collegeTournamentRoundName():S.stage+" Game"},base=hsFinal?(800000+Math.random()*1200000):(collegeTourney?collegeTournamentAudience(ensureCollegeTournamentState().round):broadcastBaseAudience(S.stage,playoff,S.playoffs&&S.playoffs.round||0)*spot.mult);
- const pb=pregameBoost();S.player.energy=Math.max(35,Math.min(100,S.player.energy+pb.energy));S.player.trust=Math.min(100,S.player.trust+pb.trust);const gameJersey=S.stage==="NBA"?activeJersey():null;S.fullGame={active:true,opp,stage:S.stage,playoff,collegeTournament:collegeTourney,highSchoolFinals:!!hsFinal,finalsApproach:null,opponentStar:hsFinal?{...highSchoolFinalsRival()}:null,collegeTournamentRound:collegeTourney?ensureCollegeTournamentState().round:null,collegeTournamentGame:collegeTourney?collegeTournamentGameNumber():null,jersey:gameJersey?{id:gameJersey.id,name:gameJersey.name,colors:jerseyColors(gameJersey)}:null,homeAway:playoff?"PLAYOFF":nextGameLocation(),quarter:1,clock:720,team:0,oppScore:0,turn:"offense",onCourt:true,minutesPlayed:0,targetMinutes:target,grade:70,energy:S.player.energy,halftimeDone:false,adjustment:null,stint:0,benchTrips:0,fouledOut:false,intro:true,pendingAnswer:null,hype:hsFinal?72:35,viewers:Math.round(base),viewerFloor:Math.round(base*.55),peakViewers:Math.round(base),broadcastLine:hsFinal?"Championship pregame: scouts, cameras and a national audience are locked on "+S.player.name+" vs Jomal Gibbs.":"Pregame coverage is live.",lastMessage:"Opening tip. Coach wants a composed first possession.",stats:{pts:0,ast:0,reb:0,stl:0,blk:0,tov:0,pf:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,plusMinus:0},log:["Opening tip vs "+opp+"."]};
+ const pb=pregameBoost();S.player.energy=Math.max(35,Math.min(100,S.player.energy+pb.energy));S.player.trust=Math.min(100,S.player.trust+pb.trust);const gameJersey=S.stage==="NBA"?activeJersey():null;S.fullGame={active:true,opp,stage:S.stage,playoff,collegeTournament:collegeTourney,highSchoolFinals:!!hsFinal,finalsApproach:null,finalsQuarterDecisions:{},finalsClimaxTriggered:false,finalsClimaxResolved:false,opponentStar:hsFinal?{...highSchoolFinalsRival()}:null,collegeTournamentRound:collegeTourney?ensureCollegeTournamentState().round:null,collegeTournamentGame:collegeTourney?collegeTournamentGameNumber():null,jersey:gameJersey?{id:gameJersey.id,name:gameJersey.name,colors:jerseyColors(gameJersey)}:null,homeAway:playoff?"PLAYOFF":nextGameLocation(),quarter:1,clock:720,team:0,oppScore:0,turn:"offense",onCourt:true,minutesPlayed:0,targetMinutes:target,grade:70,energy:S.player.energy,halftimeDone:false,adjustment:null,stint:0,benchTrips:0,fouledOut:false,intro:true,pendingAnswer:null,hype:hsFinal?72:35,viewers:Math.round(base),viewerFloor:Math.round(base*.55),peakViewers:Math.round(base),broadcastLine:hsFinal?"Championship pregame: scouts, cameras and a national audience are locked on "+S.player.name+" vs Jomal Gibbs.":"Pregame coverage is live.",lastMessage:"Opening tip. Coach wants a composed first possession.",stats:{pts:0,ast:0,reb:0,stl:0,blk:0,tov:0,pf:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,plusMinus:0},log:["Opening tip vs "+opp+"."]};
  save();renderGameActionViewDirect()
 }
 function cancelFullGameToOptions(){
@@ -6421,13 +6428,85 @@ function fullScoreOther(side,max=3){
  if(side==="team")g.team+=Math.min(max,pts);else g.oppScore+=Math.min(max,pts);
  return Math.min(max,pts)
 }
+
+function finalsPerformanceEdge(g=S.fullGame){
+ if(!g?.highSchoolFinals)return 0;
+ const s=g.stats||{},grade=Number(g.grade)||70;
+ return (grade-70)*.14+(s.pts||0)*.075+(s.ast||0)*.18+(s.reb||0)*.08+(s.stl||0)*.2+(s.blk||0)*.2-(s.tov||0)*.4
+}
+function balanceHighSchoolFinalsScore(g=S.fullGame){
+ if(!g?.highSchoolFinals||!g.active)return;
+ const edge=finalsPerformanceEdge(g),late=g.quarter===4&&g.clock<=300,maxGap=late?4:7;
+ let diff=(g.team||0)-(g.oppScore||0);
+ if(diff>maxGap)g.oppScore+=(diff-maxGap);
+ else if(diff<-maxGap)g.team+=(-maxGap-diff);
+ diff=g.team-g.oppScore;
+ if(edge>=3&&diff<=0)g.team+=Math.min(late?3:2,1+Math.floor(edge/6));
+ else if(edge<=-3&&diff>=0)g.oppScore+=Math.min(late?3:2,1+Math.floor(Math.abs(edge)/6));
+}
+function openFinalsQuarterDecision(quarter){
+ const g=S.fullGame;if(!g?.highSchoolFinals||!g.active)return;
+ g.finalsQuarterDecisions=g.finalsQuarterDecisions||{};
+ if(g.finalsQuarterDecisions[quarter])return;
+ const title=quarter===2?"Start of Q2":quarter===3?"Start of Q3":"Start of Q4";
+ modal('<span class="kicker">🏆 HIGH SCHOOL FINAL • '+title+'</span><h2>Championship Adjustment</h2><p class="muted">'+S.player.name+' has '+g.stats.pts+' PTS • '+g.stats.ast+' AST • '+g.stats.reb+' REB. The game is being played possession by possession, and your performance is helping decide which team holds the edge.</p><div class="list"><button class="btn primary" data-finals-quarter="takeover">Take Over</button><button class="btn" data-finals-quarter="create">Create for Everyone</button><button class="btn" data-finals-quarter="lock">Lock In Defensively</button><button class="btn" data-finals-quarter="poise">Stay Poised</button></div>',{locked:true});
+ document.querySelectorAll("[data-finals-quarter]").forEach(b=>b.onclick=()=>resolveFinalsQuarterDecision(quarter,b.dataset.finalsQuarter))
+}
+function resolveFinalsQuarterDecision(quarter,type){
+ const g=S.fullGame;if(!g?.highSchoolFinals||!g.active)return;
+ g.finalsQuarterDecisions=g.finalsQuarterDecisions||{};if(g.finalsQuarterDecisions[quarter])return;
+ g.finalsQuarterDecisions[quarter]=type;g.adjustment=type==="takeover"?"aggressive":type==="create"?"team":type==="lock"?"defense":"energy";
+ if(type==="takeover"){g.hype=Math.min(100,(g.hype||0)+7);g.energy=Math.max(20,g.energy-3);fullGrade(1)}
+ if(type==="create"){S.player.chemistry=Math.min(100,(S.player.chemistry||0)+2);fullGrade(1)}
+ if(type==="lock"){fullGrade(1.5);S.player.trust=Math.min(100,(S.player.trust||0)+1)}
+ if(type==="poise"){g.energy=Math.min(100,g.energy+10);fullGrade(1)}
+ fullLog("Q"+quarter+" plan: "+({takeover:"take over the game",create:"create for everyone",lock:"lock in defensively",poise:"stay poised"}[type])+".");
+ closeModal(true);save();render()
+}
+function triggerFinalsClimax(){
+ const g=S.fullGame;if(!g?.highSchoolFinals||!g.active||g.finalsClimaxTriggered||g.quarter!==4||g.clock>300)return false;
+ g.finalsClimaxTriggered=true;g.clock=Math.min(g.clock,300);balanceHighSchoolFinalsScore(g);
+ if(Math.abs(g.team-g.oppScore)>3){if(g.team>g.oppScore)g.oppScore=g.team-3;else g.team=g.oppScore-3}
+ g.stats.reb=(g.stats.reb||0)+1;fullGrade(2);
+ g.broadcastLine="Jomal Gibbs just blocked THREE straight Northside attempts — and the third rejection dropped into "+S.player.name+"'s hands.";
+ fullLog("Jomal Gibbs blocks three straight teammates. The last block falls to you for the rebound.");
+ save();
+ modal('<span class="kicker">🔥 FINAL 5 MINUTES • CHAMPIONSHIP CUTSCENE</span><h2>Jomal Gibbs Just Took Over the Paint</h2><p class="muted">BLOCK ONE. Your teammate tries the rim — Jomal sends it back.</p><p class="muted">BLOCK TWO. Another Northside player challenges the 7-footer — rejected again.</p><p class="muted"><b>BLOCK THREE.</b> Jomal erases a third attempt, but the ball drops directly into <b>'+S.player.name+'\'s</b> hands. Rebound added. The building is exploding. Jomal steps up to meet you.</p><div class="item" style="border-color:#b34e39"><div><b>SUPERSTAR DECISION</b><small>This is your moment. Both paths put the created star at the center of Championship history.</small></div><span class="pill bad">5:00 Q4</span></div><div class="list"><button class="btn primary" data-finals-climax="stepback">🌀 Cross Up Jomal → Step-Back 3</button><button class="btn danger" data-finals-climax="poster">💥 Drive at Jomal → POSTERIZE THE BIG MAN</button></div>',{locked:true});
+ document.querySelectorAll("[data-finals-climax]").forEach(b=>b.onclick=()=>resolveFinalsClimax(b.dataset.finalsClimax));
+ return true
+}
+function resolveFinalsClimax(type){
+ const g=S.fullGame;if(!g?.highSchoolFinals||!g.active||g.finalsClimaxResolved)return;
+ g.finalsClimaxResolved=true;const before=g.viewers||0;
+ if(type==="stepback"){
+   g.team+=3;g.stats.pts+=3;g.stats.fga++;g.stats.fgm++;g.stats.tpa++;g.stats.tpm++;fullGrade(5);
+   g.hype=100;g.viewers=Math.max(g.viewers,Math.round(before*1.85+450000));g.peakViewers=Math.max(g.peakViewers||0,g.viewers);
+   S.social.followers=(S.social.followers||0)+45000;S.social.fame=Math.min(100,(S.social.fame||0)+8);
+   g.broadcastLine=S.player.name+" CROSSES JOMAL GIBBS, sends the 7-footer sliding, and buries the step-back THREE! The broadcast has gone insane.";
+   fullLog("You cross up Jomal Gibbs and drill the step-back three. Championship crowd erupts.");
+   S.news.unshift("🔥 VIRAL FINALS MOMENT • "+S.player.name+" crossed up 7'0\" Jomal Gibbs and buried a step-back three in the final five minutes.")
+ }else{
+   g.team+=2;g.stats.pts+=2;g.stats.fga++;g.stats.fgm++;fullGrade(6);
+   g.hype=100;g.viewers=Math.max(g.viewers,Math.round(before*2.15+650000));g.peakViewers=Math.max(g.peakViewers||0,g.viewers);
+   S.social.followers=(S.social.followers||0)+65000;S.social.fame=Math.min(100,(S.social.fame||0)+10);
+   g.broadcastLine=S.player.name+" ATTACKS THE 7-FOOTER — AND POSTERIZES JOMAL GIBBS! A championship GRAND SLAM at the rim!";
+   fullLog("You drive straight at Jomal Gibbs and POSTERIZE him. The building completely loses it.");
+   S.news.unshift("💥 POSTER OF THE YEAR • "+S.player.name+" drove straight at 7'0\" Jomal Gibbs and posterized him in the High School Final.")
+ }
+ g.turn="defense";g.clock=Math.min(g.clock,292);balanceHighSchoolFinalsScore(g);closeModal(true);save();render();toast(type==="poster"?"JOMAL GOT POSTERIZED 😂":"ANKLES + STEP-BACK 3 🔥")
+}
 function fullAdvance(seconds){
  const g=S.fullGame;if(!g||!g.active)return "inactive";
  const onBefore=g.onCourt,used=Math.min(Math.max(0,Number(seconds)||0),g.clock);
  if(onBefore)g.minutesPlayed+=used/60;
  g.clock=Math.max(0,g.clock-used);
+ if(g.highSchoolFinals){balanceHighSchoolFinalsScore(g);if(triggerFinalsClimax())return "cinematic"}
  if(g.stage==="NBA"){const close=Math.abs(g.team-g.oppScore)<=8;broadcastAdjust((g.quarter===4&&close?1.1:close?.35:-.08),"LIVE audience updates with the flow of the game.")}
  if(g.clock<=0){
+   if(g.highSchoolFinals){
+     if(g.quarter>=4){finishFullGame();return "finished"}
+     g.quarter++;g.clock=720;g.onCourt=true;g.stint=0;g.turn="offense";g.energy=Math.min(100,g.energy+7);fullLog("Quarter "+g.quarter+" begins.");balanceHighSchoolFinalsScore(g);save();openFinalsQuarterDecision(g.quarter);return "quarter-decision"
+   }
    if(g.quarter===2&&!g.halftimeDone){g.clock=0;g.onCourt=false;fullLog("Halftime. Review your line and choose an adjustment.");save();openHalftime();return "halftime"}
    if(g.quarter>=4){finishFullGame();return "finished"}
    g.quarter++;g.clock=720;g.onCourt=true;g.stint=0;g.turn=Math.random()<.5?"offense":"defense";g.energy=Math.min(100,g.energy+7);fullLog("Quarter "+g.quarter+" begins.")
@@ -6437,6 +6516,7 @@ function fullAdvance(seconds){
 }
 function maybeFullSubstitution(){
  const g=S.fullGame;if(!g||!g.active||!g.onCourt||g.clock<=0)return;
+ if(g.highSchoolFinals)return;
  const remainingTarget=g.targetMinutes-g.minutesPlayed;
  const gameRemaining=(4-g.quarter)*12+g.clock/60;
  if(g.quarter<4&&g.stint>=5.5&&remainingTarget<gameRemaining+2){
@@ -6537,7 +6617,7 @@ function fullDefense(type){
 function fullGameView(){
  const g=S.fullGame;if(!g)return "";
  const s=g.stats,on=g.onCourt,close=Math.abs(g.team-g.oppScore)<=8&&g.quarter===4&&g.clock<=120;const uniformLine=g.jersey?'<p class="muted">Uniform: '+g.jersey.name+'</p>':'';
- if(g.intro){return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+starIntroHTML()+highSchoolFinalsPregameHTML(g)+'<section class="card s12"><p class="muted">'+g.broadcastLine+'</p><div class="actions"><button class="btn primary" id="tipoffStartBtn">Start Tipoff</button>'+(g.highSchoolFinals?'':'<button class="btn" id="pregameLockerBtn">Visit Locker Room</button>')+'<button type="button" class="btn" id="fullToMomentBtn">Play Crucial Moment</button><button type="button" class="btn" id="fullQuickSimBtn">Quick Sim Game</button><button class="btn" id="cancelFullGameBtn">Back to Game Options</button></div></section></div>'}
+ if(g.intro){return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+starIntroHTML()+highSchoolFinalsPregameHTML(g)+'<section class="card s12"><p class="muted">'+g.broadcastLine+'</p><div class="actions"><button class="btn primary" id="tipoffStartBtn">Start Tipoff</button>'+(g.highSchoolFinals?'':'<button class="btn" id="pregameLockerBtn">Visit Locker Room</button>')+''+(g.highSchoolFinals?'':'<button type="button" class="btn" id="fullToMomentBtn">Play Crucial Moment</button><button type="button" class="btn" id="fullQuickSimBtn">Quick Sim Game</button>')+'<button class="btn" id="cancelFullGameBtn">Back to Game Options</button></div></section></div>'}
  const answer=g.pendingAnswer?'<section class="card s12"><span class="kicker">STAR CHALLENGE • LIVE SPORTS</span><h2>'+g.pendingAnswer.leader+' just scored. Answer back?</h2><p class="muted">Taking the challenge costs extra energy, but a successful response boosts Game Grade, Fame, broadcast hype and live viewers.</p><div class="actions"><button class="btn primary" data-answer-full="drive">Answer at the Rim</button><button class="btn" data-answer-full="three">Answer with a Three</button><button class="btn" data-answer-full="playmake">Answer by Creating</button><button class="btn" id="declineAnswerBtn">Stay in the Flow</button></div></section>':'';
  const actions=g.pendingAnswer?'':on?(g.turn==="offense"?'<div class="list"><button class="btn" data-full-off="drive">Attack Rim</button><button class="btn" data-full-off="mid">Pull-Up Jumper</button><button class="btn" data-full-off="three">Shoot Three</button><button class="btn" data-full-off="pnr">Run Pick-and-Roll</button><button class="btn" data-full-off="pass">Create for Teammate</button></div>':'<div class="list"><button class="btn" data-full-def="pressure">Pressure Ball Handler</button><button class="btn" data-full-def="steal">Go for Steal</button><button class="btn" data-full-def="help">Help Defense</button><button class="btn" data-full-def="rebound">Protect Paint / Rebound</button></div>'):'<button class="btn primary" id="simBenchBtn">Sim Until Subbed In</button>';
  return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+(g.playoff?playoffBanner():'')+answer+'<section class="card s8"><div class="row"><span class="pill '+(close?"bad":"good")+'">Q'+g.quarter+' • '+fullClock(g.clock)+' • '+(on?(g.turn==="offense"?"OFFENSE":"DEFENSE"):"BENCH")+'</span><span class="pill bad">● LIVE '+formatAudience(g.viewers)+'</span></div><h2 style="margin:12px 0">'+currentTeamName()+' '+g.team+' — '+g.oppScore+' '+g.opp+'</h2>'+uniformLine+'<p class="muted">'+g.lastMessage+'</p>'+actions+'<div class="actions fullGameUtilityActions" style="margin-top:14px"><button type="button" class="btn" id="fullToMomentBtn">Jump to Crucial Moment</button><button type="button" class="btn" id="fullQuickSimBtn">Quick Sim Rest of Game</button></div>'+(close?'<div class="item" style="margin-top:12px"><div><b>CLUTCH TIME</b><small>Every possession matters in the final two minutes.</small></div><span class="pill bad">LIVE</span></div>':'')+'</section><section class="card"><h3>Broadcast Hype</h3><div class="big">'+Math.round(g.hype)+'</div>'+meter("Hype",g.hype)+row("Watching Now",formatAudience(g.viewers))+row("Peak Audience",formatAudience(g.peakViewers))+'<p class="muted">'+g.broadcastLine+'</p></section><section class="card"><h3>Game Grade</h3><div class="big">'+gameGradeLetter(g.grade)+'</div>'+meter("Grade",g.grade)+row("Minutes",g.minutesPlayed.toFixed(1)+" / "+g.targetMinutes)+row("Energy",Math.round(g.energy))+'</section><section class="card s6"><h3>Live Box Score</h3>'+row("PTS",s.pts)+row("REB",s.reb)+row("AST",s.ast)+row("STL",s.stl)+row("BLK",s.blk)+row("TOV",s.tov)+row("PF",s.pf)+'</section><section class="card s6"><h3>Shooting</h3>'+row("FG",s.fgm+"/"+s.fga)+row("3PT",s.tpm+"/"+s.tpa)+row("FT",s.ftm+"/"+s.fta)+row("Role",S.player.role)+'</section><section class="card s12"><h3>Game Feed</h3><div class="list">'+g.log.slice(0,8).map(x=>'<div class="item"><small>'+x+'</small></div>').join("")+'</div></section></div>'
