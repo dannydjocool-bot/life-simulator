@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.20.7</title>
+<title>MYCAREER Basketball Sim v0.20.8</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -1306,6 +1306,9 @@ table{max-width:100%}
 .finalsReplayImage{width:100%;max-height:70vh;display:block;object-fit:contain;border-radius:18px;border:1px solid var(--line);background:#080c13;box-shadow:0 14px 35px rgba(0,0,0,.35)}
 .finalsReplayCaption{margin:0}
 @media(max-width:520px){.finalsReplayImage{border-radius:13px;max-height:55vh}#viewFinalsReplayBtn{width:100%}}
+/* v0.20.8 replay recovery visibility */
+.finalsReplayActions{border-top:1px solid #26344a;padding-top:12px}
+.finalsReplayActions .btn{box-shadow:0 0 0 1px rgba(75,214,150,.12),0 8px 24px rgba(0,0,0,.2)}
 </style>
 </head>
 <body>
@@ -6485,7 +6488,7 @@ function triggerFinalsClimax(){
 }
 function resolveFinalsClimax(type){
  const g=S.fullGame;if(!g?.highSchoolFinals||!g.active||g.finalsClimaxResolved)return;
- g.finalsClimaxResolved=true;const before=g.viewers||0;
+ g.finalsClimaxResolved=true;g.finalsClimaxChoice=type;const before=g.viewers||0;
  if(type==="stepback"){
    g.team+=3;g.stats.pts+=3;g.stats.fga++;g.stats.fgm++;g.stats.tpa++;g.stats.tpm++;fullGrade(5);
    g.hype=100;g.viewers=Math.max(g.viewers,Math.round(before*1.85+450000));g.peakViewers=Math.max(g.peakViewers||0,g.viewers);
@@ -6513,9 +6516,9 @@ function repairHighSchoolFinalsReplayState(){
  if(typeof g.finalsReplay.viewed!=="boolean"){g.finalsReplay.viewed=false;changed=true}
  if(!["poster","stepback",null].includes(g.finalsReplay.type)){g.finalsReplay.type=null;changed=true}
  const evidence=[String(g.broadcastLine||""),String(g.lastMessage||""),...(Array.isArray(g.log)?g.log.map(String):[]),...(Array.isArray(S.news)?S.news.slice(0,30).map(String):[])].join(" | ").toLowerCase();
- let inferred=null;
- if(evidence.includes("posterizes jomal gibbs")||evidence.includes("posterizes jomal")||evidence.includes("posterize him")||evidence.includes("posterize the big man")||evidence.includes("posterized him"))inferred="poster";
- else if(evidence.includes("crosses jomal gibbs")||evidence.includes("crosses jomal")||evidence.includes("step-back three")||evidence.includes("step-back 3")||evidence.includes("ankles + step-back"))inferred="stepback";
+ let inferred=["poster","stepback"].includes(g.finalsClimaxChoice)?g.finalsClimaxChoice:null;
+ if(!inferred&&(evidence.includes("posterizes jomal gibbs")||evidence.includes("posterizes jomal")||evidence.includes("posterize him")||evidence.includes("posterize the big man")||evidence.includes("posterized him")))inferred="poster";
+ else if(!inferred&&(evidence.includes("crosses jomal gibbs")||evidence.includes("crosses jomal")||evidence.includes("step-back three")||evidence.includes("step-back 3")||evidence.includes("ankles + step-back")))inferred="stepback";
  if(inferred&&(!g.finalsReplay.available||g.finalsReplay.type!==inferred)){
    g.finalsReplay.available=true;g.finalsReplay.type=inferred;if(typeof g.finalsReplay.viewed!=="boolean")g.finalsReplay.viewed=false;changed=true
  }
@@ -6536,7 +6539,7 @@ function finalsReplayButtonHTML(g=S.fullGame){
 }
 function openFinalsReplayView(){
  const g=S.fullGame;if(!g?.highSchoolFinals||!g?.active||!g?.finalsReplay?.available)return;
- g.finalsReplayReturnState={quarter:g.quarter,clock:g.clock,team:g.team,oppScore:g.oppScore,turn:g.turn,stats:JSON.stringify(g.stats)};
+ g.finalsReplayReturnState={quarter:g.quarter,clock:g.clock,team:g.team,oppScore:g.oppScore,turn:g.turn,onCourt:g.onCourt,energy:g.energy,grade:g.grade,hype:g.hype,viewers:g.viewers,peakViewers:g.peakViewers,lastMessage:g.lastMessage,broadcastLine:g.broadcastLine,stats:JSON.stringify(g.stats),log:JSON.stringify(g.log)};
  const type=g.finalsReplay.type,title=type==="poster"?"Poster on Jomal Gibbs":"Crossed Jomal • Step-Back Three";
  const caption=type==="poster"?S.player.name+" attacks the 7-footer and POSTERIZES Jomal Gibbs in the High School Championship.":S.player.name+" crosses Jomal Gibbs to the floor and drills the step-back three in the High School Championship.";
  const img=finalsReplayImagePath(type);g.finalsReplay.viewed=true;save();
@@ -6547,8 +6550,8 @@ function closeFinalsReplayView(){
  const g=S.fullGame,back=g?.finalsReplayReturnState;
  closeModal(true);
  if(g?.highSchoolFinals&&back){
-   g.quarter=back.quarter;g.clock=back.clock;g.team=back.team;g.oppScore=back.oppScore;g.turn=back.turn;
-   try{g.stats=JSON.parse(back.stats)}catch(e){}
+   g.quarter=back.quarter;g.clock=back.clock;g.team=back.team;g.oppScore=back.oppScore;g.turn=back.turn;g.onCourt=back.onCourt;g.energy=back.energy;g.grade=back.grade;g.hype=back.hype;g.viewers=back.viewers;g.peakViewers=back.peakViewers;g.lastMessage=back.lastMessage;g.broadcastLine=back.broadcastLine;
+   try{g.stats=JSON.parse(back.stats)}catch(e){}try{g.log=JSON.parse(back.log)}catch(e){}
    delete g.finalsReplayReturnState;save()
  }
  renderGameActionViewDirect()
@@ -6679,7 +6682,7 @@ function fullGameView(){
  if(g.intro){return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+starIntroHTML()+highSchoolFinalsPregameHTML(g)+'<section class="card s12"><p class="muted">'+g.broadcastLine+'</p><div class="actions"><button class="btn primary" id="tipoffStartBtn">Start Tipoff</button>'+(g.highSchoolFinals?'':'<button class="btn" id="pregameLockerBtn">Visit Locker Room</button>')+''+(g.highSchoolFinals?'':'<button type="button" class="btn" id="fullToMomentBtn">Play Crucial Moment</button><button type="button" class="btn" id="fullQuickSimBtn">Quick Sim Game</button>')+'<button class="btn" id="cancelFullGameBtn">Back to Game Options</button></div></section></div>'}
  const answer=g.pendingAnswer?'<section class="card s12"><span class="kicker">STAR CHALLENGE • LIVE SPORTS</span><h2>'+g.pendingAnswer.leader+' just scored. Answer back?</h2><p class="muted">Taking the challenge costs extra energy, but a successful response boosts Game Grade, Fame, broadcast hype and live viewers.</p><div class="actions"><button class="btn primary" data-answer-full="drive">Answer at the Rim</button><button class="btn" data-answer-full="three">Answer with a Three</button><button class="btn" data-answer-full="playmake">Answer by Creating</button><button class="btn" id="declineAnswerBtn">Stay in the Flow</button></div></section>':'';
  const actions=g.pendingAnswer?'':on?(g.turn==="offense"?'<div class="list"><button class="btn" data-full-off="drive">Attack Rim</button><button class="btn" data-full-off="mid">Pull-Up Jumper</button><button class="btn" data-full-off="three">Shoot Three</button><button class="btn" data-full-off="pnr">Run Pick-and-Roll</button><button class="btn" data-full-off="pass">Create for Teammate</button></div>':'<div class="list"><button class="btn" data-full-def="pressure">Pressure Ball Handler</button><button class="btn" data-full-def="steal">Go for Steal</button><button class="btn" data-full-def="help">Help Defense</button><button class="btn" data-full-def="rebound">Protect Paint / Rebound</button></div>'):'<button class="btn primary" id="simBenchBtn">Sim Until Subbed In</button>';
- return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+(g.playoff?playoffBanner():'')+answer+'<section class="card s8"><div class="row"><span class="pill '+(close?"bad":"good")+'">Q'+g.quarter+' • '+fullClock(g.clock)+' • '+(on?(g.turn==="offense"?"OFFENSE":"DEFENSE"):"BENCH")+'</span><span class="pill bad">● LIVE '+formatAudience(g.viewers)+'</span></div><h2 style="margin:12px 0">'+currentTeamName()+' '+g.team+' — '+g.oppScore+' '+g.opp+'</h2>'+uniformLine+'<p class="muted">'+g.lastMessage+'</p>'+actions+''+(g.highSchoolFinals?'':'<div class="actions fullGameUtilityActions" style="margin-top:14px"><button type="button" class="btn" id="fullToMomentBtn">Jump to Crucial Moment</button><button type="button" class="btn" id="fullQuickSimBtn">Quick Sim Rest of Game</button></div>')+''+(close?'<div class="item" style="margin-top:12px"><div><b>CLUTCH TIME</b><small>Every possession matters in the final two minutes.</small></div><span class="pill bad">LIVE</span></div>':'')+'</section><section class="card"><h3>Broadcast Hype</h3><div class="big">'+Math.round(g.hype)+'</div>'+meter("Hype",g.hype)+row("Watching Now",formatAudience(g.viewers))+row("Peak Audience",formatAudience(g.peakViewers))+'<p class="muted">'+g.broadcastLine+'</p>'+(g.highSchoolFinals&&g.finalsReplay?.available?'<div class="actions" style="margin-top:12px">'+finalsReplayButtonHTML(g)+'</div>':'')+'</section><section class="card"><h3>Game Grade</h3><div class="big">'+gameGradeLetter(g.grade)+'</div>'+meter("Grade",g.grade)+row("Minutes",g.minutesPlayed.toFixed(1)+" / "+g.targetMinutes)+row("Energy",Math.round(g.energy))+'</section><section class="card s6"><h3>Live Box Score</h3>'+row("PTS",s.pts)+row("REB",s.reb)+row("AST",s.ast)+row("STL",s.stl)+row("BLK",s.blk)+row("TOV",s.tov)+row("PF",s.pf)+'</section><section class="card s6"><h3>Shooting</h3>'+row("FG",s.fgm+"/"+s.fga)+row("3PT",s.tpm+"/"+s.tpa)+row("FT",s.ftm+"/"+s.fta)+row("Role",S.player.role)+'</section><section class="card s12"><h3>Game Feed</h3><div class="list">'+g.log.slice(0,8).map(x=>'<div class="item"><small>'+x+'</small></div>').join("")+'</div></section></div>'
+ return '<div class="grid" style="margin-top:0">'+collegeTournamentGameBannerHTML(g)+(g.playoff?playoffBanner():'')+answer+'<section class="card s8"><div class="row"><span class="pill '+(close?"bad":"good")+'">Q'+g.quarter+' • '+fullClock(g.clock)+' • '+(on?(g.turn==="offense"?"OFFENSE":"DEFENSE"):"BENCH")+'</span><span class="pill bad">● LIVE '+formatAudience(g.viewers)+'</span></div><h2 style="margin:12px 0">'+currentTeamName()+' '+g.team+' — '+g.oppScore+' '+g.opp+'</h2>'+uniformLine+'<p class="muted">'+g.lastMessage+'</p>'+actions+''+(g.highSchoolFinals&&g.finalsReplay?.available?'<div class="actions finalsReplayActions" style="margin-top:14px">'+finalsReplayButtonHTML(g)+'</div>':'')+''+(g.highSchoolFinals?'':'<div class="actions fullGameUtilityActions" style="margin-top:14px"><button type="button" class="btn" id="fullToMomentBtn">Jump to Crucial Moment</button><button type="button" class="btn" id="fullQuickSimBtn">Quick Sim Rest of Game</button></div>')+''+(close?'<div class="item" style="margin-top:12px"><div><b>CLUTCH TIME</b><small>Every possession matters in the final two minutes.</small></div><span class="pill bad">LIVE</span></div>':'')+'</section><section class="card"><h3>Broadcast Hype</h3><div class="big">'+Math.round(g.hype)+'</div>'+meter("Hype",g.hype)+row("Watching Now",formatAudience(g.viewers))+row("Peak Audience",formatAudience(g.peakViewers))+'<p class="muted">'+g.broadcastLine+'</p></section><section class="card"><h3>Game Grade</h3><div class="big">'+gameGradeLetter(g.grade)+'</div>'+meter("Grade",g.grade)+row("Minutes",g.minutesPlayed.toFixed(1)+" / "+g.targetMinutes)+row("Energy",Math.round(g.energy))+'</section><section class="card s6"><h3>Live Box Score</h3>'+row("PTS",s.pts)+row("REB",s.reb)+row("AST",s.ast)+row("STL",s.stl)+row("BLK",s.blk)+row("TOV",s.tov)+row("PF",s.pf)+'</section><section class="card s6"><h3>Shooting</h3>'+row("FG",s.fgm+"/"+s.fga)+row("3PT",s.tpm+"/"+s.tpa)+row("FT",s.ftm+"/"+s.fta)+row("Role",S.player.role)+'</section><section class="card s12"><h3>Game Feed</h3><div class="list">'+g.log.slice(0,8).map(x=>'<div class="item"><small>'+x+'</small></div>').join("")+'</div></section></div>'
 }
 function gradeValue(letter){return {"A+":5,"A":4.5,"A-":4,"B+":3.5,"B":3,"B-":2.5,"C+":2,"C":1.5,"C-":1,"D+":.5,"D":0}[letter]||0}
 function fullGameFollowerGain(g,out){
