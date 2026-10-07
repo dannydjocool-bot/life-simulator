@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.20.2</title>
+<title>MYCAREER Basketball Sim v0.20.3</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -3312,8 +3312,9 @@ function repairCurrentChampionshipHistory(){
 function render(){
  const shapeRecovered=sanitizeSubsystemShapes(S),transientRecovered=sanitizeTransientGameState(S);
  ensureHighSchoolOnboarding();
+ const finalsReplayRecovered=repairHighSchoolFinalsReplayState();
  if(frontMode==="career"&&S.created&&S.stage==="High School"&&!S.onboarding.schoolChosen){
-   repairInteractionBlockers();if((shapeRecovered||transientRecovered)&&S&&S.created)save();
+   repairInteractionBlockers();if((shapeRecovered||transientRecovered||finalsReplayRecovered)&&S&&S.created)save();
    try{nav()}catch(e){recordClientFailure("school choice nav",e)}if($("profileBtn"))$("profileBtn").style.visibility="visible";try{ensureAppearance();head()}catch(e){recordClientFailure("school choice header",e)}if($("content"))$("content").innerHTML='<section class="card s12"><span class="kicker">HIGH SCHOOL DECISION REQUIRED</span><h2>Choose your high school to continue.</h2><p class="muted">Your career cannot progress until you select a school.</p><button class="btn primary" id="requiredSchoolChoiceBtn">Choose High School</button></section>';if($("requiredSchoolChoiceBtn"))$("requiredSchoolChoiceBtn").onclick=showHighSchoolPicker;try{syncMissionLauncher()}catch(e){recordClientFailure("school choice mission launcher",e)}return
  }
  repairInteractionBlockers();if((shapeRecovered||transientRecovered)&&S&&S.created)save();
@@ -6332,6 +6333,7 @@ function answerBackFull(type){
  g.turn="defense";const status=fullAdvance(34+Math.floor(Math.random()*16));if(status==="active")finishFullGameAction()
 }
 function renderGameActionViewDirect(){
+ if(repairHighSchoolFinalsReplayState())save();
  if(frontMode==="career"&&S.screen==="games"){
    const content=$("content");
    if(content){
@@ -6502,6 +6504,22 @@ function resolveFinalsClimax(type){
    S.news.unshift("💥 POSTER OF THE YEAR • "+S.player.name+" drove straight at 7'0\" Jomal Gibbs and posterized him in the High School Final.")
  }
  g.turn="defense";g.clock=Math.min(g.clock,292);balanceHighSchoolFinalsScore(g);closeModal(true);save();render();toast(type==="poster"?"JOMAL GOT POSTERIZED 😂":"ANKLES + STEP-BACK 3 🔥")
+}
+function repairHighSchoolFinalsReplayState(){
+ const g=S?.fullGame;if(!g?.highSchoolFinals||!g?.active)return false;
+ let changed=false;
+ if(!g.finalsReplay||typeof g.finalsReplay!=="object"){g.finalsReplay={available:false,type:null,viewed:false};changed=true}
+ if(typeof g.finalsReplay.available!=="boolean"){g.finalsReplay.available=false;changed=true}
+ if(typeof g.finalsReplay.viewed!=="boolean"){g.finalsReplay.viewed=false;changed=true}
+ if(!["poster","stepback",null].includes(g.finalsReplay.type)){g.finalsReplay.type=null;changed=true}
+ const evidence=[String(g.broadcastLine||""),...(Array.isArray(g.log)?g.log.map(String):[])].join(" | ").toLowerCase();
+ let inferred=null;
+ if(evidence.includes("posterizes jomal")||evidence.includes("posterize him")||evidence.includes("posterize the big man"))inferred="poster";
+ else if(evidence.includes("crosses jomal")||evidence.includes("step-back three")||evidence.includes("step-back 3"))inferred="stepback";
+ if((g.finalsClimaxResolved||inferred)&&inferred&&(!g.finalsReplay.available||!g.finalsReplay.type)){
+   g.finalsReplay.available=true;g.finalsReplay.type=inferred;g.finalsReplay.viewed=false;changed=true
+ }
+ return changed
 }
 function finalsReplayImagePath(type){
  if(type==="poster")return "assets/finals/jomal-poster-replay.b64";
