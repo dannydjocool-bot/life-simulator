@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.19.4</title>
+<title>MYCAREER Basketball Sim v0.19.5</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -348,7 +348,7 @@ body.menuReducedMotion *{scroll-behavior:auto!important;transition:none!importan
  .floatingPhoneIcon .uiIcon{width:33px;height:33px}
  .floatingPhone small{font-size:9px;color:#eef5ff;letter-spacing:.2px}
  .floatingPhone i{position:absolute;right:8px;top:8px;width:12px;height:12px;border-radius:50%;background:#ff6b14;border:2px solid #132238;display:none;box-shadow:0 0 0 2px rgba(255,107,20,.12)}
- .missionLauncher{position:fixed;z-index:74;left:14px;right:auto;top:96px;width:70px;min-height:70px;border-radius:20px;border:1px solid #7f6948;background:linear-gradient(145deg,#3b3021,#17130e);color:#fff;display:grid;place-items:center;align-content:center;gap:3px;box-shadow:0 16px 38px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.12);font-weight:900}
+ .missionLauncher{position:relative;z-index:24;left:auto;right:auto;top:auto;width:52px;min-height:52px;flex:0 0 52px;border-radius:20px;border:1px solid #7f6948;background:linear-gradient(145deg,#3b3021,#17130e);color:#fff;display:grid;place-items:center;align-content:center;gap:3px;box-shadow:0 16px 38px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.12);font-weight:900}
  .missionLauncher.hidden{display:none!important}.modalSuppressed{display:none!important}.missionLauncher .missionScroll{font-size:31px;line-height:1}.missionLauncher small{font-size:9px;color:#f5dfb5;letter-spacing:.35px;white-space:nowrap;line-height:1}.missionLauncher i{position:absolute;right:7px;top:7px;width:12px;height:12px;border-radius:50%;background:#ffb13b;border:2px solid #21180d;box-shadow:0 0 0 3px rgba(255,177,59,.12)}.missionLauncher.completed{border-color:#4b9d70;background:linear-gradient(145deg,#183b29,#0d2118)}.missionLauncher.completed .missionScroll{font-size:30px}.missionLauncher.completed small{color:#bff2d1;font-size:8px;letter-spacing:.7px;white-space:nowrap}.missionLauncher.completed i{background:#40d47a;border-color:#102c1c}
  .personalUnread{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#e94f5f;color:#fff;font-size:10px;font-weight:950;margin-left:6px}
 .scholarshipHub{background:radial-gradient(circle at 90% 0,rgba(75,135,255,.16),transparent 35%),linear-gradient(145deg,#0d1725,#111a28)!important;border-color:#304967!important}
@@ -1254,25 +1254,49 @@ table{max-width:100%}
 @media(max-width:390px){
   .missionLauncher{left:10px!important;top:92px!important;width:66px!important;min-height:66px!important}
 }
+
+/* v0.19.5 mobile utility cleanup: no floating controls over gameplay cards */
+@media(max-width:900px){
+  .bottom{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+  .bottom button{min-width:0!important}
+  .floatingPhone,.phoneEditToggle,.phonePlaceHint{display:none!important}
+  .missionLauncher{
+    position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+    width:48px!important;min-height:48px!important;height:48px!important;flex:0 0 48px!important;
+    border-radius:15px!important;box-shadow:0 8px 20px rgba(0,0,0,.32)!important;touch-action:manipulation
+  }
+  .missionLauncher .missionScroll{font-size:22px!important}
+  .missionLauncher small{font-size:7px!important}
+  .missionLauncher i{width:9px!important;height:9px!important;right:5px!important;top:5px!important}
+  .topActions{gap:7px!important;max-width:66%!important;align-items:center!important}
+}
+@media(max-width:430px){
+  .bottom{left:5px!important;right:5px!important;gap:2px!important;padding:6px!important}
+  .bottom button{padding:7px 1px!important;font-size:9px!important}
+  .mobileNavIcon .uiIcon{width:22px!important;height:22px!important}
+  .mobileNavLabel{font-size:8.5px!important}
+  .missionLauncher{width:44px!important;min-height:44px!important;height:44px!important;flex-basis:44px!important}
+}
 </style>
 </head>
 <body>
 <div class="app">
 <aside class="side"><div class="brand">MY<span>HALL</span>OFFAME<small>BASKETBALL CAREER SIMULATOR</small></div><div class="nav" id="deskNav"></div><div class="mini" id="mini"></div></aside>
-<main class="main"><header class="top"><div><p id="eyebrow">MYCAREER</p><h1 id="title">Start</h1></div><div class="topActions"><button class="btn topMainMenuBtn" id="topMainMenuBtn">Main Menu</button><button class="profile" id="profileBtn"><span id="profileAvatar" class="profileAvatar"></span><div><b id="pname">Rookie</b><small id="povr">60 OVR</small></div></button></div></header><section class="content" id="content"><section class="card s12 bootCard"><span class="kicker">MYCAREER</span><h2 style="margin:8px 0">Loading your career…</h2><p class="muted">Your save stays on this device. MYCAREER is starting now.</p></section></section></main>
+<main class="main"><header class="top"><div><p id="eyebrow">MYCAREER</p><h1 id="title">Start</h1></div><div class="topActions"><button class="missionLauncher hidden" id="missionLauncherBtn" aria-label="Open Mission"><span class="missionScroll">📜</span><small>MISSION</small><i></i></button><button class="btn topMainMenuBtn" id="topMainMenuBtn">Main Menu</button><button class="profile" id="profileBtn"><span id="profileAvatar" class="profileAvatar"></span><div><b id="pname">Rookie</b><small id="povr">60 OVR</small></div></button></div></header><section class="content" id="content"><section class="card s12 bootCard"><span class="kicker">MYCAREER</span><h2 style="margin:8px 0">Loading your career…</h2><p class="muted">Your save stays on this device. MYCAREER is starting now.</p></section></section></main>
 <nav class="bottom" id="bottomNav"></nav>
-<button class="missionLauncher hidden" id="missionLauncherBtn" aria-label="Open Mission"><span class="missionScroll">📜</span><small>MISSION</small><i></i></button><button class="floatingPhone hidden" id="floatingPhoneBtn" aria-label="Open Phone"><span class="floatingPhoneIcon"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"></rect><path d="M9.5 5h5"></path><path d="M11 18.5h2"></path></svg></span><small id="floatingPhoneLabel">Phone</small><i id="phoneNotifyDot"></i></button><button class="phoneEditToggle hidden" id="phoneEditToggle" aria-label="Edit Phone position"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.2-1 10.9-10.9a2.2 2.2 0 0 0-3.1-3.1L5.1 15.9 4 20Z"></path><path d="m14.8 6.2 3 3"></path></svg><span id="phoneEditText">Edit</span></button><div class="phonePlaceHint hidden" id="phonePlaceHint">Tap anywhere to place Phone</div><div class="phonePlaceShield hidden" id="phonePlaceShield" aria-hidden="true"></div>
+<button class="floatingPhone hidden" id="floatingPhoneBtn" aria-label="Open Phone"><span class="floatingPhoneIcon"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"></rect><path d="M9.5 5h5"></path><path d="M11 18.5h2"></path></svg></span><small id="floatingPhoneLabel">Phone</small><i id="phoneNotifyDot"></i></button><button class="phoneEditToggle hidden" id="phoneEditToggle" aria-label="Edit Phone position"><svg class="uiIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 20 4.2-1 10.9-10.9a2.2 2.2 0 0 0-3.1-3.1L5.1 15.9 4 20Z"></path><path d="m14.8 6.2 3 3"></path></svg><span id="phoneEditText">Edit</span></button><div class="phonePlaceHint hidden" id="phonePlaceHint">Tap anywhere to place Phone</div><div class="phonePlaceShield hidden" id="phonePlaceShield" aria-hidden="true"></div>
 </div>
 <div class="modalWrap hidden" id="modalWrap"><div class="modal" id="modal"></div></div><div class="toast hidden" id="toast"></div>
 <script>
 const NAV=[["home","Hub"],["story","Story"],["career","Career"],["games","Games"],["stats","Stats"],["player","Player"],["life","Life"],["social","Social"],["phone","Phone"],["dating","Dating"],["residence","Home"],["rosters","Roster"],["league","League"]];
-const MOBILE_NAV=[["home","home","Hub"],["career","briefcase","Career"],["games","basketball","Games"],["player","user","Player"],["life","wallet","Life"]];
+const MOBILE_NAV=[["home","home","Hub"],["career","briefcase","Career"],["games","basketball","Games"],["player","user","Player"],["life","wallet","Life"],["phone","phone","Phone"]];
 const UI_ICON_PATHS={
  home:'<path d="M3 10.5 12 3l9 7.5"></path><path d="M5.5 9.5V21h13V9.5"></path><path d="M9.5 21v-7h5v7"></path>',
  briefcase:'<rect x="3" y="7" width="18" height="13" rx="2.5"></rect><path d="M8.5 7V5.5A2.5 2.5 0 0 1 11 3h2a2.5 2.5 0 0 1 2.5 2.5V7"></path><path d="M3 12h18"></path><path d="M10 12v2h4v-2"></path>',
  basketball:'<circle cx="12" cy="12" r="9"></circle><path d="M5.2 6.2c3.2 1.9 5 5 5.1 9.8"></path><path d="M13.7 4.1c-2 4.8-1.9 10.1.3 15.8"></path><path d="M4 13.6c5.2-1.8 10.4-1.7 16 .3"></path>',
  user:'<circle cx="12" cy="8" r="3.5"></circle><path d="M5.5 21c.6-4.3 3-6.5 6.5-6.5s5.9 2.2 6.5 6.5"></path>',
  wallet:'<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H19v16H6.5A2.5 2.5 0 0 1 4 17.5z"></path><path d="M4 8h15"></path><path d="M14 11h7v5h-7a2.5 2.5 0 0 1 0-5Z"></path><circle cx="17.5" cy="13.5" r=".7" fill="currentColor" stroke="none"></circle>',
+ phone:'<rect x="6.5" y="2.5" width="11" height="19" rx="2.4"></rect><path d="M9.5 5h5"></path><path d="M11 18.5h2"></path>',
  message:'<path d="M4 5.5h16v11H9l-5 4v-15Z"></path><path d="M8 9h8"></path><path d="M8 12.5h5"></path>',
  bank:'<path d="M3 9h18"></path><path d="M5 9V20"></path><path d="M9.5 9V20"></path><path d="M14.5 9V20"></path><path d="M19 9V20"></path><path d="M2.5 20h19"></path><path d="m3 8 9-5 9 5"></path>',
  camera:'<rect x="3" y="6.5" width="18" height="13" rx="3"></rect><circle cx="12" cy="13" r="4"></circle><path d="m8 6.5 1.5-2h5l1.5 2"></path>',
@@ -2763,6 +2787,8 @@ function ensureHighSchoolOnboarding(){
  if(!Array.isArray(S.collegeLineup.roster))S.collegeLineup.roster=[];if(!Array.isArray(S.collegeLineup.startingFive))S.collegeLineup.startingFive=[];
  if(!validPlainObject(S.missionUI))S.missionUI={completed:null};
  if(S.missionUI.completed!==null&&!validPlainObject(S.missionUI.completed))S.missionUI.completed=null;
+ const existingHsGames=(S.games||[]).filter(g=>(g.stage||"High School")==="High School").length;
+ if(S.stage==="High School"&&!hf.played&&hf.triggered&&existingHsGames<20&&!hf.meetingComplete&&!hf.rewardClaimed){hf.triggered=false;hf.coachMessaged=false;hf.gameReady=false;hf.preFinalUpgrade=false;S.onboarding.missionActive=false;S.onboarding.missionComplete=true}
  return S.onboarding
 }
 function highSchoolTeamName(){return S.highSchool?.name||"Northside High"}
@@ -2778,6 +2804,9 @@ function addPersonalMessage(from,text,unread=true){
 }
 
 function highSchoolGamesPlayed(){return (S.games||[]).filter(g=>(g.stage||"High School")==="High School").length}
+const HIGH_SCHOOL_FINALS_MIN_GAMES=20;
+function highSchoolFinalsGameRequirementMet(gp=highSchoolGamesPlayed()){return gp>=HIGH_SCHOOL_FINALS_MIN_GAMES}
+function highSchoolRecordIsTerrible(){const w=Math.max(0,Number(S.record?.w)||0),l=Math.max(0,Number(S.record?.l)||0),gp=w+l;return gp>=10&&(w/gp)<0.4}
 function highSchoolOfferCap(gp=highSchoolGamesPlayed()){if(gp<3)return 0;if(gp<5)return 2;if(gp<7)return 4;if(gp<9)return 6;if(gp<10)return 7;return 8}
 function collegeRecruitingTier(name){const elite=["Duke","Kentucky","Kansas","UConn","North Carolina","Gonzaga","UCLA","Purdue"],major=["Michigan State","Villanova","Arizona","Houston","Tennessee","Baylor","Alabama","Auburn","Florida","Texas","Indiana","Louisville"];return elite.includes(name)?"National Power":major.includes(name)?"Major Program":"High-Major"}
 function scholarshipIcon(name){const t=collegeRecruitingTier(name);return t==="National Power"?"🏆":t==="Major Program"?"⭐":"🎓"}
@@ -2830,11 +2859,12 @@ function processHighSchoolRecruiting(g){
  if(gp===3)evaluateHighSchoolGame3ScoutMission(g);
  while(S.offers.length<Math.min(8,cap)&&r.points>=threshold){r.points-=threshold;const offer=addScholarshipOffer();if(!offer)break;added.push(offer);threshold=32+S.offers.length*5}
  if(gp>=12&&S.offers.length<Math.min(8,cap)&&gp-(r.lastOfferGame||0)>=2){const offer=addScholarshipOffer();if(offer)added.push(offer)}
- if(S.offers.length>=8&&gp>=10)triggerHighSchoolFinals();return added
+ if(S.offers.length>=8&&highSchoolFinalsGameRequirementMet(gp))triggerHighSchoolFinals();return added
 }
 function triggerHighSchoolFinals(){
- ensureHighSchoolOnboarding();const h=S.highSchoolFinals;if(h.triggered||h.played||S.stage!=="High School")return false;
- h.triggered=true;h.gameReady=false;h.opponent="Westbridge Academy";addPersonalMessage("Coach","We made it. The High School Championship Final is today. There are scouts from multiple programs in attendance. Come to my office before warmups — I need to talk to you.",true);h.coachMessaged=true;S.onboarding.missionActive=true;S.onboarding.missionComplete=false;S.news.unshift("🏆 CHAMPIONSHIP DAY • Coach wants you in his office before the High School Final.");save();return true
+ ensureHighSchoolOnboarding();const h=S.highSchoolFinals,gp=highSchoolGamesPlayed();if(h.triggered||h.played||S.stage!=="High School"||S.offers.length<8||!highSchoolFinalsGameRequirementMet(gp))return false;
+ const rough=highSchoolRecordIsTerrible();
+ h.triggered=true;h.gameReady=false;h.opponent="Westbridge Academy";addPersonalMessage("Coach",rough?"I’m not sure how we made it to the finals, but here we are. The High School Championship Final is today. There are scouts from multiple programs in attendance. Come to my office before warmups — I need to talk to you.":"We made it. The High School Championship Final is today. There are scouts from multiple programs in attendance. Come to my office before warmups — I need to talk to you.",true);h.coachMessaged=true;S.onboarding.missionActive=true;S.onboarding.missionComplete=false;S.news.unshift("🏆 CHAMPIONSHIP DAY • "+(rough?"Against all odds, ":"")+"Coach wants you in his office before the High School Final.");save();return true
 }
 function highSchoolFinalsPending(){return S.stage==="High School"&&S.highSchoolFinals?.triggered&&!S.highSchoolFinals?.played}
 function highSchoolFinalDraftGain(g){const base=Math.max(2,Math.min(10,Math.round(((g.pts||0)/8)+((g.ast||0)/4)+((g.reb||0)/5)+((g.stl||0)+(g.blk||0))*.8+(g.win?2:0))));return Math.min(30,base*3)}
@@ -5458,8 +5488,9 @@ function coachOfficeSceneHTML(){
 function talkToCoach(){
  ensureHighSchoolOnboarding();
  if(S.stage==="High School"&&highSchoolFinalsPending()&&!S.highSchoolFinals.meetingComplete){
-   const h=S.highSchoolFinals;
-   modal(coachOfficeSceneHTML().replace(coachOfficeName()+': “What do you need?”',coachOfficeName()+': “Today is the day.”').replace('<div class="coachChoices">','<p class="muted" style="margin-top:12px">The High School Championship Final is today. We have scouts from multiple programs sitting in the building, and every possession matters.</p><p class="muted">Go out there and perform at your best. You earned this stage. I am giving you <b>10 Attribute Points</b> before warmups, and your finals performance will receive a <b>3× Draft Stock boost</b>.</p><div class="coachChoices">').replace('<button class="btn primary" id="askRole">Ask About My Role</button>','<button class="btn primary" id="acceptFinalsBoost">🏆 Accept 10 Points & Play Finals</button>'));
+   const h=S.highSchoolFinals,rough=highSchoolRecordIsTerrible();
+   const finalsCoachLead=rough?'<p class="muted" style="margin-top:12px"><b>“I’m not sure how we made it to the finals, but here we are.”</b></p><p class="muted">Forget the record now. The High School Championship Final is today. We have scouts from multiple programs sitting in the building, and every possession matters.</p>':'<p class="muted" style="margin-top:12px">The High School Championship Final is today. We have scouts from multiple programs sitting in the building, and every possession matters.</p>';
+   modal(coachOfficeSceneHTML().replace(coachOfficeName()+': “What do you need?”',coachOfficeName()+(rough?': “Well... somehow, today is the day.”':': “Today is the day.”')).replace('<div class="coachChoices">',finalsCoachLead+'<p class="muted">Go out there and perform at your best. You earned this stage. I am giving you <b>10 Attribute Points</b> before warmups, and your finals performance will receive a <b>3× Draft Stock boost</b>.</p><div class="coachChoices">').replace('<button class="btn primary" id="askRole">Ask About My Role</button>','<button class="btn primary" id="acceptFinalsBoost">🏆 Accept 10 Points & Play Finals</button>'));
    if($("askDevelopment"))$("askDevelopment").style.display="none";
    if($("askMinutes"))$("askMinutes").style.display="none";
    if($("coachClose"))$("coachClose").style.display="none";
@@ -7672,7 +7703,7 @@ const ROAD_TO_NBA_CHAPTERS={
  hs_intro:{stage:"High School",title:"Chapter 1 • Nobody Knows Your Name",subtitle:"Senior Year • Northside HS",text:"The gym is half empty, the scouts are nowhere to be seen, and your coach tells you the truth: talent is not enough. This is your last high-school season to make people remember your name.",choices:[["grind","Stay After Practice"],["leader","Bring the Team With You"],["flash","Promise a Breakout Season"]]},
  hs_scout:{stage:"High School",title:"Chapter 2 • Eyes in the Bleachers",subtitle:"Recruiting Begins",text:"Two college assistants quietly take seats behind the baseline. Coach warns you not to chase highlights just because somebody important is watching.",choices:[["fundamentals","Play the Right Way"],["attack","Take Over the Game"],["teamfirst","Feed Your Teammates"]]},
  hs_rival:{stage:"High School",title:"Chapter 3 • The Other Prospect",subtitle:"Northside vs Westbridge",text:"Jaylen Cross, a nationally ranked guard from Westbridge Academy, tells a local reporter that you are 'having a nice little season.' The clip reaches your locker room before the game.",choices:[["answer","Answer on the Court"],["respect","Show Respect"],["fire","Make It Personal"]]},
- hs_pressure:{stage:"High School",title:"Chapter 4 • Championship Day",subtitle:"8 Scholarships • Scouts Everywhere",text:"Your scholarship board is full and the High School Championship Final is here. Multiple college scouts are in attendance. Coach tells you this is the game that can change your entire basketball future.",choices:[["development","Best Development"],["spotlight","Biggest Spotlight"],["loyalty","Best Relationship"]]},
+ hs_pressure:{stage:"High School",title:"Chapter 4 • Championship Day",subtitle:"20-Game Grind • 8 Scholarships • Scouts Everywhere",text:"You made it through roughly 20 high-school games, your scholarship board is full, and the High School Championship Final is here. Multiple college scouts are in attendance. Coach tells you this is the game that can change your entire basketball future.",choices:[["development","Best Development"],["spotlight","Biggest Spotlight"],["loyalty","Best Relationship"]]},
  college_arrival:{stage:"College",title:"Chapter 5 • Campus Is Different",subtitle:"Freshman Arrival",text:"The facilities are bigger, the practices are faster, and nobody cares what you did in high school. An upperclassman tells you freshmen have to earn everything here.",choices:[["humble","Start From Zero"],["compete","Challenge the Veterans"],["connect","Win the Locker Room"]]},
  college_role:{stage:"College",title:"Chapter 6 • Earn Your Minutes",subtitle:"Rotation Battle",text:"Your coach says your talent is obvious, but trust is not. A veteran at your position is getting the late-game minutes you want.",choices:[["defense","Win Minutes With Defense"],["work","Live in the Gym"],["speak","Ask Coach What You Need"]]},
  college_rival:{stage:"College",title:"Chapter 7 • National Television",subtitle:"The Rematch",text:"Jaylen Cross has become a college star too. The networks build your matchup as a battle between two future pros. For the first time, millions are watching.",choices:[["calm","Treat It Like Any Game"],["duel","Go At Cross"],["team","Win, Stats Second"]]},
@@ -7709,7 +7740,7 @@ function roadChapterAvailable(id){
  if(r.completed.includes(id)||r.pending===id)return false;
  if(id==="hs_scout")return S.stage==="High School"&&gp>=2;
  if(id==="hs_rival")return S.stage==="High School"&&gp>=5;
- if(id==="hs_pressure")return S.stage==="High School"&&gp>=10&&(S.offers||[]).length>=8;
+ if(id==="hs_pressure")return S.stage==="High School"&&gp>=HIGH_SCHOOL_FINALS_MIN_GAMES&&(S.offers||[]).length>=8;
  if(id==="college_role")return S.stage==="College"&&gp>=2;
  if(id==="college_rival")return S.stage==="College"&&gp>=5;
  if(id==="college_choice")return S.stage==="College"&&gp>=7;
@@ -8686,7 +8717,7 @@ function startHighSchoolFinalsGame(){
 function scholarshipHubHTML(){
  if(S.stage!=="High School"||S.college)return "";
  const gp=S.player.stats?.gp||0,cap=highSchoolOfferCap(gp),h=S.highSchoolFinals||{},cards=(S.offers||[]).map(x=>'<div class="scholarCard"><div class="scholarIcon">'+scholarshipIcon(x)+'</div><div><b>'+x+'</b><small>'+collegeRecruitingTier(x)+' • Full Scholarship</small></div><span class="pill good">OFFER</span></div>').join("");
- return '<section class="card s12 scholarshipHub"><div class="row"><div><span class="kicker">🎓 RECRUITING CENTER</span><h2 style="margin:5px 0">Scholarship Board</h2><small class="muted">Performance builds attention, but persistence keeps your recruiting alive.</small></div><span class="pill good">'+S.offers.length+' / 8 OFFERS</span></div><div class="scholarStats"><div><small>HS GAMES</small><b>'+gp+'</b></div><div><small>CURRENT OFFER CAP</small><b>'+cap+'</b></div><div><small>RECRUITING MOMENTUM</small><b>'+Math.round(S.highSchoolRecruiting?.points||0)+'</b></div><div><small>FINALS</small><b>'+(h.played?(h.won?"CHAMPION":"COMPLETE"):h.triggered?"READY":"LOCKED")+'</b></div></div><div class="scholarGrid">'+(cards||'<div class="item"><div><b>No offers yet</b><small>Keep playing. Strong games accelerate recruiting, and continued play creates more chances even after a slow start.</small></div></div>')+'</div><p class="muted">You cannot reach all 8 scholarships before roughly 10 high-school games. Once all 8 arrive, Championship Day begins.</p></section>'
+ return '<section class="card s12 scholarshipHub"><div class="row"><div><span class="kicker">🎓 RECRUITING CENTER</span><h2 style="margin:5px 0">Scholarship Board</h2><small class="muted">Performance builds attention, but persistence keeps your recruiting alive.</small></div><span class="pill good">'+S.offers.length+' / 8 OFFERS</span></div><div class="scholarStats"><div><small>HS GAMES</small><b>'+gp+'</b></div><div><small>CURRENT OFFER CAP</small><b>'+cap+'</b></div><div><small>RECRUITING MOMENTUM</small><b>'+Math.round(S.highSchoolRecruiting?.points||0)+'</b></div><div><small>FINALS</small><b>'+(h.played?(h.won?"CHAMPION":"COMPLETE"):h.triggered?"READY":((S.offers||[]).length>=8?(gp+"/"+HIGH_SCHOOL_FINALS_MIN_GAMES+" GAMES"):"LOCKED"))+'</b></div></div><div class="scholarGrid">'+(cards||'<div class="item"><div><b>No offers yet</b><small>Keep playing. Strong games accelerate recruiting, and continued play creates more chances even after a slow start.</small></div></div>')+'</div><p class="muted">Scholarships can fill up before the season ends, but Championship Day does not unlock until you have played at least '+HIGH_SCHOOL_FINALS_MIN_GAMES+' high-school games. Keep playing even after all 8 offers arrive.</p></section>'
 }
 </script>
 </body>
