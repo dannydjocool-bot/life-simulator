@@ -1930,11 +1930,11 @@ function sanitizeSubsystemShapes(d){
   const before=d.news.length;
   d.news=d.news.filter(n=>{
    const t=String(n||"").trim();
-   return !/^MISSION COMPLETE/i.test(t)
-    && !/^👀 GAME 3 UNLOCKED/i.test(t)
-    && !/^🌙 PRIVATE INVITE EARNED/i.test(t)
-    && !/^🏆 FINALS BOOST/i.test(t)
-    && !/^⭐ .* CAPTAIN • Starting 5 control unlocked/i.test(t);
+   return !t.toUpperCase().startsWith("MISSION COMPLETE")
+    && !t.startsWith("👀 GAME 3 UNLOCKED")
+    && !t.startsWith("🌙 PRIVATE INVITE EARNED")
+    && !t.startsWith("🏆 FINALS BOOST")
+    && !(t.startsWith("⭐ ")&&t.includes("CAPTAIN • Starting 5 control unlocked"));
   });
   if(d.news.length!==before)changed=true
  }
@@ -3207,11 +3207,11 @@ function home(){
  const firstName=String(p.name||"Player").split(" ")[0];
  const hubNewsList=Array.isArray(S.news)?S.news.filter(n=>{
   const t=String(n||"").trim();
-  return !/^MISSION COMPLETE/i.test(t)
-   && !/^👀 GAME 3 UNLOCKED/i.test(t)
-   && !/^🌙 PRIVATE INVITE EARNED/i.test(t)
-   && !/^🏆 FINALS BOOST/i.test(t)
-   && !/^⭐ .* CAPTAIN • Starting 5 control unlocked/i.test(t);
+  return !t.toUpperCase().startsWith("MISSION COMPLETE")
+   && !t.startsWith("👀 GAME 3 UNLOCKED")
+   && !t.startsWith("🌙 PRIVATE INVITE EARNED")
+   && !t.startsWith("🏆 FINALS BOOST")
+   && !(t.startsWith("⭐ ")&&t.includes("CAPTAIN • Starting 5 control unlocked"));
  }):[];
  const news=hubNewsList.length?String(hubNewsList[0]):"Your career is ready.";
  const stageLabel=String(S.stage||"High School").toUpperCase();
