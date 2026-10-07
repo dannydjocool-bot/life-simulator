@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.20.0</title>
+<title>MYCAREER Basketball Sim v0.20.1</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -1301,13 +1301,7 @@ table{max-width:100%}
  [data-finals-quarter],[data-finals-climax]{width:100%}
 }
 
-/* v0.19.10 High School Finals replay viewer */
-.finalsReplayWrap{display:flex;flex-direction:column;gap:12px;margin-top:12px}
-.finalsReplayImage{width:100%;display:block;border-radius:18px;border:1px solid var(--line);object-fit:cover;box-shadow:0 12px 30px rgba(0,0,0,.35)}
-.finalsReplayCaption{margin:0}
-@media(max-width:520px){.finalsReplayImage{border-radius:14px}#viewFinalsReplayBtn{width:100%}}
-
-/* v0.19.10 Finals replay viewer */
+/* v0.20.1 High School Finals replay viewer */
 .finalsReplayWrap{display:flex;flex-direction:column;gap:12px;margin-top:12px}
 .finalsReplayImage{width:100%;max-height:70vh;display:block;object-fit:contain;border-radius:18px;border:1px solid var(--line);background:#080c13;box-shadow:0 14px 35px rgba(0,0,0,.35)}
 .finalsReplayCaption{margin:0}
@@ -6495,55 +6489,39 @@ function resolveFinalsClimax(type){
    g.hype=100;g.viewers=Math.max(g.viewers,Math.round(before*1.85+450000));g.peakViewers=Math.max(g.peakViewers||0,g.viewers);
    S.social.followers=(S.social.followers||0)+45000;S.social.fame=Math.min(100,(S.social.fame||0)+8);
    g.broadcastLine=S.player.name+" CROSSES JOMAL GIBBS, sends the 7-footer sliding, and buries the step-back THREE! The broadcast has gone insane.";
-   fullLog("You cross up Jomal Gibbs and drill the step-back three. Championship crowd erupts.");g.finalsReplay={available:true,type:"stepback",viewed:false};
-   S.news.unshift("🔥 VIRAL FINALS MOMENT • "+S.player.name+" crossed up 7'0\" Jomal Gibbs and buried a step-back three in the final five minutes.");g.finalsReplay={available:true,type:"stepback",viewed:false}
+   fullLog("You cross up Jomal Gibbs and drill the step-back three. Championship crowd erupts.");
+   g.finalsReplay={available:true,type:"stepback",viewed:false};
+   S.news.unshift("🔥 VIRAL FINALS MOMENT • "+S.player.name+" crossed up 7'0\" Jomal Gibbs and buried a step-back three in the final five minutes.")
  }else{
    g.team+=2;g.stats.pts+=2;g.stats.fga++;g.stats.fgm++;fullGrade(6);
    g.hype=100;g.viewers=Math.max(g.viewers,Math.round(before*2.15+650000));g.peakViewers=Math.max(g.peakViewers||0,g.viewers);
    S.social.followers=(S.social.followers||0)+65000;S.social.fame=Math.min(100,(S.social.fame||0)+10);
    g.broadcastLine=S.player.name+" ATTACKS THE 7-FOOTER — AND POSTERIZES JOMAL GIBBS! A championship GRAND SLAM at the rim!";
-   fullLog("You drive straight at Jomal Gibbs and POSTERIZE him. The building completely loses it.");g.finalsReplay={available:true,type:"poster",viewed:false};
-   S.news.unshift("💥 POSTER OF THE YEAR • "+S.player.name+" drove straight at 7'0\" Jomal Gibbs and posterized him in the High School Final.");g.finalsReplay={available:true,type:"poster",viewed:false}
+   fullLog("You drive straight at Jomal Gibbs and POSTERIZE him. The building completely loses it.");
+   g.finalsReplay={available:true,type:"poster",viewed:false};
+   S.news.unshift("💥 POSTER OF THE YEAR • "+S.player.name+" drove straight at 7'0\" Jomal Gibbs and posterized him in the High School Final.")
  }
  g.turn="defense";g.clock=Math.min(g.clock,292);balanceHighSchoolFinalsScore(g);closeModal(true);save();render();toast(type==="poster"?"JOMAL GOT POSTERIZED 😂":"ANKLES + STEP-BACK 3 🔥")
 }
-
 function finalsReplayImagePath(type){
- if(type==="poster")return "assets/finals/jomal-poster-replay.webp";
- if(type==="stepback")return "assets/finals/jomal-stepback-replay.webp";
+ if(type==="poster")return "assets/finals/jomal-poster-replay.jpg";
+ if(type==="stepback")return "assets/finals/jomal-stepback-replay.jpg";
  return ""
 }
 function finalsReplayButtonHTML(g=S.fullGame){
  if(!g?.highSchoolFinals||!g?.finalsReplay?.available)return "";
- return '<button class="btn good" id="viewFinalsReplayBtn">🎬 '+(g.finalsReplay.viewed?"View Replay Again":"View What Happened")+'</button>'
+ return '<button type="button" class="btn good" id="viewFinalsReplayBtn">🎬 '+(g.finalsReplay.viewed?"View Replay Again":"View What Happened")+'</button>'
 }
 function openFinalsReplayView(){
  const g=S.fullGame;if(!g?.highSchoolFinals||!g?.finalsReplay?.available)return;
  const type=g.finalsReplay.type,title=type==="poster"?"Poster on Jomal Gibbs":"Crossed Jomal • Step-Back Three";
- const caption=type==="poster"?S.player.name+" attacks the rim and posterizes Jomal Gibbs in the High School Championship.":S.player.name+" crosses Jomal Gibbs to the floor and drills the step-back three in the High School Championship.";
+ const caption=type==="poster"?S.player.name+" attacks the 7-footer and POSTERIZES Jomal Gibbs in the High School Championship.":S.player.name+" crosses Jomal Gibbs to the floor and drills the step-back three in the High School Championship.";
  const img=finalsReplayImagePath(type);g.finalsReplay.viewed=true;save();
- modal('<span class="kicker">🎬 HIGH SCHOOL FINALS REPLAY</span><h2>'+title+'</h2><p class="muted">Exactly what happened in the fourth-quarter superstar moment.</p><div class="finalsReplayWrap"><img class="finalsReplayImage" src="'+img+'" alt="'+title+'"><p class="muted finalsReplayCaption">'+caption+'</p></div><div class="modalFoot"><button class="btn primary" id="closeFinalsReplayBtn">Back to Game</button></div>',{locked:true});
+ modal('<span class="kicker">🎬 HIGH SCHOOL FINALS REPLAY</span><h2>'+title+'</h2><p class="muted">Exactly what happened in the fourth-quarter superstar moment.</p><div class="finalsReplayWrap"><img class="finalsReplayImage" src="'+img+'" alt="'+title+'"><p class="muted finalsReplayCaption">'+caption+'</p></div><div class="modalFoot"><button type="button" class="btn primary" id="closeFinalsReplayBtn">Back to Game</button></div>',{locked:true});
  if($("closeFinalsReplayBtn"))$("closeFinalsReplayBtn").onclick=closeFinalsReplayView
 }
 function closeFinalsReplayView(){
  if(!S.fullGame?.highSchoolFinals){closeModal(true);return}
- closeModal(true);save();render()
-}
-function finalsReplayButtonHTML(g=S.fullGame){
- if(!g?.highSchoolFinals||!g?.finalsReplay?.available)return "";
- return '<button type="button" class="btn primary" id="viewFinalsReplayBtn">🎬 '+(g.finalsReplay.viewed?"View Replay Again":"View What Happened")+'</button>'
-}
-function openFinalsReplayView(){
- const g=S.fullGame;if(!g?.highSchoolFinals||!g?.finalsReplay?.available)return;
- const type=g.finalsReplay.type,poster=type==="poster";
- const title=poster?"Poster on Jomal Gibbs":"Crossed Jomal • Step-Back Three";
- const img=poster?"assets/finals/jomal-poster-replay.jpg":"assets/finals/jomal-stepback-replay.jpg";
- const caption=poster?S.player.name+" attacks the 7-footer and POSTERIZES Jomal Gibbs in the High School Championship.":S.player.name+" crosses Jomal Gibbs to the floor and rises into the step-back three in the High School Championship.";
- g.finalsReplay.viewed=true;save();
- modal('<span class="kicker">🎬 HIGH SCHOOL FINALS REPLAY</span><h2>'+title+'</h2><div class="finalsReplayWrap"><img class="finalsReplayImage" src="'+img+'" alt="'+title+'"><p class="muted finalsReplayCaption">'+caption+'</p></div><div class="modalFoot"><button type="button" class="btn primary" id="closeFinalsReplayBtn">Back to Game</button></div>',{locked:true});
- if($("closeFinalsReplayBtn"))$("closeFinalsReplayBtn").onclick=closeFinalsReplayView
-}
-function closeFinalsReplayView(){
  closeModal(true);save();render();
  requestAnimationFrame(()=>{const el=$("viewFinalsReplayBtn");if(el)el.scrollIntoView({behavior:"smooth",block:"center"})})
 }
