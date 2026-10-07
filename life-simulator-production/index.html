@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
-<title>MYCAREER Basketball Sim v0.20.5</title>
+<title>MYCAREER Basketball Sim v0.20.6</title>
 <style>
 :root{--bg:#070b12;--panel:#101722;--panel2:#151e2c;--line:#26344a;--txt:#f6f8fb;--muted:#91a0b5;--orange:#ff6b14;--good:#4bd696;--bad:#ff667c;--gold:#ffd45d;--r:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 80% -10%,#1a2842,#070b12 42%);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}
@@ -6512,53 +6512,42 @@ function repairHighSchoolFinalsReplayState(){
  if(typeof g.finalsReplay.available!=="boolean"){g.finalsReplay.available=false;changed=true}
  if(typeof g.finalsReplay.viewed!=="boolean"){g.finalsReplay.viewed=false;changed=true}
  if(!["poster","stepback",null].includes(g.finalsReplay.type)){g.finalsReplay.type=null;changed=true}
- const evidence=[String(g.broadcastLine||""),...(Array.isArray(g.log)?g.log.map(String):[])].join(" | ").toLowerCase();
+ const evidence=[String(g.broadcastLine||""),String(g.lastMessage||""),...(Array.isArray(g.log)?g.log.map(String):[])].join(" | ").toLowerCase();
  let inferred=null;
- if(evidence.includes("posterizes jomal")||evidence.includes("posterize him")||evidence.includes("posterize the big man"))inferred="poster";
- else if(evidence.includes("crosses jomal")||evidence.includes("step-back three")||evidence.includes("step-back 3"))inferred="stepback";
- if((g.finalsClimaxResolved||inferred)&&inferred&&(!g.finalsReplay.available||!g.finalsReplay.type)){
-   g.finalsReplay.available=true;g.finalsReplay.type=inferred;g.finalsReplay.viewed=false;changed=true
+ if(evidence.includes("posterizes jomal gibbs")||evidence.includes("posterizes jomal")||evidence.includes("posterize him")||evidence.includes("posterize the big man")||evidence.includes("posterized him"))inferred="poster";
+ else if(evidence.includes("crosses jomal gibbs")||evidence.includes("crosses jomal")||evidence.includes("step-back three")||evidence.includes("step-back 3")||evidence.includes("ankles + step-back"))inferred="stepback";
+ if(inferred&&(!g.finalsReplay.available||g.finalsReplay.type!==inferred)){
+   g.finalsReplay.available=true;g.finalsReplay.type=inferred;if(typeof g.finalsReplay.viewed!=="boolean")g.finalsReplay.viewed=false;changed=true
+ }
+ if(g.finalsClimaxResolved&&!g.finalsReplay.available&&g.finalsReplay.type){
+   g.finalsReplay.available=true;changed=true
  }
  return changed
 }
 function finalsReplayImagePath(type){
- if(type==="poster")return "assets/finals/jomal-poster-replay.b64";
- if(type==="stepback")return "assets/finals/jomal-stepback-replay.b64";
+ if(type==="poster")return "assets/finals/jomal-poster-replay.webp";
+ if(type==="stepback")return "assets/finals/jomal-stepback-replay.webp";
  return ""
 }
 function finalsReplayButtonHTML(g=S.fullGame){
- if(!g?.highSchoolFinals||!g?.finalsReplay?.available)return "";
+ if(!g?.highSchoolFinals||!g?.active||!g?.finalsReplay?.available)return "";
  return '<button type="button" class="btn good" id="viewFinalsReplayBtn">🎬 '+(g.finalsReplay.viewed?"View Replay Again":"View What Happened")+'</button>'
 }
-async function openFinalsReplayView(){
+function openFinalsReplayView(){
  const g=S.fullGame;if(!g?.highSchoolFinals||!g?.active||!g?.finalsReplay?.available)return;
  g.finalsReplayReturnState={quarter:g.quarter,clock:g.clock,team:g.team,oppScore:g.oppScore,turn:g.turn,stats:JSON.stringify(g.stats)};
  const type=g.finalsReplay.type,title=type==="poster"?"Poster on Jomal Gibbs":"Crossed Jomal • Step-Back Three";
  const caption=type==="poster"?S.player.name+" attacks the 7-footer and POSTERIZES Jomal Gibbs in the High School Championship.":S.player.name+" crosses Jomal Gibbs to the floor and drills the step-back three in the High School Championship.";
- const asset=finalsReplayImagePath(type);g.finalsReplay.viewed=true;save();
- const launcher=$("viewFinalsReplayBtn");if(launcher)launcher.textContent="🎬 View Replay Again";
- modal('<span class="kicker">🎬 HIGH SCHOOL FINALS REPLAY</span><h2>'+title+'</h2><p class="muted">Exactly what happened in the fourth-quarter superstar moment.</p><div class="finalsReplayWrap"><div class="muted" id="finalsReplayLoading">Loading championship replay…</div><img class="finalsReplayImage" id="finalsReplayImage" alt="'+title+'" style="display:none"><p class="muted finalsReplayCaption">'+caption+'</p></div><div class="modalFoot"><button type="button" class="btn primary" id="closeFinalsReplayBtn">Back to Game</button></div>',{locked:true});
- if($("closeFinalsReplayBtn"))$("closeFinalsReplayBtn").onclick=closeFinalsReplayView;
- try{
-   const res=await fetch(asset,{cache:"force-cache"});if(!res.ok)throw new Error("Replay asset "+res.status);
-   const b64=(await res.text()).trim();if(!b64)throw new Error("Replay asset empty");
-   const img=$("finalsReplayImage"),loading=$("finalsReplayLoading");
-   if(img){img.src="data:image/webp;base64,"+b64;img.style.display="block"}
-   if(loading)loading.remove()
- }catch(e){
-   const loading=$("finalsReplayLoading");if(loading)loading.textContent="Replay image could not load. Tap Back to Game and try again.";
-   recordClientFailure("openFinalsReplayView",e)
- }
+ const img=finalsReplayImagePath(type);g.finalsReplay.viewed=true;save();
+ modal('<span class="kicker">🎬 HIGH SCHOOL FINALS REPLAY</span><h2>'+title+'</h2><p class="muted">Exactly what happened in the fourth-quarter superstar moment.</p><div class="finalsReplayWrap"><img class="finalsReplayImage" src="'+img+'" alt="'+title+'" onerror="this.style.display=\'none\';document.getElementById(\'finalsReplayLoadError\').style.display=\'block\'"><div class="item" id="finalsReplayLoadError" style="display:none"><small>Replay image failed to load. Back out and try again.</small></div><p class="muted finalsReplayCaption">'+caption+'</p></div><div class="modalFoot"><button type="button" class="btn primary" id="closeFinalsReplayBtn">Back to Game</button></div>',{locked:true});
+ if($("closeFinalsReplayBtn"))$("closeFinalsReplayBtn").onclick=closeFinalsReplayView
 }
 function closeFinalsReplayView(){
  const g=S.fullGame,back=g?.finalsReplayReturnState;
  closeModal(true);
  if(g?.highSchoolFinals&&back){
-   const unchanged=g.quarter===back.quarter&&g.clock===back.clock&&g.team===back.team&&g.oppScore===back.oppScore&&g.turn===back.turn&&JSON.stringify(g.stats)===back.stats;
-   if(!unchanged){
-     g.quarter=back.quarter;g.clock=back.clock;g.team=back.team;g.oppScore=back.oppScore;g.turn=back.turn;
-     try{g.stats=JSON.parse(back.stats)}catch(e){}
-   }
+   g.quarter=back.quarter;g.clock=back.clock;g.team=back.team;g.oppScore=back.oppScore;g.turn=back.turn;
+   try{g.stats=JSON.parse(back.stats)}catch(e){}
    delete g.finalsReplayReturnState;save()
  }
  renderGameActionViewDirect()
