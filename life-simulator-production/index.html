@@ -3822,8 +3822,8 @@ function roadChapterTimelineHTML(){
    const skipped=id==="green_room"&&["NBA","Offseason","Retired"].includes(S.stage)&&!hist&&!current;const status=hist?"PLAYED":current?"CURRENT":skipped?"MISSED":legacy?"NOT PLAYED":"HIDDEN";
    const cls=hist||current?"good":"";
    const title=hist||current||skipped?ch.title.replace(/^Chapter \d+ • /,""):"Hidden Chapter";
-   const detail=hist?hist.summary:current?("Active now • "+ch.subtitle):skipped?"Draft Night advanced before this chapter was completed on this save. Your draft outcome is preserved.":legacy?"This older save never played this chapter.":"Reveals when this chapter becomes current.";
-   return '<div class="item"><div><small class="muted">CHAPTER '+(i+1)+'</small><b>'+title+'</b><small>'+detail+'</small></div><span class="pill '+cls+'">'+status+'</span></div>'
+   const detail=hist?hist.summary:current?("Active now • "+ch.subtitle):skipped?"Draft Night advanced before this chapter was played. You can play the Green Room as a flashback without changing your NBA draft result.":legacy?"This older save never played this chapter.":"Reveals when this chapter becomes current.";
+   return '<div class="item"><div><small class="muted">CHAPTER '+(i+1)+'</small><b>'+title+'</b><small>'+detail+'</small>'+(skipped?'<button class="btn" data-recover-greenroom="1">Play Missed Chapter 11</button>':'')+'</div><span class="pill '+cls+'">'+status+'</span></div>'
  }).join("")+'</div>'
 }
 function nbaStoryContinuationHTML(){
@@ -8240,7 +8240,7 @@ function roadProgress(){
 }
 function roadToNBAHTML(compact=false){
  const r=ensureRoadToNBAState(),id=r.pending,ch=ROAD_TO_NBA_CHAPTERS[id];
- if(r.finished){
+ if(r.finished&&!ch){
   if(compact)return "";
   return '<section class="card s12" style="border-color:#ff8d3f"><span class="kicker">ROAD TO THE NBA • COMPLETE</span><h3>From Northside to Draft Night</h3><p class="muted">Your choices are saved in your career history. Rival: '+r.rival.name+' • Rivalry '+Math.round(r.rival.heat)+' • Respect '+Math.round(r.rival.respect)+'.</p></section>'
  }
@@ -8253,6 +8253,7 @@ function roadToNBAHTML(compact=false){
  return '<section class="card s12" style="border-color:#ff8d3f;background:linear-gradient(145deg,#171d28,#111721)"><div class="row"><div><span class="kicker">ROAD TO THE NBA</span><h2 style="margin:5px 0">'+ch.title+'</h2><small class="muted">'+ch.subtitle+'</small></div><span class="pill good">'+(r.completed.length+1)+' / 12</span></div><p style="line-height:1.65">'+ch.text+'</p><div class="storyChoiceGrid">'+buttons+'</div><small class="muted">Your choice affects draft stock, relationships, reputation or development and is remembered later in the story.</small></section>'
 }
 function bindRoadToNBAActions(){
+ document.querySelectorAll("[data-recover-greenroom]").forEach(b=>b.onclick=()=>{const r=ensureRoadToNBAState();if(!["NBA","Offseason","Retired"].includes(S.stage)||r.completed.includes("green_room"))return;if(r.pending&&r.pending!=="green_room"){toast("Finish your current chapter first");return}r.pending="green_room";save();render();toast("Chapter 11 • Green Room is now available as a flashback")});
  document.querySelectorAll("[data-road-choice]").forEach(b=>b.onclick=()=>chooseRoadToNBA(b.dataset.roadChoice));
  if($("storyNewCareerBtn"))$("storyNewCareerBtn").onclick=()=>{save();openNewCareerSelect()}
 }
